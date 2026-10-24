@@ -1,6 +1,7 @@
 package com.panda.fullcourse;
 
 import com.mojang.logging.LogUtils;
+import com.panda.fullcourse.compat.CookingForBlockheadsCompat;
 import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.registry.ModAttributes;
 import com.panda.fullcourse.registry.ModBlockEntities;
@@ -33,6 +34,7 @@ public final class FullCourse {
                 throw new IllegalStateException(e);
             }
         }
+        if (Services.PLATFORM.isModLoaded("cookingforblockheads")) CookingForBlockheadsCompat.init();
         LOGGER.info("Full Course booting on {}", Services.PLATFORM.loaderName());
     }
 

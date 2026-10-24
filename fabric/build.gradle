@@ -66,7 +66,8 @@ dependencies {
     compileOnly "maven.modrinth:appleskin:${rootProject.appleskin_fabric_version}"
 }
 
-// -PfullcourseWithJei, -PfullcourseWithAppleSkin and -PfullcourseWithFarmersDelight load those mods in the dev runs
+// -PfullcourseWithJei, -PfullcourseWithAppleSkin, -PfullcourseWithFarmersDelight and -PfullcourseWithCookingForBlockheads
+// load those mods in the dev runs
 if (project.hasProperty("fullcourseWithJei")) {
     dependencies { localRuntime "maven.modrinth:jei:${rootProject.jei_fabric_version}" }
 }
@@ -75,6 +76,12 @@ if (project.hasProperty("fullcourseWithAppleSkin")) {
 }
 if (project.hasProperty("fullcourseWithFarmersDelight")) {
     dependencies { localRuntime "maven.modrinth:farmers-delight-refabricated:${rootProject.farmers_delight_fabric_version}" }
+}
+if (project.hasProperty("fullcourseWithCookingForBlockheads")) {
+    dependencies {
+        localRuntime "maven.modrinth:cooking-for-blockheads:${rootProject.cfb_fabric_version}"
+        localRuntime "maven.modrinth:balm:${rootProject.balm_fabric_version}"
+    }
 }
 
 processResources {

@@ -19,6 +19,9 @@ dependencies {
     implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     // JEI's API for the kitchen's recipe categories (the plugin only loads when JEI is installed)
     compileOnly("maven.modrinth:jei:${rootProject.jei_fabric_version}") { transitive = false }
+    // Cooking for Blockheads' API and oven, and the Balm library its classes extend (loaded only when it is installed)
+    compileOnly("maven.modrinth:cooking-for-blockheads:${rootProject.cfb_fabric_version}") { transitive = false }
+    compileOnly("maven.modrinth:balm:${rootProject.balm_fabric_version}") { transitive = false }
 
     testImplementation platform("org.junit:junit-bom:5.14.4")
     testImplementation "org.junit.jupiter:junit-jupiter"

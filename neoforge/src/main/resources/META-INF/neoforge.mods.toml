@@ -36,3 +36,11 @@ config="fullcourse.mixins.json"
     versionRange="[3.0.10,)"
     ordering="NONE"
     side="CLIENT"
+
+# its oven heats the Cooking Pot; our sort button joins its kitchen screens after its own
+[[dependencies.${mod_id}]]
+    modId="cookingforblockheads"
+    type="optional"
+    versionRange="[26.3.0,)"
+    ordering="AFTER"
+    side="BOTH"

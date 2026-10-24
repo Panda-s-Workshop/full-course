@@ -55,12 +55,18 @@ dependencies {
     compileOnly "maven.modrinth:appleskin:${rootProject.appleskin_neoforge_version}"
 }
 
-// -PfullcourseWithJei and -PfullcourseWithAppleSkin load those mods in the dev runs
+// -PfullcourseWithJei, -PfullcourseWithAppleSkin and -PfullcourseWithCookingForBlockheads load those mods in the dev runs
 if (project.hasProperty("fullcourseWithJei")) {
     dependencies { localRuntime "maven.modrinth:jei:${rootProject.jei_neoforge_version}" }
 }
 if (project.hasProperty("fullcourseWithAppleSkin")) {
     dependencies { localRuntime "maven.modrinth:appleskin:${rootProject.appleskin_neoforge_version}" }
+}
+if (project.hasProperty("fullcourseWithCookingForBlockheads")) {
+    dependencies {
+        localRuntime "maven.modrinth:cooking-for-blockheads:${rootProject.cfb_neoforge_version}"
+        localRuntime "maven.modrinth:balm:${rootProject.balm_neoforge_version}"
+    }
 }
 
 // The run folders stay at the repository root.

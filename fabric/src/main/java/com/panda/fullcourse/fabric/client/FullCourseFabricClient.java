@@ -9,6 +9,7 @@ import com.panda.fullcourse.client.FoodTooltips;
 import com.panda.fullcourse.client.JournalScreen;
 import com.panda.fullcourse.client.KitchenRecipes;
 import com.panda.fullcourse.client.MealHud;
+import com.panda.fullcourse.client.compat.cfb.CookingForBlockheadsClient;
 import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.registry.ModBlockEntities;
@@ -23,6 +24,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.recipe.v1.sync.ClientRecipeSynchronizedEvent;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -89,6 +91,8 @@ public final class FullCourseFabricClient implements ClientModInitializer {
         });
         ItemTooltipCallback.EVENT.register((stack, context, flags, lines) -> FoodTooltips.onTooltip(stack, lines));
         TastingJournalItem.setOpener(JournalScreen::open);
+        // client entrypoints run after every mod's main one, so the button follows Cooking for Blockheads' own
+        if (FabricLoader.getInstance().isModLoaded("cookingforblockheads")) CookingForBlockheadsClient.register();
         ClientLifecycleEvents.CLIENT_STOPPING.register(mc -> DevExit.onClientStopping());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, mc) -> ClientSync.disconnected());
         ClientRecipeSynchronizedEvent.EVENT.register((mc, recipes) -> KitchenRecipes.received(type -> recipes.getAllOfType((RecipeType) type)));

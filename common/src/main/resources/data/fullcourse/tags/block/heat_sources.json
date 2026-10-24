@@ -8,6 +8,10 @@
     "minecraft:lava",
     "minecraft:furnace",
     "minecraft:smoker",
-    "minecraft:blast_furnace"
+    "minecraft:blast_furnace",
+    {
+      "id": "#cookingforblockheads:ovens",
+      "required": false
+    }
   ]
 }

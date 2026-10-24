@@ -111,6 +111,7 @@
   "gui.fullcourse.pot.status.no_heat": "No heat",
   "gui.fullcourse.pot.status.no_recipe": "No recipe",
   "gui.fullcourse.pot.strays": "No recipe uses all of these",
+  "gui.fullcourse.sort_by_tier": "Sort by tier: best dishes first",
   "hint.fullcourse.made": "%s: %s",
   "hint.fullcourse.or": " or ",
   "hint.fullcourse.served_in": ", in a %s",

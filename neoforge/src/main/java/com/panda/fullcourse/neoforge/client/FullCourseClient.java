@@ -10,6 +10,7 @@ import com.panda.fullcourse.client.FoodTooltips;
 import com.panda.fullcourse.client.JournalScreen;
 import com.panda.fullcourse.client.KitchenRecipes;
 import com.panda.fullcourse.client.MealHud;
+import com.panda.fullcourse.client.compat.cfb.CookingForBlockheadsClient;
 import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.neoforge.client.compat.AppleSkinCompat;
 import com.panda.fullcourse.network.ProfilesPayload;
@@ -59,6 +60,7 @@ public final class FullCourseClient {
         NeoForge.EVENT_BUS.addListener((ItemTooltipEvent e) -> FoodTooltips.onTooltip(e.getItemStack(), e.getToolTip()));
         TastingJournalItem.setOpener(JournalScreen::open);
         if (ModList.get().isLoaded("appleskin")) AppleSkinCompat.register();
+        if (ModList.get().isLoaded("cookingforblockheads")) CookingForBlockheadsClient.register();
         NeoForge.EVENT_BUS.addListener((GameShuttingDownEvent e) -> DevExit.onClientStopping());
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> ClientSync.disconnected());
         // before recipe viewers read them (JEI listens at the lowest priority)

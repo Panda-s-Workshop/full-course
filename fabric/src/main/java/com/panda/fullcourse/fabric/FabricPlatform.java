@@ -29,6 +29,11 @@ public final class FabricPlatform implements FullCoursePlatform {
     }
 
     @Override
+    public boolean isModLoaded(String modId) {
+        return FabricLoader.getInstance().isModLoaded(modId);
+    }
+
+    @Override
     public String modName(String namespace) {
         return FabricLoader.getInstance().getModContainer(namespace).map(c -> c.getMetadata().getName()).orElse(namespace);
     }

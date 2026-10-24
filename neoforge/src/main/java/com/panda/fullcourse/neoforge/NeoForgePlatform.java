@@ -17,6 +17,11 @@ public final class NeoForgePlatform implements FullCoursePlatform {
     }
 
     @Override
+    public boolean isModLoaded(String modId) {
+        return ModList.get().isLoaded(modId);
+    }
+
+    @Override
     public String modName(String namespace) {
         return ModList.get().getModContainerById(namespace).map(c -> c.getModInfo().getDisplayName()).orElse(namespace);
     }

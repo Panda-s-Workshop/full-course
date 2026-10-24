@@ -11,6 +11,9 @@ public interface FullCoursePlatform {
     /** "neoforge" or "fabric". */
     String loaderName();
 
+    /** Whether a mod with this id is installed. */
+    boolean isModLoaded(String modId);
+
     /** The display name of the mod that owns a namespace, or the namespace itself. */
     String modName(String namespace);
 
