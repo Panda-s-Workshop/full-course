@@ -32,6 +32,11 @@ public final class MealHud {
 
     private MealHud() {}
 
+    /** The server runs Full Course with hunger off: no food bar, so nothing that previews hunger or saturation is true. */
+    public static boolean hungerReplaced() {
+        return FoodProfiles.clientReady() && !FullCourseConfig.keepVanillaHunger();
+    }
+
     /**
      * Whether the row replaces the food bar now: the server runs Full Course (it sent its table) with hunger removed, a
      * survival-like player, the HUD visible.
@@ -39,7 +44,7 @@ public final class MealHud {
     public static boolean active() {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer p = mc.player;
-        return p != null && FoodProfiles.clientReady() && !FullCourseConfig.keepVanillaHunger() && !mc.gui.hud.isHidden()
+        return p != null && hungerReplaced() && !mc.gui.hud.isHidden()
                 && mc.gameMode != null && mc.gameMode.canHurtPlayer();
     }
 

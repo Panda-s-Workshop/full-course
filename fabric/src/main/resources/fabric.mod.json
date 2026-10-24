@@ -21,6 +21,9 @@
     ],
     "client": [
       "com.panda.fullcourse.fabric.client.FullCourseFabricClient"
+    ],
+    "appleskin": [
+      "com.panda.fullcourse.fabric.client.compat.AppleSkinCompat"
     ]
   },
   "accessWidener": "fullcourse.accesswidener",
@@ -32,5 +35,9 @@
     "fabric-api": ">=${fabric_api_min}",
     "minecraft": "~${minecraft_version}",
     "java": ">=25"
+  },
+  "suggests": {
+    "appleskin": "*",
+    "farmersdelight": "*"
   }
 }

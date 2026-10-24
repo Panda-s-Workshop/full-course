@@ -28,3 +28,11 @@ config="fullcourse.mixins.json"
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
+
+# its hunger and saturation previews are hidden while hunger is off
+[[dependencies.${mod_id}]]
+    modId="appleskin"
+    type="optional"
+    versionRange="[3.0.10,)"
+    ordering="NONE"
+    side="CLIENT"
