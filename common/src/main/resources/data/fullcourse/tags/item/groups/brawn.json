@@ -7,6 +7,10 @@
     {
       "id": "#c:foods/cooked_meat",
       "required": false
+    },
+    {
+      "id": "farmersdelight:ham",
+      "required": false
     }
   ]
 }

@@ -110,6 +110,7 @@
   "hint.fullcourse.made": "%s: %s",
   "hint.fullcourse.or": " or ",
   "hint.fullcourse.served_in": ", in a %s",
+  "hint.fullcourse.tag.c.crops.onion": "any onion",
   "hint.fullcourse.tag.c.foods.raw_fish": "any raw fish",
   "hint.fullcourse.tag.c.foods.raw_meat": "any raw meat",
   "hint.fullcourse.tag.fullcourse.journal_foods": "any simple dish",

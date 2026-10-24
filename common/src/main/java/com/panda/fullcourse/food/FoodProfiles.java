@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,11 @@ import net.minecraft.world.item.crafting.display.SlotDisplayContext;
  * sent ({@link #setClient}).
  */
 public final class FoodProfiles {
-    /** Datapack overrides: {@code data/<ns>/fullcourse/food_profiles/<item path>.json} for the item {@code <ns>:<path>}. */
+    /**
+     * Datapack overrides: {@code data/<ns>/fullcourse/food_profiles/<item path>.json} for the item {@code <ns>:<path>},
+     * with any of {@code tier}, {@code families}, {@code remedy} and {@code serving_of} (the item id of the dish this is
+     * a serving or slice of: a feast served from its block, a pie cut into slices).
+     */
     public static final String OVERRIDES = "fullcourse/food_profiles";
     /** The crock counts double: patience is effort. */
     private static final Map<String, Integer> STATION_WEIGHTS = Map.of("fullcourse:fermenting", 2);
@@ -101,10 +106,20 @@ public final class FoodProfiles {
 
     // ---- computing ---------------------------------------------------------------------------------------------
 
-    private record ProfileOverride(Optional<Integer> tier, Optional<List<Family>> families, Optional<Boolean> remedy) {}
+    /** {@code servingOf}: the dish this item is a serving or slice of; it is worth what that dish is worth. */
+    private record ProfileOverride(Optional<Integer> tier, Optional<List<Family>> families, Optional<Boolean> remedy, Optional<Item> servingOf) {}
 
     private static Map<Item, Profile> compute(MinecraftServer mcServer) {
         Map<Item, List<TierScorer.Recipe<Item>>> byOutput = recipeGraph(mcServer);
+        Map<Item, ProfileOverride> overrides = overrides(mcServer);
+        // a dish served from a block (a feast, a pie cut into slices) is a placed meal, whether or not it's tagged one
+        Set<Item> servedFrom = new HashSet<>();
+        for (ProfileOverride o : overrides.values()) o.servingOf().filter(dish -> !isFood(dish)).ifPresent(servedFrom::add);
+        // putting the slices back together (four slices make a pie) is no way to make the dish
+        overrides.forEach((serving, o) -> o.servingOf().ifPresent(dish -> byOutput.computeIfPresent(dish, (k, recipes) -> {
+            List<TierScorer.Recipe<Item>> kept = recipes.stream().filter(r -> !onlyServingsOf(r, dish, overrides)).toList();
+            return kept.isEmpty() ? null : kept;
+        })));
         TierScorer<Item> scorer = new TierScorer<>(new TierScorer.Graph<>() {
             @Override
             public List<TierScorer.Recipe<Item>> recipesFor(Item item) {
@@ -128,32 +143,36 @@ public final class FoodProfiles {
 
             @Override
             public boolean placed(Item item) {
-                return item.builtInRegistryHolder().is(FoodTags.PLACED_MEALS);
+                return item.builtInRegistryHolder().is(FoodTags.PLACED_MEALS) || servedFrom.contains(item);
             }
         });
-        Map<Item, ProfileOverride> overrides = overrides(mcServer);
         int[] thresholds = FullCourseConfig.tierThresholds();
         Map<Item, Profile> out = new HashMap<>();
         for (Item item : BuiltInRegistries.ITEM) {
             boolean placed = item.builtInRegistryHolder().is(FoodTags.PLACED_MEALS);
             if (!isFood(item) && !placed) continue;
-            TierScorer.Score<Item> score = scorer.score(item);
             ProfileOverride o = overrides.get(item);
+            // a serving is rated as its dish: the dish's chain, groups and own override, under this item's override
+            Item dish = o != null && o.servingOf().isPresent() ? o.servingOf().get() : item;
+            ProfileOverride dishOverride = dish == item ? null : overrides.get(dish);
+            TierScorer.Score<Item> score = scorer.score(dish);
             boolean remedy = o != null && o.remedy().isPresent() ? o.remedy().get() : item.builtInRegistryHolder().is(FoodTags.REMEDIES);
+            Optional<Integer> setTier = o != null && o.tier().isPresent() ? o.tier() : dishOverride != null ? dishOverride.tier() : Optional.empty();
+            Optional<List<Family>> setFamilies = o != null && o.families().isPresent() ? o.families()
+                    : dishOverride != null ? dishOverride.families() : Optional.empty();
             // a remedy has no tier: its own effects and the heal, no meal, so no stars to imply one
-            Tier tier = remedy ? Tier.RAW
-                    : o != null && o.tier().isPresent() ? Tier.ofStars(o.tier().get()) : Tier.fromScore(score.score(), thresholds);
+            Tier tier = remedy ? Tier.RAW : setTier.map(Tier::ofStars).orElseGet(() -> Tier.fromScore(score.score(), thresholds));
             List<Family> families;
             if (remedy) {
                 families = List.of();
-            } else if (o != null && o.families().isPresent()) {
-                families = o.families().get();
+            } else if (setFamilies.isPresent()) {
+                families = setFamilies.get();
             } else {
-                families = TierScorer.families(item, score.leaves(), FoodProfiles::groupsOf, tier.benefits());
+                families = TierScorer.families(dish, score.leaves(), FoodProfiles::groupsOf, tier.benefits());
                 // a food whose ingredients belong to no group still counts: a good meal helps you heal (pillar 4)
                 if (families.isEmpty() && tier.benefits() > 0) families = List.of(Family.MENDING);
                 // a soup always mends: Mending takes the weakest-counted place if the count left it out
-                if (tier.benefits() > 0 && !families.contains(Family.MENDING) && item.builtInRegistryHolder().is(FoodTags.SOUPS)) {
+                if (tier.benefits() > 0 && !families.contains(Family.MENDING) && dish.builtInRegistryHolder().is(FoodTags.SOUPS)) {
                     List<Family> withMending = new ArrayList<>(families.subList(0, families.size() - 1));
                     withMending.add(Family.MENDING);
                     families = List.copyOf(withMending);
@@ -162,6 +181,17 @@ public final class FoodProfiles {
             out.put(item, new Profile(tier, score.score(), score.depth(), score.stationWeight(), score.leaves().size(), families, remedy));
         }
         return Collections.unmodifiableMap(out);
+    }
+
+    /** Every ingredient of {@code recipe} is a serving of {@code dish}. */
+    private static boolean onlyServingsOf(TierScorer.Recipe<Item> recipe, Item dish, Map<Item, ProfileOverride> overrides) {
+        for (Set<Item> slot : recipe.ingredients()) {
+            for (Item i : slot) {
+                ProfileOverride o = overrides.get(i);
+                if (o == null || o.servingOf().filter(dish::equals).isEmpty()) return false;
+            }
+        }
+        return true;
     }
 
     static Set<Family> groupsOf(Item item) {
@@ -248,7 +278,9 @@ public final class FoodProfiles {
                     for (JsonElement el : json.getAsJsonArray("families")) Family.byKey(el.getAsString()).ifPresent(list::add);
                     families = Optional.of(List.copyOf(list));
                 }
-                out.put(item.get().value(), new ProfileOverride(tier, families, remedy));
+                Optional<Item> servingOf = json.has("serving_of")
+                        ? BuiltInRegistries.ITEM.get(Identifier.parse(json.get("serving_of").getAsString())).map(Holder::value) : Optional.empty();
+                out.put(item.get().value(), new ProfileOverride(tier, families, remedy, servingOf));
             } catch (Exception ex) {
                 FullCourse.LOGGER.warn("Full Course: couldn't read food profile override {}", file, ex);
             }

@@ -4,6 +4,10 @@
     {
       "id": "#c:eggs",
       "required": false
+    },
+    {
+      "id": "#c:drinks/milk",
+      "required": false
     }
   ]
 }

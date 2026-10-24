@@ -30,7 +30,17 @@ loom {
     }
 }
 
+repositories {
+    // other mods the compat code talks to; only their own group comes from here
+    exclusiveContent {
+        forRepository { maven { url = "https://api.modrinth.com/maven" } }
+        filter { includeGroup "maven.modrinth" }
+    }
+}
+
 configurations {
+    localRuntime
+    runtimeClasspath.extendsFrom localRuntime // dev-run-only mods
     common {
         canBeResolved = true
         canBeConsumed = false
@@ -51,6 +61,17 @@ dependencies {
 
     common(project(path: ":common")) { transitive = false }
     shadowBundle(project(path: ":common", configuration: "transformProductionFabric")) { transitive = false }
+
+    // AppleSkin's API, to hide its hunger overlays (the mod runs without it)
+    compileOnly "maven.modrinth:appleskin:${rootProject.appleskin_fabric_version}"
+}
+
+// -PfullcourseWithAppleSkin and -PfullcourseWithFarmersDelight load those mods in the dev runs
+if (project.hasProperty("fullcourseWithAppleSkin")) {
+    dependencies { localRuntime "maven.modrinth:appleskin:${rootProject.appleskin_fabric_version}" }
+}
+if (project.hasProperty("fullcourseWithFarmersDelight")) {
+    dependencies { localRuntime "maven.modrinth:farmers-delight-refabricated:${rootProject.farmers_delight_fabric_version}" }
 }
 
 processResources {

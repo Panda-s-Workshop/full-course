@@ -3,7 +3,7 @@
   "category": "food",
   "cookingtime": 200,
   "experience": 0.35,
-  "ingredient": "fullcourse:onion",
+  "ingredient": "#c:crops/onion",
   "result": {
     "id": "fullcourse:baked_onion"
   }

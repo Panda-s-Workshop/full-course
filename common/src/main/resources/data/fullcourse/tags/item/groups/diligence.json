@@ -7,7 +7,19 @@
       "required": false
     },
     {
+      "id": "#c:crops/grain",
+      "required": false
+    },
+    {
+      "id": "#c:crops/rice",
+      "required": false
+    },
+    {
       "id": "#c:foods/bread",
+      "required": false
+    },
+    {
+      "id": "#c:foods/pasta",
       "required": false
     }
   ]

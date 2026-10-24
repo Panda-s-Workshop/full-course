@@ -1,6 +1,6 @@
 {
   "type": "fullcourse:cutting",
-  "ingredient": "fullcourse:onion",
+  "ingredient": "#c:crops/onion",
   "result": {
     "id": "fullcourse:chopped_onion",
     "count": 2
