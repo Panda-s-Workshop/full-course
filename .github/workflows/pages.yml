@@ -1,10 +1,8 @@
 name: Website
 
-# Publishes site/ to GitHub Pages. One-time setup: Settings > Pages > Build and deployment > Source: GitHub Actions.
+# Publishes site/ to GitHub Pages, when run by hand. One-time setup: Settings > Pages > Build and deployment > Source:
+# GitHub Actions.
 on:
-  push:
-    branches: [main]
-    paths: ['site/**', '.github/workflows/pages.yml']
   workflow_dispatch:
 
 permissions:
