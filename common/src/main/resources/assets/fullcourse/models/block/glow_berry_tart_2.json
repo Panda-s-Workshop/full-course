@@ -10,39 +10,39 @@
       "from": [
         3,
         0,
-        3
+        8
       ],
       "to": [
         8,
         3,
-        8
+        13
       ],
       "faces": {
         "up": {
           "texture": "#tart_top",
           "uv": [
             3,
-            3,
             8,
-            8
+            8,
+            13
           ]
         },
         "north": {
-          "texture": "#tart_side",
-          "uv": [
-            3,
-            13,
-            8,
-            16
-          ]
-        },
-        "south": {
           "texture": "#tart_top",
           "uv": [
             3,
             7,
             8,
             10
+          ]
+        },
+        "south": {
+          "texture": "#tart_side",
+          "uv": [
+            3,
+            13,
+            8,
+            16
           ]
         },
         "east": {
@@ -57,9 +57,9 @@
         "west": {
           "texture": "#tart_side",
           "uv": [
-            3,
-            13,
             8,
+            13,
+            13,
             16
           ]
         },
@@ -79,33 +79,24 @@
       "from": [
         8,
         0,
-        3
+        8
       ],
       "to": [
         13,
         3,
-        8
+        13
       ],
       "faces": {
         "up": {
           "texture": "#tart_top",
           "uv": [
             8,
-            3,
+            8,
             13,
-            8
+            13
           ]
         },
         "north": {
-          "texture": "#tart_side",
-          "uv": [
-            8,
-            13,
-            13,
-            16
-          ]
-        },
-        "south": {
           "texture": "#tart_top",
           "uv": [
             3,
@@ -114,12 +105,21 @@
             10
           ]
         },
+        "south": {
+          "texture": "#tart_side",
+          "uv": [
+            8,
+            13,
+            13,
+            16
+          ]
+        },
         "east": {
           "texture": "#tart_side",
           "uv": [
-            3,
-            13,
             8,
+            13,
+            13,
             16
           ]
         },

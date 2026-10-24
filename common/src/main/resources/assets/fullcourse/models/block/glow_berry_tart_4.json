@@ -10,111 +10,33 @@
       "from": [
         3,
         0,
-        3
+        8
       ],
       "to": [
         8,
         3,
-        8
+        13
       ],
       "faces": {
         "up": {
           "texture": "#tart_top",
           "uv": [
             3,
-            3,
             8,
-            8
-          ]
-        },
-        "north": {
-          "texture": "#tart_side",
-          "uv": [
-            3,
-            13,
             8,
-            16
-          ]
-        },
-        "south": {
-          "texture": "#tart_top",
-          "uv": [
-            3,
-            7,
-            8,
-            10
-          ]
-        },
-        "east": {
-          "texture": "#tart_top",
-          "uv": [
-            3,
-            7,
-            8,
-            10
-          ]
-        },
-        "west": {
-          "texture": "#tart_side",
-          "uv": [
-            3,
-            13,
-            8,
-            16
-          ]
-        },
-        "down": {
-          "texture": "#tart_side",
-          "uv": [
-            3,
-            3,
-            13,
             13
-          ],
-          "cullface": "down"
-        }
-      }
-    },
-    {
-      "from": [
-        8,
-        0,
-        3
-      ],
-      "to": [
-        13,
-        3,
-        8
-      ],
-      "faces": {
-        "up": {
-          "texture": "#tart_top",
-          "uv": [
-            8,
-            3,
-            13,
-            8
           ]
         },
         "north": {
-          "texture": "#tart_side",
+          "texture": "#tart_top",
           "uv": [
+            3,
+            7,
             8,
-            13,
-            13,
-            16
+            10
           ]
         },
         "south": {
-          "texture": "#tart_top",
-          "uv": [
-            3,
-            7,
-            8,
-            10
-          ]
-        },
-        "east": {
           "texture": "#tart_side",
           "uv": [
             3,
@@ -123,13 +45,22 @@
             16
           ]
         },
-        "west": {
+        "east": {
           "texture": "#tart_top",
           "uv": [
             3,
             7,
             8,
             10
+          ]
+        },
+        "west": {
+          "texture": "#tart_side",
+          "uv": [
+            8,
+            13,
+            13,
+            16
           ]
         },
         "down": {
@@ -215,26 +146,35 @@
     },
     {
       "from": [
-        3,
+        8,
         0,
-        8
+        3
       ],
       "to": [
-        8,
+        13,
         3,
-        13
+        8
       ],
       "faces": {
         "up": {
           "texture": "#tart_top",
           "uv": [
+            8,
             3,
-            8,
-            8,
-            13
+            13,
+            8
           ]
         },
         "north": {
+          "texture": "#tart_side",
+          "uv": [
+            8,
+            13,
+            13,
+            16
+          ]
+        },
+        "south": {
           "texture": "#tart_top",
           "uv": [
             3,
@@ -243,13 +183,73 @@
             10
           ]
         },
-        "south": {
+        "east": {
           "texture": "#tart_side",
           "uv": [
             3,
             13,
             8,
             16
+          ]
+        },
+        "west": {
+          "texture": "#tart_top",
+          "uv": [
+            3,
+            7,
+            8,
+            10
+          ]
+        },
+        "down": {
+          "texture": "#tart_side",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        0,
+        3
+      ],
+      "to": [
+        8,
+        3,
+        8
+      ],
+      "faces": {
+        "up": {
+          "texture": "#tart_top",
+          "uv": [
+            3,
+            3,
+            8,
+            8
+          ]
+        },
+        "north": {
+          "texture": "#tart_side",
+          "uv": [
+            3,
+            13,
+            8,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#tart_top",
+          "uv": [
+            3,
+            7,
+            8,
+            10
           ]
         },
         "east": {
@@ -264,9 +264,9 @@
         "west": {
           "texture": "#tart_side",
           "uv": [
+            3,
+            13,
             8,
-            13,
-            13,
             16
           ]
         },
