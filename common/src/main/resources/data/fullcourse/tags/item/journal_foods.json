@@ -18,6 +18,22 @@
     "minecraft:baked_potato",
     "minecraft:cookie",
     "minecraft:mushroom_stew",
-    "minecraft:beetroot_soup"
+    "minecraft:beetroot_soup",
+    {
+      "id": "#c:foods/cooked_meat",
+      "required": false
+    },
+    {
+      "id": "#c:foods/cooked_fish",
+      "required": false
+    },
+    {
+      "id": "#c:foods/bread",
+      "required": false
+    },
+    {
+      "id": "#c:foods/cookie",
+      "required": false
+    }
   ]
 }
