@@ -100,11 +100,11 @@ public final class MealList {
         if (hovered != null) g.setTooltipForNextFrame(font, hovered, mouseX, mouseY);
     }
 
-    /** "Brawn, Vigor, Mending III". */
+    /** "III · Brawn, Vigor, Mending": the level first, since it applies to every family the meal gives. */
     private static String benefits(Meals.Meal<Identifier> meal) {
         String names = meal.families().stream().map(f -> Component.translatable("family.fullcourse." + f.key()).getString())
                 .collect(Collectors.joining(", "));
-        return names + " " + Component.translatable("enchantment.level." + meal.level()).getString();
+        return Component.translatable("enchantment.level." + meal.level()).getString() + " · " + names;
     }
 
     /** {@code s} cut to {@code width} with an ellipsis. */
