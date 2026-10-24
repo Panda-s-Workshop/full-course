@@ -1,13 +1,14 @@
 package com.panda.fullcourse.neoforge.client;
 
 import com.panda.fullcourse.FullCourse;
-import com.panda.fullcourse.client.ClientSync;
 import com.panda.fullcourse.client.BrickOvenScreen;
+import com.panda.fullcourse.client.ClientSync;
 import com.panda.fullcourse.client.CookingPotScreen;
 import com.panda.fullcourse.client.CuttingBoardRenderer;
 import com.panda.fullcourse.client.DevExit;
 import com.panda.fullcourse.client.FoodTooltips;
 import com.panda.fullcourse.client.JournalScreen;
+import com.panda.fullcourse.client.KitchenRecipes;
 import com.panda.fullcourse.client.MealHud;
 import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.neoforge.client.compat.AppleSkinCompat;
@@ -16,7 +17,9 @@ import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModMenus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Hud;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
@@ -24,8 +27,9 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RecipesReceivedEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
@@ -57,6 +61,8 @@ public final class FullCourseClient {
         if (ModList.get().isLoaded("appleskin")) AppleSkinCompat.register();
         NeoForge.EVENT_BUS.addListener((GameShuttingDownEvent e) -> DevExit.onClientStopping());
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> ClientSync.disconnected());
+        // before recipe viewers read them (JEI listens at the lowest priority)
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, false, (RecipesReceivedEvent e) -> KitchenRecipes.received(type -> e.getRecipeMap().byType((RecipeType) type)));
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e) -> ClientSync.tick());
     }
 }

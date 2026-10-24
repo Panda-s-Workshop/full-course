@@ -6,9 +6,19 @@ loom {
     accessWidenerPath = file("src/main/resources/fullcourse.accesswidener")
 }
 
+repositories {
+    // other mods the compat code talks to; only their own group comes from here
+    exclusiveContent {
+        forRepository { maven { url = "https://api.modrinth.com/maven" } }
+        filter { includeGroup "maven.modrinth" }
+    }
+}
+
 dependencies {
     // the Fabric loader brings the Mixin library (and @Environment) that common code compiles against
     implementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    // JEI's API for the kitchen's recipe categories (the plugin only loads when JEI is installed)
+    compileOnly("maven.modrinth:jei:${rootProject.jei_fabric_version}") { transitive = false }
 
     testImplementation platform("org.junit:junit-bom:5.14.4")
     testImplementation "org.junit.jupiter:junit-jupiter"

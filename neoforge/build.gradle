@@ -55,7 +55,10 @@ dependencies {
     compileOnly "maven.modrinth:appleskin:${rootProject.appleskin_neoforge_version}"
 }
 
-// -PfullcourseWithAppleSkin loads AppleSkin in the dev runs
+// -PfullcourseWithJei and -PfullcourseWithAppleSkin load those mods in the dev runs
+if (project.hasProperty("fullcourseWithJei")) {
+    dependencies { localRuntime "maven.modrinth:jei:${rootProject.jei_neoforge_version}" }
+}
 if (project.hasProperty("fullcourseWithAppleSkin")) {
     dependencies { localRuntime "maven.modrinth:appleskin:${rootProject.appleskin_neoforge_version}" }
 }

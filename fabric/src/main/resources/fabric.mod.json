@@ -24,6 +24,9 @@
     ],
     "appleskin": [
       "com.panda.fullcourse.fabric.client.compat.AppleSkinCompat"
+    ],
+    "jei_mod_plugin": [
+      "com.panda.fullcourse.client.compat.jei.FullCourseJeiPlugin"
     ]
   },
   "accessWidener": "fullcourse.accesswidener",
@@ -38,6 +41,7 @@
   },
   "suggests": {
     "appleskin": "*",
-    "farmersdelight": "*"
+    "farmersdelight": "*",
+    "jei": "*"
   }
 }

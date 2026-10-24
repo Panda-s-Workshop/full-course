@@ -9,6 +9,7 @@ import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.platform.registry.DeferredRegister;
 import com.panda.fullcourse.registry.ModAttributes;
+import com.panda.fullcourse.registry.ModRecipes;
 import java.util.Comparator;
 import java.util.List;
 import net.fabricmc.api.ModInitializer;
@@ -20,6 +21,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -53,6 +55,7 @@ public final class FullCourseFabric implements ModInitializer {
         FabricDefaultAttributeRegistry.register(EntityTypes.PLAYER, Player.createAttributes().add(ModAttributes.RECOVERY_RATE.holder()));
 
         PayloadTypeRegistry.clientboundPlay().register(ProfilesPayload.TYPE, ProfilesPayload.STREAM_CODEC);
+        ModRecipes.kitchenSerializers().forEach(RecipeSynchronization::synchronizeRecipeSerializer); // for recipe viewers
         // wild onions and ember peppers (NeoForge reads data/fullcourse/neoforge/biome_modifier/*.json instead)
         BiomeModifications.addFeature(BiomeSelectors.tag(TagKey.create(Registries.BIOME, FullCourse.id("has_wild_onions"))),
                 GenerationStep.Decoration.VEGETAL_DECORATION, ResourceKey.create(Registries.PLACED_FEATURE, FullCourse.id("patch_wild_onions")));

@@ -7,6 +7,7 @@ import com.panda.fullcourse.kitchen.CuttingRecipe;
 import com.panda.fullcourse.kitchen.FermentingRecipe;
 import com.panda.fullcourse.platform.registry.DeferredHolder;
 import com.panda.fullcourse.platform.registry.DeferredRegister;
+import java.util.List;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
@@ -43,6 +44,16 @@ public final class ModRecipes {
     public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> FERMENTING_CATEGORY = CATEGORIES.register("fermenting", RecipeBookCategory::new);
 
     private ModRecipes() {}
+
+    /** The four kitchen recipe types, which the server sends to clients for recipe viewers. */
+    public static List<RecipeType<?>> kitchenTypes() {
+        return List.of(CUTTING.get(), COOKING.get(), BAKING.get(), FERMENTING.get());
+    }
+
+    /** Their serializers, for loaders that sync recipes by serializer. */
+    public static List<RecipeSerializer<?>> kitchenSerializers() {
+        return List.of(CUTTING_SERIALIZER.get(), COOKING_SERIALIZER.get(), BAKING_SERIALIZER.get(), FERMENTING_SERIALIZER.get());
+    }
 
     private static <T extends Recipe<?>> RecipeType<T> type(String name) {
         String id = FullCourse.id(name).toString();

@@ -1,12 +1,13 @@
 package com.panda.fullcourse.fabric.client;
 
-import com.panda.fullcourse.client.ClientSync;
 import com.panda.fullcourse.client.BrickOvenScreen;
+import com.panda.fullcourse.client.ClientSync;
 import com.panda.fullcourse.client.CookingPotScreen;
 import com.panda.fullcourse.client.CuttingBoardRenderer;
 import com.panda.fullcourse.client.DevExit;
 import com.panda.fullcourse.client.FoodTooltips;
 import com.panda.fullcourse.client.JournalScreen;
+import com.panda.fullcourse.client.KitchenRecipes;
 import com.panda.fullcourse.client.MealHud;
 import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.network.ProfilesPayload;
@@ -15,10 +16,11 @@ import com.panda.fullcourse.registry.ModMenus;
 import java.util.List;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.recipe.v1.sync.ClientRecipeSynchronizedEvent;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.Minecraft;
@@ -27,6 +29,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.crafting.RecipeType;
 
 /** The Fabric client entry point: hands the common client registrations to Fabric API's registries and events. */
 public final class FullCourseFabricClient implements ClientModInitializer {
@@ -88,6 +91,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
         TastingJournalItem.setOpener(JournalScreen::open);
         ClientLifecycleEvents.CLIENT_STOPPING.register(mc -> DevExit.onClientStopping());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, mc) -> ClientSync.disconnected());
+        ClientRecipeSynchronizedEvent.EVENT.register((mc, recipes) -> KitchenRecipes.received(type -> recipes.getAllOfType((RecipeType) type)));
         ClientTickEvents.END_CLIENT_TICK.register(mc -> ClientSync.tick());
     }
 }

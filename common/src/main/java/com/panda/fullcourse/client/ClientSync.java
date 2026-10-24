@@ -86,6 +86,7 @@ public final class ClientSync {
 
     public static void disconnected() {
         FoodProfiles.clearClient();
+        KitchenRecipes.clear();
         FullCourseConfig.clearServer();
         hinted = false;
         hintIn = -1;

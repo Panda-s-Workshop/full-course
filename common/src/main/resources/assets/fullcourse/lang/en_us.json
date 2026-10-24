@@ -73,6 +73,7 @@
   "family.fullcourse.tide.effect": "+%s respiration, +%s%% swim speed",
   "family.fullcourse.vigor": "Vigor",
   "family.fullcourse.vigor.effect": "+%s max health",
+  "gui.fullcourse.jei.served_in": "The dish is served in this; the pot uses one up",
   "gui.fullcourse.journal.all": "Every meal slot is open",
   "gui.fullcourse.journal.count": "%s of %s dishes tasted",
   "gui.fullcourse.journal.progress": "%s / %s %s",

@@ -9,6 +9,7 @@ import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.platform.registry.DeferredRegister;
 import com.panda.fullcourse.registry.ModAttributes;
+import com.panda.fullcourse.registry.ModRecipes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityTypes;
 import net.neoforged.bus.api.EventPriority;
@@ -49,7 +50,10 @@ public final class FullCourseNeoForge {
             if (e.getEntity() instanceof ServerPlayer player) FoodRules.onDeath(player);
         });
         // fires for one player at login and for everyone after /reload: the food table follows the recipes
-        game.addListener((OnDatapackSyncEvent e) -> e.getRelevantPlayers().forEach(p -> Services.PLATFORM.sendToPlayer(p, ProfilesPayload.of(p))));
+        game.addListener((OnDatapackSyncEvent e) -> {
+            e.getRelevantPlayers().forEach(p -> Services.PLATFORM.sendToPlayer(p, ProfilesPayload.of(p)));
+            e.sendRecipes(ModRecipes.kitchenTypes()); // for recipe viewers on the client
+        });
         game.addListener((ServerStartedEvent e) -> FoodProfiles.all(e.getServer()));
         game.addListener((RegisterCommandsEvent e) -> FullCourseCommand.register(e.getDispatcher(), e.getBuildContext()));
         game.addListener((ServerStoppedEvent e) -> FoodProfiles.reset());
