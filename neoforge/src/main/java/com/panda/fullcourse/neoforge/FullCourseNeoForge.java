@@ -1,7 +1,5 @@
 package com.panda.fullcourse.neoforge;
 
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.bus.api.EventPriority;
 import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.command.FullCourseCommand;
@@ -10,7 +8,10 @@ import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.platform.registry.DeferredRegister;
+import com.panda.fullcourse.registry.ModAttributes;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityTypes;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -18,7 +19,9 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -31,6 +34,7 @@ public final class FullCourseNeoForge {
         FullCourse.init();
         modBus.addListener((RegisterEvent e) -> DeferredRegister.all().forEach(register -> registerInto(e, register)));
         NeoForgeAttachments.register(modBus);
+        modBus.addListener((EntityAttributeModificationEvent e) -> e.add(EntityTypes.PLAYER, ModAttributes.RECOVERY_RATE.holder()));
         container.registerConfig(ModConfig.Type.SYNCED, NeoForgeConfig.SPEC);
         FullCourseConfig.use(new NeoForgeConfig());
         // the client handler is registered by the client entry class

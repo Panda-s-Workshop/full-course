@@ -2,6 +2,7 @@ package com.panda.fullcourse;
 
 import com.mojang.logging.LogUtils;
 import com.panda.fullcourse.platform.Services;
+import com.panda.fullcourse.registry.ModAttributes;
 import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModBlocks;
 import com.panda.fullcourse.registry.ModItems;
@@ -18,8 +19,8 @@ public final class FullCourse {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     /** The classes whose static DeferredRegisters hold the mod's content. */
-    private static final List<Class<?>> CONTENT = List.of(ModBlocks.class, ModBlockEntities.class, ModItems.class, ModMenus.class,
-            ModRecipes.class, ModTabs.class);
+    private static final List<Class<?>> CONTENT = List.of(ModAttributes.class, ModBlocks.class, ModBlockEntities.class, ModItems.class,
+            ModMenus.class, ModRecipes.class, ModTabs.class);
 
     private FullCourse() {}
 

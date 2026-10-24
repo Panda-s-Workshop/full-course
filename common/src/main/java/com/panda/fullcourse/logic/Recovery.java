@@ -12,7 +12,12 @@ public final class Recovery {
 
     /** Ticks between Recovery heals at a Mending level (0 = none). */
     public static int interval(int baseTicks, int mendingLevel) {
-        return Math.max(1, Math.round(baseTicks / (1F + 0.5F * Math.max(0, mendingLevel))));
+        return interval(baseTicks, 1 + 0.5 * Math.max(0, mendingLevel));
+    }
+
+    /** The interval at a recovery rate ({@code fullcourse:recovery_rate}): the base divided by the rate, 0 for none. */
+    public static int interval(int baseTicks, double rate) {
+        return rate <= 0 ? 0 : (int) Math.max(1, Math.round(baseTicks / rate));
     }
 
     /**
@@ -21,6 +26,7 @@ public final class Recovery {
      * @param sinceDamage ticks since the player last took damage
      */
     public static boolean healsNow(long sinceDamage, int delayTicks, int interval) {
+        if (interval <= 0) return false;
         long since = sinceDamage - delayTicks;
         return since >= 0 && since % interval == 0;
     }

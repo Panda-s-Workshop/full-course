@@ -8,22 +8,26 @@ import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.platform.registry.DeferredRegister;
+import com.panda.fullcourse.registry.ModAttributes;
 import java.util.Comparator;
 import java.util.List;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
 /** The Fabric entry point: registers the common content and wires the common hooks to Fabric API's events. */
@@ -45,6 +49,8 @@ public final class FullCourseFabric implements ModInitializer {
                     return i < 0 ? FIRST.size() : i;
                 }))
                 .forEach(FullCourseFabric::registerAll);
+        // players get Recovery's rate: vanilla's player attributes plus ours (NeoForge adds it to the existing set instead)
+        FabricDefaultAttributeRegistry.register(EntityTypes.PLAYER, Player.createAttributes().add(ModAttributes.RECOVERY_RATE.holder()));
 
         PayloadTypeRegistry.clientboundPlay().register(ProfilesPayload.TYPE, ProfilesPayload.STREAM_CODEC);
         // wild onions and ember peppers (NeoForge reads data/fullcourse/neoforge/biome_modifier/*.json instead)

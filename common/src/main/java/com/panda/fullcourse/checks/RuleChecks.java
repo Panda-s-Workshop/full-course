@@ -12,6 +12,7 @@ import com.panda.fullcourse.logic.Family;
 import com.panda.fullcourse.logic.Meals;
 import com.panda.fullcourse.logic.Tier;
 import com.panda.fullcourse.platform.Services;
+import com.panda.fullcourse.registry.ModAttributes;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
@@ -87,6 +89,7 @@ public final class RuleChecks {
         CHECKS.put("recovery_respects_gamerule", RuleChecks::recoveryRespectsGamerule);
         CHECKS.put("recovery_off_on_peaceful", RuleChecks::recoveryOffOnPeaceful);
         CHECKS.put("mending_shortens_recovery", RuleChecks::mendingShortensRecovery);
+        CHECKS.put("recovery_rate_attribute", RuleChecks::recoveryRateAttribute);
         CHECKS.put("steak_heals_eight_over_eight_seconds", RuleChecks::steakHeals);
         CHECKS.put("meal_fills_slot", RuleChecks::mealFillsSlot);
         CHECKS.put("meal_refresh", RuleChecks::mealRefresh);
@@ -294,6 +297,38 @@ public final class RuleChecks {
         health(c, 11F, "before 40 ticks");
         FoodRules.tick(c.player(), t + 200);
         health(c, 12F, "Mending II heals every 40 ticks");
+    }
+
+    /**
+     * Players have {@code fullcourse:recovery_rate} at 1; Mending II raises it to 2; another mod's modifier on it
+     * speeds Recovery up the same way, and one that takes it to 0 stops Recovery.
+     */
+    private static void recoveryRateAttribute(Ctx c) {
+        AttributeInstance rate = c.player().getAttribute(ModAttributes.RECOVERY_RATE.holder());
+        check(rate != null, "players have no fullcourse:recovery_rate");
+        check(rate.getBaseValue() == 1, "recovery_rate starts at %s, expected 1", rate.getBaseValue());
+        long t = c.t();
+        eat(c, Items.RABBIT_STEW, t);
+        check(rate.getValue() == 2, "Mending II puts recovery_rate at %s, expected 2", rate.getValue());
+        Services.PLATFORM.setFoodState(c.player(), FoodState.EMPTY);
+        Benefits.apply(c.player(), Map.of());
+        check(rate.getValue() == 1, "with no meal recovery_rate is %s, expected 1", rate.getValue());
+        Identifier other = Identifier.fromNamespaceAndPath("othermod", "faster_recovery");
+        try {
+            rate.addOrUpdateTransientModifier(new AttributeModifier(other, 1, AttributeModifier.Operation.ADD_VALUE));
+            hurtAt(c, t);
+            FoodRules.tick(c.player(), t + 160);
+            ticks(c, t + 161, t + 199);
+            health(c, 11F, "another mod's +1: the first heal, then nothing before 40 ticks");
+            FoodRules.tick(c.player(), t + 200);
+            health(c, 12F, "another mod's +1 heals every 40 ticks");
+            rate.addOrUpdateTransientModifier(new AttributeModifier(other, -1, AttributeModifier.Operation.ADD_VALUE));
+            hurtAt(c, t);
+            ticks(c, t + 160, t + 400);
+            health(c, 10F, "recovery_rate 0 stops Recovery");
+        } finally {
+            rate.removeModifier(other);
+        }
     }
 
     // ---- 3.3 eating heals ---------------------------------------------------------------------------------------

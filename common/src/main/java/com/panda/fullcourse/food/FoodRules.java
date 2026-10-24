@@ -1,11 +1,11 @@
 package com.panda.fullcourse.food;
 
 import com.panda.fullcourse.FullCourseConfig;
-import com.panda.fullcourse.logic.Family;
 import com.panda.fullcourse.logic.Meals;
 import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.logic.Recovery;
 import com.panda.fullcourse.platform.Services;
+import com.panda.fullcourse.registry.ModAttributes;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +17,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -119,13 +120,18 @@ public final class FoodRules {
             }
             saturation(player);
             if (recovers(player)) {
-                int mending = s.meals().strongest().getOrDefault(Family.MENDING, 0);
-                int interval = Recovery.interval(FullCourseConfig.recoveryIntervalTicks(), mending);
+                int interval = Recovery.interval(FullCourseConfig.recoveryIntervalTicks(), recoveryRate(player));
                 if (Recovery.healsNow(now - player.lastDamageStamp, FullCourseConfig.recoveryDelayTicks(), interval)) player.heal(1F);
             }
         }
         set(player, before, s);
         if (now % 20 == 0 || s.meals() != before.meals()) Benefits.apply(player, s.meals().strongest());
+    }
+
+    /** {@code fullcourse:recovery_rate}, which Mending raises; the default pace if something removed the attribute. */
+    private static double recoveryRate(ServerPlayer player) {
+        AttributeInstance rate = player.getAttribute(ModAttributes.RECOVERY_RATE.holder());
+        return rate == null ? 1 : rate.getValue();
     }
 
     /** After a login or an End exit: the meal bonus back first, then the health the save or the old player had. */
