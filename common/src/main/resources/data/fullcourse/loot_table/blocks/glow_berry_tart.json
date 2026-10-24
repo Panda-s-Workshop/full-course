@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:match_block",
+        "blocks": "fullcourse:glow_berry_tart",
+        "state": {
+          "servings": "4"
+        }
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "fullcourse:glow_berry_tart"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "fullcourse:blocks/glow_berry_tart"
+}

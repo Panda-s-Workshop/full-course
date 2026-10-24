@@ -1,0 +1,82 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "platter": "fullcourse:block/feast_platter",
+    "platter_side": "fullcourse:block/feast_platter_side",
+    "particle": "fullcourse:block/roast_banquet_roast_side",
+    "roast_top": "fullcourse:block/roast_banquet_roast_top",
+    "roast_side": "fullcourse:block/roast_banquet_roast_side",
+    "sides": "fullcourse:block/roast_banquet_sides"
+  },
+  "elements": [
+    {
+      "from": [
+        1,
+        0,
+        1
+      ],
+      "to": [
+        15,
+        1,
+        15
+      ],
+      "faces": {
+        "up": {
+          "texture": "#platter",
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ]
+        },
+        "down": {
+          "texture": "#platter",
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "cullface": "down"
+        },
+        "north": {
+          "texture": "#platter_side",
+          "uv": [
+            1,
+            15,
+            15,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#platter_side",
+          "uv": [
+            1,
+            15,
+            15,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#platter_side",
+          "uv": [
+            1,
+            15,
+            15,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#platter_side",
+          "uv": [
+            1,
+            15,
+            15,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:book",
+    "#fullcourse:journal_foods"
+  ],
+  "result": {
+    "id": "fullcourse:tasting_journal"
+  }
+}

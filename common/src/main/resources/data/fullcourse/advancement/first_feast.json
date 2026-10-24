@@ -1,0 +1,27 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fullcourse:roast_banquet"
+    },
+    "title": {
+      "translate": "advancements.fullcourse.first_feast.title"
+    },
+    "description": {
+      "translate": "advancements.fullcourse.first_feast.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "parent": "fullcourse:gourmet"
+}

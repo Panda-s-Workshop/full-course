@@ -4,6 +4,7 @@ import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodText;
 import com.panda.fullcourse.food.Profile;
+import com.panda.fullcourse.kitchen.FeastBlock;
 import com.panda.fullcourse.kitchen.RecipeHints;
 import com.panda.fullcourse.platform.Services;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -45,7 +47,10 @@ public final class FoodTooltips {
             boolean tasted = mc.player != null
                     && Services.PLATFORM.foodState(mc.player).tasted().contains(BuiltInRegistries.ITEM.getKey(stack.getItem()));
             var component = stack.get(DataComponents.FOOD);
-            lines.addAll(1, FoodText.lines(p, component == null ? 0 : component.nutrition(), shift, tasted));
+            // a feast heals per serving, not as an item
+            int nutrition = component != null ? component.nutrition()
+                    : stack.getItem() instanceof BlockItem b && b.getBlock() instanceof FeastBlock feast ? feast.serving() : 0;
+            lines.addAll(1, FoodText.lines(p, nutrition, shift, tasted));
         } else if (!made.isEmpty() && !shift) {
             lines.add(1, Component.translatable("tooltip.fullcourse.shift_recipe").withStyle(ChatFormatting.DARK_GRAY));
         }

@@ -6,7 +6,9 @@ import com.panda.fullcourse.client.CookingPotScreen;
 import com.panda.fullcourse.client.CuttingBoardRenderer;
 import com.panda.fullcourse.client.DevExit;
 import com.panda.fullcourse.client.FoodTooltips;
+import com.panda.fullcourse.client.JournalScreen;
 import com.panda.fullcourse.client.MealHud;
+import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModMenus;
@@ -83,6 +85,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
             g.pose().popMatrix();
         });
         ItemTooltipCallback.EVENT.register((stack, context, flags, lines) -> FoodTooltips.onTooltip(stack, lines));
+        TastingJournalItem.setOpener(JournalScreen::open);
         ClientLifecycleEvents.CLIENT_STOPPING.register(mc -> DevExit.onClientStopping());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, mc) -> ClientSync.disconnected());
         ClientTickEvents.END_CLIENT_TICK.register(mc -> ClientSync.tick());

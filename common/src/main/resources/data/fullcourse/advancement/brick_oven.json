@@ -1,0 +1,34 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "fullcourse:brick_oven"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fullcourse:brick_oven"
+    },
+    "title": {
+      "translate": "advancements.fullcourse.brick_oven.title"
+    },
+    "description": {
+      "translate": "advancements.fullcourse.brick_oven.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "parent": "fullcourse:cooking_pot"
+}

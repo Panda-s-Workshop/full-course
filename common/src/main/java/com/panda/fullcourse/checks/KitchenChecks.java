@@ -83,6 +83,7 @@ final class KitchenChecks {
         checks.put("meal_advancements", KitchenChecks::mealAdvancements);
         checks.put("tier_command", KitchenChecks::tierCommand);
         StationChecks.register(checks);
+        FeastChecks.register(checks);
     }
 
     private static Item item(String path) {
@@ -430,7 +431,7 @@ final class KitchenChecks {
 
     // ---- advancements and the command ---------------------------------------------------------------------------
 
-    private static boolean done(RuleChecks.Ctx c, String key) {
+    static boolean done(RuleChecks.Ctx c, String key) {
         var holder = c.server().getAdvancements().get(FullCourse.id(key));
         check(holder != null, "advancement %s is missing", key);
         return c.player().getAdvancements().getOrStartProgress(holder).isDone();

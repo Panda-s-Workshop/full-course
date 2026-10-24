@@ -972,5 +972,92 @@
         ]
       }
     ]
+  },
+  {
+    "id": "tasting_journal",
+    "kind": "journal",
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "minecraft:book",
+          "#fullcourse:journal_foods"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "roast_banquet",
+    "kind": "feast",
+    "block": "roast_banquet",
+    "servings": 8,
+    "serving": 6,
+    "platter": true,
+    "tier": 5,
+    "families": [
+      "brawn",
+      "vigor",
+      "mending"
+    ],
+    "made": [
+      {
+        "station": "oven",
+        "from": [
+          "minecraft:cooked_chicken",
+          "fullcourse:dough",
+          "fullcourse:chopped_vegetables",
+          "fullcourse:broth"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "harvest_pie",
+    "kind": "feast",
+    "block": "harvest_pie",
+    "servings": 6,
+    "serving": 6,
+    "platter": true,
+    "tier": 5,
+    "families": [
+      "vigor",
+      "diligence",
+      "swift"
+    ],
+    "made": [
+      {
+        "station": "oven",
+        "from": [
+          "fullcourse:pastry",
+          "minecraft:pumpkin",
+          "fullcourse:chopped_vegetables",
+          "minecraft:apple"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "glow_berry_tart",
+    "kind": "feast",
+    "block": "glow_berry_tart",
+    "servings": 4,
+    "serving": 5,
+    "platter": false,
+    "tier": 5,
+    "families": [
+      "swift",
+      "fortune",
+      "fortitude"
+    ],
+    "made": [
+      {
+        "station": "oven",
+        "from": [
+          "fullcourse:pastry",
+          "fullcourse:glow_berry_jam",
+          "fullcourse:sweet_cream"
+        ]
+      }
+    ]
   }
 ]

@@ -1,0 +1,11 @@
+{
+  "type": "fullcourse:baking",
+  "ingredients": [
+    "fullcourse:pastry",
+    "fullcourse:glow_berry_jam",
+    "fullcourse:sweet_cream"
+  ],
+  "result": {
+    "id": "fullcourse:glow_berry_tart"
+  }
+}

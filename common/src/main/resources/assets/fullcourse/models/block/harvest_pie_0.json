@@ -1,0 +1,82 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "platter": "fullcourse:block/feast_platter",
+    "platter_side": "fullcourse:block/feast_platter_side",
+    "particle": "fullcourse:block/harvest_pie_side",
+    "pie_top": "fullcourse:block/harvest_pie_top",
+    "pie_side": "fullcourse:block/harvest_pie_side",
+    "pie_inside": "fullcourse:block/harvest_pie_inside"
+  },
+  "elements": [
+    {
+      "from": [
+        1,
+        0,
+        1
+      ],
+      "to": [
+        15,
+        1,
+        15
+      ],
+      "faces": {
+        "up": {
+          "texture": "#platter",
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ]
+        },
+        "down": {
+          "texture": "#platter",
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "cullface": "down"
+        },
+        "north": {
+          "texture": "#platter_side",
+          "uv": [
+            1,
+            15,
+            15,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#platter_side",
+          "uv": [
+            1,
+            15,
+            15,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#platter_side",
+          "uv": [
+            1,
+            15,
+            15,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#platter_side",
+          "uv": [
+            1,
+            15,
+            15,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

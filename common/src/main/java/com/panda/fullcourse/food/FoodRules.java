@@ -3,6 +3,7 @@ package com.panda.fullcourse.food;
 import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.logic.Family;
 import com.panda.fullcourse.logic.Meals;
+import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.logic.Recovery;
 import com.panda.fullcourse.platform.Services;
 import java.util.HashMap;
@@ -72,13 +73,25 @@ public final class FoodRules {
                 Identifier id = BuiltInRegistries.ITEM.getKey(dish);
                 int duration = profile.tier().durationTicks(FullCourseConfig.durationMultiplier());
                 Meals.Meal<Identifier> meal = new Meals.Meal<>(id, profile.tier(), profile.families(), profile.tier().level(), now, now + duration);
-                s = s.withMeals(s.meals().eat(meal, s.slots())).withTasted(id);
+                s = unlockSlots(player, s.withTasted(id));
+                s = s.withMeals(s.meals().eat(meal, s.slots()));
                 player.sendSystemMessage(FoodText.mealMessage(name, profile), true);
-                FoodAdvancements.onMeal(player, profile.tier());
+                FoodAdvancements.onMeal(player, profile.tier(), s.tasted());
             }
         }
         set(player, before, s);
         Benefits.apply(player, s.meals().strongest());
+    }
+
+    /**
+     * The slots the tasted set has earned ({@link Milestones}), each with its advancement. Slots given another way (a
+     * command) are kept, so this only ever adds. The new slot is there for the meal that earned it.
+     */
+    private static FoodState unlockSlots(ServerPlayer player, FoodState s) {
+        int reached = Milestones.reached(Tasting.count(s.tasted(), item -> FoodProfiles.get(player.level().getServer(), item)));
+        if (reached <= s.bonusSlots()) return s;
+        for (int k = s.bonusSlots(); k < reached; k++) FoodAdvancements.award(player, "slot_" + (k + 3));
+        return s.withBonusSlots(reached);
     }
 
     /** After every server tick of a player. */

@@ -1,0 +1,27 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fullcourse:fried_egg"
+    },
+    "title": {
+      "translate": "advancements.fullcourse.taste_simple.title"
+    },
+    "description": {
+      "translate": "advancements.fullcourse.taste_simple.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "parent": "fullcourse:first_meal"
+}

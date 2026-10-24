@@ -7,7 +7,9 @@ import com.panda.fullcourse.client.CookingPotScreen;
 import com.panda.fullcourse.client.CuttingBoardRenderer;
 import com.panda.fullcourse.client.DevExit;
 import com.panda.fullcourse.client.FoodTooltips;
+import com.panda.fullcourse.client.JournalScreen;
 import com.panda.fullcourse.client.MealHud;
+import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModMenus;
@@ -49,6 +51,7 @@ public final class FullCourseClient {
             if (e.getName().equals(VanillaGuiLayers.FOOD_LEVEL) && MealHud.active()) e.setCanceled(true);
         });
         NeoForge.EVENT_BUS.addListener((ItemTooltipEvent e) -> FoodTooltips.onTooltip(e.getItemStack(), e.getToolTip()));
+        TastingJournalItem.setOpener(JournalScreen::open);
         NeoForge.EVENT_BUS.addListener((GameShuttingDownEvent e) -> DevExit.onClientStopping());
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> ClientSync.disconnected());
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e) -> ClientSync.tick());

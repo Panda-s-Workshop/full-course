@@ -1,0 +1,23 @@
+{
+  "values": [
+    "fullcourse:fried_egg",
+    "fullcourse:baked_onion",
+    "fullcourse:berry_skewer",
+    "fullcourse:mushroom_skewer",
+    "fullcourse:roasted_ember_pepper",
+    "fullcourse:charred_chorus",
+    "fullcourse:hot_cocoa",
+    "minecraft:bread",
+    "minecraft:cooked_beef",
+    "minecraft:cooked_porkchop",
+    "minecraft:cooked_chicken",
+    "minecraft:cooked_mutton",
+    "minecraft:cooked_rabbit",
+    "minecraft:cooked_cod",
+    "minecraft:cooked_salmon",
+    "minecraft:baked_potato",
+    "minecraft:cookie",
+    "minecraft:mushroom_stew",
+    "minecraft:beetroot_soup"
+  ]
+}

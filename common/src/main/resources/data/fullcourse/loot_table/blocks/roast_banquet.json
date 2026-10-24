@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:match_block",
+        "blocks": "fullcourse:roast_banquet",
+        "state": {
+          "servings": "8"
+        }
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "fullcourse:roast_banquet"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "fullcourse:blocks/roast_banquet"
+}

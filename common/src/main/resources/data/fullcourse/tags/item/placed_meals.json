@@ -1,5 +1,8 @@
 {
   "values": [
-    "minecraft:cake"
+    "minecraft:cake",
+    "fullcourse:roast_banquet",
+    "fullcourse:harvest_pie",
+    "fullcourse:glow_berry_tart"
   ]
 }

@@ -1,0 +1,27 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fullcourse:glow_berry_tart"
+    },
+    "title": {
+      "translate": "advancements.fullcourse.taste_all.title"
+    },
+    "description": {
+      "translate": "advancements.fullcourse.taste_all.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "parent": "fullcourse:slot_5"
+}

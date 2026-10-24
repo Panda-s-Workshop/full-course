@@ -1,0 +1,12 @@
+{
+  "type": "fullcourse:baking",
+  "ingredients": [
+    "fullcourse:pastry",
+    "minecraft:pumpkin",
+    "fullcourse:chopped_vegetables",
+    "minecraft:apple"
+  ],
+  "result": {
+    "id": "fullcourse:harvest_pie"
+  }
+}

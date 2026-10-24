@@ -5,14 +5,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.panda.fullcourse.FullCourse;
+import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.platform.registry.DeferredItem;
 import com.panda.fullcourse.platform.registry.DeferredRegister;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -45,8 +48,24 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> FERMENTING_CROCK = ITEMS.registerSimpleBlockItem(ModBlocks.FERMENTING_CROCK);
     /** The table's items by path, in the table's order. */
     public static final Map<String, DeferredItem<Item>> TABLE = registerTable();
+    private static List<Item> dishes;
 
     private ModItems() {}
+
+    /** The mod's dishes and feasts, in the table's order: what the tasting advancements ask for. */
+    public static synchronized List<Item> dishes() {
+        if (dishes == null) {
+            List<Item> out = new ArrayList<>();
+            for (JsonElement el : table()) {
+                JsonObject e = el.getAsJsonObject();
+                String kind = e.get("kind").getAsString();
+                if ("dish".equals(kind) || "feast".equals(kind)) out.add(item(e.get("id").getAsString()));
+            }
+            dishes = List.copyOf(out);
+        }
+        return dishes;
+    }
+
 
     /** A table item by path ("onion"). */
     public static Item item(String path) {
@@ -57,11 +76,28 @@ public final class ModItems {
 
     /** The item table, read from the jar. */
     public static JsonArray table() {
-        try (InputStream in = ModItems.class.getResourceAsStream(TABLE_PATH)) {
-            if (in == null) throw new IllegalStateException("Missing " + TABLE_PATH);
-            return JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonArray();
-        } catch (IOException e) {
-            throw new IllegalStateException("Couldn't read " + TABLE_PATH, e);
+        return Table.read();
+    }
+
+    /** Reads the table without registering the items, so blocks can take their numbers from it first. */
+    public static final class Table {
+        private Table() {}
+
+        public static JsonArray read() {
+            try (InputStream in = ModItems.class.getResourceAsStream(TABLE_PATH)) {
+                if (in == null) throw new IllegalStateException("Missing " + TABLE_PATH);
+                return JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonArray();
+            } catch (IOException e) {
+                throw new IllegalStateException("Couldn't read " + TABLE_PATH, e);
+            }
+        }
+
+        /** A table entry by path. */
+        public static JsonObject entry(String path) {
+            for (JsonElement el : read()) {
+                if (path.equals(el.getAsJsonObject().get("id").getAsString())) return el.getAsJsonObject();
+            }
+            throw new IllegalArgumentException("No Full Course item " + path);
         }
     }
 
@@ -77,6 +113,9 @@ public final class ModItems {
                         ? ToolMaterial.IRON : FLINT, 1.0F, -2.0F)));
                 case "crop" -> ITEMS.<Item>registerItem(id, p -> new BlockItem(BuiltInRegistries.BLOCK.getValue(FullCourse.id(e.get("block").getAsString())), p),
                         p -> props.apply(p.useItemDescriptionPrefix()));
+                case "feast" -> ITEMS.<Item>registerItem(id, p -> new BlockItem(BuiltInRegistries.BLOCK.getValue(FullCourse.id(e.get("block").getAsString())), p),
+                        p -> props.apply(p.useItemDescriptionPrefix().stacksTo(1)));
+                case "journal" -> ITEMS.registerItem(id, TastingJournalItem::new, p -> props.apply(p.stacksTo(1)));
                 default -> ITEMS.registerItem(id, Item::new, props);
             };
             out.put(id, holder);

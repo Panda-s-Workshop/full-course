@@ -1,0 +1,32 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": "#fullcourse:soups"
+        }
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fullcourse:pumpkin_soup"
+    },
+    "title": {
+      "translate": "advancements.fullcourse.first_stew.title"
+    },
+    "description": {
+      "translate": "advancements.fullcourse.first_stew.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "parent": "fullcourse:cooking_pot"
+}

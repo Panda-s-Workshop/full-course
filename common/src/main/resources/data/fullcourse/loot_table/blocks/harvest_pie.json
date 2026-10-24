@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:match_block",
+        "blocks": "fullcourse:harvest_pie",
+        "state": {
+          "servings": "6"
+        }
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "fullcourse:harvest_pie"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "fullcourse:blocks/harvest_pie"
+}

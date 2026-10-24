@@ -1,0 +1,139 @@
+{
+  "variants": {
+    "facing=north,servings=0": {
+      "model": "fullcourse:block/harvest_pie_0"
+    },
+    "facing=north,servings=1": {
+      "model": "fullcourse:block/harvest_pie_1"
+    },
+    "facing=north,servings=2": {
+      "model": "fullcourse:block/harvest_pie_2"
+    },
+    "facing=north,servings=3": {
+      "model": "fullcourse:block/harvest_pie_3"
+    },
+    "facing=north,servings=4": {
+      "model": "fullcourse:block/harvest_pie_4"
+    },
+    "facing=north,servings=5": {
+      "model": "fullcourse:block/harvest_pie_5"
+    },
+    "facing=north,servings=6": {
+      "model": "fullcourse:block/harvest_pie_6"
+    },
+    "facing=north,servings=7": {
+      "model": "fullcourse:block/harvest_pie_6"
+    },
+    "facing=north,servings=8": {
+      "model": "fullcourse:block/harvest_pie_6"
+    },
+    "facing=east,servings=0": {
+      "model": "fullcourse:block/harvest_pie_0",
+      "y": 90
+    },
+    "facing=east,servings=1": {
+      "model": "fullcourse:block/harvest_pie_1",
+      "y": 90
+    },
+    "facing=east,servings=2": {
+      "model": "fullcourse:block/harvest_pie_2",
+      "y": 90
+    },
+    "facing=east,servings=3": {
+      "model": "fullcourse:block/harvest_pie_3",
+      "y": 90
+    },
+    "facing=east,servings=4": {
+      "model": "fullcourse:block/harvest_pie_4",
+      "y": 90
+    },
+    "facing=east,servings=5": {
+      "model": "fullcourse:block/harvest_pie_5",
+      "y": 90
+    },
+    "facing=east,servings=6": {
+      "model": "fullcourse:block/harvest_pie_6",
+      "y": 90
+    },
+    "facing=east,servings=7": {
+      "model": "fullcourse:block/harvest_pie_6",
+      "y": 90
+    },
+    "facing=east,servings=8": {
+      "model": "fullcourse:block/harvest_pie_6",
+      "y": 90
+    },
+    "facing=south,servings=0": {
+      "model": "fullcourse:block/harvest_pie_0",
+      "y": 180
+    },
+    "facing=south,servings=1": {
+      "model": "fullcourse:block/harvest_pie_1",
+      "y": 180
+    },
+    "facing=south,servings=2": {
+      "model": "fullcourse:block/harvest_pie_2",
+      "y": 180
+    },
+    "facing=south,servings=3": {
+      "model": "fullcourse:block/harvest_pie_3",
+      "y": 180
+    },
+    "facing=south,servings=4": {
+      "model": "fullcourse:block/harvest_pie_4",
+      "y": 180
+    },
+    "facing=south,servings=5": {
+      "model": "fullcourse:block/harvest_pie_5",
+      "y": 180
+    },
+    "facing=south,servings=6": {
+      "model": "fullcourse:block/harvest_pie_6",
+      "y": 180
+    },
+    "facing=south,servings=7": {
+      "model": "fullcourse:block/harvest_pie_6",
+      "y": 180
+    },
+    "facing=south,servings=8": {
+      "model": "fullcourse:block/harvest_pie_6",
+      "y": 180
+    },
+    "facing=west,servings=0": {
+      "model": "fullcourse:block/harvest_pie_0",
+      "y": 270
+    },
+    "facing=west,servings=1": {
+      "model": "fullcourse:block/harvest_pie_1",
+      "y": 270
+    },
+    "facing=west,servings=2": {
+      "model": "fullcourse:block/harvest_pie_2",
+      "y": 270
+    },
+    "facing=west,servings=3": {
+      "model": "fullcourse:block/harvest_pie_3",
+      "y": 270
+    },
+    "facing=west,servings=4": {
+      "model": "fullcourse:block/harvest_pie_4",
+      "y": 270
+    },
+    "facing=west,servings=5": {
+      "model": "fullcourse:block/harvest_pie_5",
+      "y": 270
+    },
+    "facing=west,servings=6": {
+      "model": "fullcourse:block/harvest_pie_6",
+      "y": 270
+    },
+    "facing=west,servings=7": {
+      "model": "fullcourse:block/harvest_pie_6",
+      "y": 270
+    },
+    "facing=west,servings=8": {
+      "model": "fullcourse:block/harvest_pie_6",
+      "y": 270
+    }
+  }
+}

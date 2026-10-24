@@ -1,0 +1,27 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fullcourse:tasting_journal"
+    },
+    "title": {
+      "translate": "advancements.fullcourse.slot_3.title"
+    },
+    "description": {
+      "translate": "advancements.fullcourse.slot_3.description"
+    },
+    "frame": "goal",
+    "show_toast": false,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "parent": "fullcourse:first_meal"
+}

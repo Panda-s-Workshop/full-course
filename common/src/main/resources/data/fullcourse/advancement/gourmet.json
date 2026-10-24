@@ -1,0 +1,27 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fullcourse:apple_pie"
+    },
+    "title": {
+      "translate": "advancements.fullcourse.gourmet.title"
+    },
+    "description": {
+      "translate": "advancements.fullcourse.gourmet.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "parent": "fullcourse:hearty"
+}

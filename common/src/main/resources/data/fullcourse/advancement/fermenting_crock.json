@@ -1,0 +1,34 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "fullcourse:fermenting_crock"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fullcourse:fermenting_crock"
+    },
+    "title": {
+      "translate": "advancements.fullcourse.fermenting_crock.title"
+    },
+    "description": {
+      "translate": "advancements.fullcourse.fermenting_crock.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "parent": "fullcourse:cooking_pot"
+}
