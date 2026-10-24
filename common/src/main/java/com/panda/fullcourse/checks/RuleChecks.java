@@ -110,6 +110,7 @@ public final class RuleChecks {
         CHECKS.put("cake_slice_gives_meal", RuleChecks::cakeSliceGivesMeal);
         CHECKS.put("tooltip_lines", RuleChecks::tooltipLines);
         KitchenChecks.register(CHECKS);
+        ConfigChecks.register(CHECKS);
     }
 
     private RuleChecks() {}
@@ -148,11 +149,11 @@ public final class RuleChecks {
 
     // ---- helpers ------------------------------------------------------------------------------------------------
 
-    private static FoodState state(Ctx c) {
+    static FoodState state(Ctx c) {
         return FoodRules.state(c.player());
     }
 
-    private static void eat(Ctx c, Item item, long at) {
+    static void eat(Ctx c, Item item, long at) {
         ItemStack stack = new ItemStack(item);
         FoodRules.onEat(c.player(), stack, stack.get(DataComponents.FOOD), at);
     }
@@ -162,15 +163,15 @@ public final class RuleChecks {
         new ItemStack(item).finishUsingItem(c.level(), c.player());
     }
 
-    private static Profile profile(Ctx c, Item item) {
+    static Profile profile(Ctx c, Item item) {
         return FoodProfiles.get(c.server(), item);
     }
 
-    private static List<Identifier> dishes(Ctx c) {
+    static List<Identifier> dishes(Ctx c) {
         return state(c).meals().active().stream().map(Meals.Meal::dish).toList();
     }
 
-    private static Identifier id(Item item) {
+    static Identifier id(Item item) {
         return BuiltInRegistries.ITEM.getKey(item);
     }
 
@@ -180,12 +181,12 @@ public final class RuleChecks {
     }
 
     /** Down to 10 HP, hit at time {@code at} as far as Recovery can tell. */
-    private static void hurtAt(Ctx c, long at) {
+    static void hurtAt(Ctx c, long at) {
         c.player().setHealth(10F);
         c.player().lastDamageStamp = at;
     }
 
-    private static void ticks(Ctx c, long from, long toInclusive) {
+    static void ticks(Ctx c, long from, long toInclusive) {
         for (long now = from; now <= toInclusive; now++) FoodRules.tick(c.player(), now);
     }
 
@@ -193,7 +194,7 @@ public final class RuleChecks {
         if (!ok) throw new CheckFailure(String.format(fmt, args));
     }
 
-    private static void health(Ctx c, float expected, String when) {
+    static void health(Ctx c, float expected, String when) {
         float hp = c.player().getHealth();
         check(Math.abs(hp - expected) < 0.01F, "%s: health %s, expected %s", when, hp, expected);
     }

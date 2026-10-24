@@ -99,6 +99,20 @@ public final class FullCourseConfig {
         source = values;
     }
 
+    /**
+     * Runs {@code body} with {@code values} in place of both this side's file and the server's, then puts the old ones
+     * back. GameTests check each key this way; in play the file is the source.
+     */
+    public static void with(Source values, Runnable body) {
+        Source was = source;
+        source = values;
+        try {
+            body.run();
+        } finally {
+            source = was;
+        }
+    }
+
     /** On the client: disconnected, back to this side's own file. */
     public static void clearServer() {
         fromServer = null;
