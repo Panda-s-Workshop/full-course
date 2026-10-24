@@ -3,7 +3,9 @@
   "textures": {
     "particle": "fullcourse:block/glow_berry_tart_side",
     "tart_top": "fullcourse:block/glow_berry_tart_top",
-    "tart_side": "fullcourse:block/glow_berry_tart_side"
+    "tart_side": "fullcourse:block/glow_berry_tart_side",
+    "tart_inside": "fullcourse:block/glow_berry_tart_inside",
+    "berry": "fullcourse:block/glow_berry_tart_berry"
   },
   "elements": [
     {
@@ -28,12 +30,12 @@
           ]
         },
         "north": {
-          "texture": "#tart_top",
+          "texture": "#tart_inside",
           "uv": [
             3,
-            7,
+            13,
             8,
-            10
+            16
           ]
         },
         "south": {
@@ -46,12 +48,12 @@
           ]
         },
         "east": {
-          "texture": "#tart_top",
+          "texture": "#tart_inside",
           "uv": [
             3,
-            7,
+            13,
             8,
-            10
+            16
           ]
         },
         "west": {
@@ -74,6 +76,144 @@
           "cullface": "down"
         }
       }
+    },
+    {
+      "from": [
+        4.25,
+        3,
+        9.75
+      ],
+      "to": [
+        6.25,
+        4.5,
+        11.75
+      ],
+      "faces": {
+        "up": {
+          "texture": "#berry",
+          "uv": [
+            0,
+            0,
+            2.0,
+            2.0
+          ]
+        },
+        "down": {
+          "texture": "#berry",
+          "uv": [
+            0,
+            0,
+            2.0,
+            2.0
+          ]
+        },
+        "north": {
+          "texture": "#berry",
+          "uv": [
+            0,
+            4,
+            2.0,
+            5.5
+          ]
+        },
+        "south": {
+          "texture": "#berry",
+          "uv": [
+            0,
+            4,
+            2.0,
+            5.5
+          ]
+        },
+        "east": {
+          "texture": "#berry",
+          "uv": [
+            0,
+            4,
+            2.0,
+            5.5
+          ]
+        },
+        "west": {
+          "texture": "#berry",
+          "uv": [
+            0,
+            4,
+            2.0,
+            5.5
+          ]
+        }
+      },
+      "light_emission": 15
+    },
+    {
+      "from": [
+        6.5,
+        3,
+        8.5
+      ],
+      "to": [
+        7.5,
+        4,
+        9.5
+      ],
+      "faces": {
+        "up": {
+          "texture": "#berry",
+          "uv": [
+            8,
+            0,
+            9.0,
+            1.0
+          ]
+        },
+        "down": {
+          "texture": "#berry",
+          "uv": [
+            8,
+            0,
+            9.0,
+            1.0
+          ]
+        },
+        "north": {
+          "texture": "#berry",
+          "uv": [
+            8,
+            4,
+            9.0,
+            5
+          ]
+        },
+        "south": {
+          "texture": "#berry",
+          "uv": [
+            8,
+            4,
+            9.0,
+            5
+          ]
+        },
+        "east": {
+          "texture": "#berry",
+          "uv": [
+            8,
+            4,
+            9.0,
+            5
+          ]
+        },
+        "west": {
+          "texture": "#berry",
+          "uv": [
+            8,
+            4,
+            9.0,
+            5
+          ]
+        }
+      },
+      "light_emission": 15
     }
   ]
 }

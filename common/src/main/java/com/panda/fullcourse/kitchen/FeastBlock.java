@@ -52,7 +52,8 @@ public class FeastBlock extends Block {
     /** The side it's served from, toward whoever placed it: the pie is cut and the tart taken from there. */
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     private static final VoxelShape PLATTER = Block.box(1, 0, 1, 15, 1, 15);
-    private static final VoxelShape FULL_PLATTER = Block.box(1, 0, 1, 15, 6, 15);
+    /** Up to the banquet's drumstick tips. */
+    private static final VoxelShape FULL_PLATTER = Block.box(1, 0, 1, 15, 8, 15);
     private static final VoxelShape TIN = Block.box(3, 0, 3, 13, 3, 13);
 
     private final int servings;

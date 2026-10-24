@@ -3,7 +3,9 @@
   "textures": {
     "particle": "fullcourse:block/glow_berry_tart_side",
     "tart_top": "fullcourse:block/glow_berry_tart_top",
-    "tart_side": "fullcourse:block/glow_berry_tart_side"
+    "tart_side": "fullcourse:block/glow_berry_tart_side",
+    "tart_inside": "fullcourse:block/glow_berry_tart_inside",
+    "berry": "fullcourse:block/glow_berry_tart_berry"
   },
   "elements": [
     {
@@ -28,12 +30,12 @@
           ]
         },
         "north": {
-          "texture": "#tart_top",
+          "texture": "#tart_inside",
           "uv": [
             3,
-            7,
+            13,
             8,
-            10
+            16
           ]
         },
         "south": {
@@ -46,12 +48,12 @@
           ]
         },
         "east": {
-          "texture": "#tart_top",
+          "texture": "#tart_inside",
           "uv": [
             3,
-            7,
+            13,
             8,
-            10
+            16
           ]
         },
         "west": {

@@ -6,6 +6,7 @@
     "particle": "fullcourse:block/roast_banquet_roast_side",
     "roast_top": "fullcourse:block/roast_banquet_roast_top",
     "roast_side": "fullcourse:block/roast_banquet_roast_side",
+    "leg": "fullcourse:block/roast_banquet_leg",
     "sides": "fullcourse:block/roast_banquet_sides"
   },
   "elements": [

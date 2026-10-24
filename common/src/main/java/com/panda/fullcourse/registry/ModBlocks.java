@@ -41,18 +41,20 @@ public final class ModBlocks {
     public static final DeferredBlock<WildEmberPepperBlock> WILD_EMBER_PEPPERS = BLOCKS.registerBlock("wild_ember_peppers", WildEmberPepperBlock::new,
             p -> p.mapColor(MapColor.CRIMSON_NYLIUM).noCollision().instabreak().sound(SoundType.ROOTS).offsetType(BlockBehaviour.OffsetType.XZ)
                     .pushReaction(PushReaction.POPPED));
-    public static final DeferredBlock<FeastBlock> ROAST_BANQUET = feast("roast_banquet", MapColor.COLOR_BROWN);
-    public static final DeferredBlock<FeastBlock> HARVEST_PIE = feast("harvest_pie", MapColor.COLOR_ORANGE);
-    public static final DeferredBlock<FeastBlock> GLOW_BERRY_TART = feast("glow_berry_tart", MapColor.COLOR_YELLOW);
+    public static final DeferredBlock<FeastBlock> ROAST_BANQUET = feast("roast_banquet", MapColor.COLOR_BROWN, 0);
+    public static final DeferredBlock<FeastBlock> HARVEST_PIE = feast("harvest_pie", MapColor.COLOR_ORANGE, 0);
+    /** Its glow berries give a little light, as a candle does. */
+    public static final DeferredBlock<FeastBlock> GLOW_BERRY_TART = feast("glow_berry_tart", MapColor.COLOR_YELLOW, 5);
 
     private ModBlocks() {}
 
     /** A feast, its servings and platter from the item table. */
-    private static DeferredBlock<FeastBlock> feast(String id, MapColor color) {
+    private static DeferredBlock<FeastBlock> feast(String id, MapColor color, int light) {
         JsonObject e = ModItems.Table.entry(id);
         int servings = e.get("servings").getAsInt(), serving = e.get("serving").getAsInt();
         boolean platter = e.get("platter").getAsBoolean();
         return BLOCKS.registerBlock(id, p -> new FeastBlock(p, servings, serving, platter),
-                p -> p.mapColor(color).strength(0.5F).sound(SoundType.WOOL).noOcclusion().pushReaction(PushReaction.POPPED));
+                p -> p.mapColor(color).strength(0.5F).sound(SoundType.WOOL).noOcclusion().pushReaction(PushReaction.POPPED)
+                        .lightLevel(state -> light));
     }
 }
