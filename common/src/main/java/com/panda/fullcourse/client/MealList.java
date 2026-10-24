@@ -47,14 +47,14 @@ public final class MealList {
         long now = player.level().getGameTime();
         List<Meals.Meal<Identifier>> meals = state.meals().active();
         int free = Math.max(0, state.slots() - meals.size());
-        Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()));
+        Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()), state.bonusSlots());
         boolean more = next != Milestones.Next.NONE && state.slots() < FullCourseConfig.maxMealSlots();
 
         int tx = PAD + 20, room = w - tx - PAD;
         List<List<FormattedCharSequence>> lines = new ArrayList<>();
         int rows = 0;
         for (Meals.Meal<Identifier> meal : meals) {
-            List<FormattedCharSequence> wrapped = font.split(Component.literal(benefits(meal)), room);
+            List<FormattedCharSequence> wrapped = font.split(Component.literal(benefits(meal, now)), room);
             lines.add(wrapped);
             rows += Math.max(ROW, 12 + 10 * wrapped.size());
         }
@@ -75,9 +75,7 @@ public final class MealList {
             Meals.Meal<Identifier> meal = meals.get(i);
             ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.getValue(meal.dish()));
             g.item(stack, x + PAD, cy + 2);
-            String time = FoodText.duration((int) Math.min(Integer.MAX_VALUE, meal.remaining(now)));
-            g.text(font, time, x + w - PAD - font.width(time), cy + 1, DIM, false);
-            g.text(font, fit(font, stack.getHoverName().getString(), room - font.width(time) - 4), x + tx, cy + 1, meal.tier().color(), false);
+            g.text(font, fit(font, stack.getHoverName().getString(), room), x + tx, cy + 1, meal.tier().color(), false);
             List<FormattedCharSequence> wrapped = lines.get(i);
             for (int l = 0; l < wrapped.size(); l++) g.text(font, wrapped.get(l), x + tx, cy + 11 + 10 * l, DIM, false);
             int rowH = Math.max(ROW, 12 + 10 * wrapped.size());
@@ -100,11 +98,12 @@ public final class MealList {
         if (hovered != null) g.setTooltipForNextFrame(font, hovered, mouseX, mouseY);
     }
 
-    /** "III · Brawn, Vigor, Mending": the level first, since it applies to every family the meal gives. */
-    private static String benefits(Meals.Meal<Identifier> meal) {
+    /** "19:59 · III · Brawn, Vigor, Mending": time left, then the level, which applies to every family the meal gives. */
+    private static String benefits(Meals.Meal<Identifier> meal, long now) {
         String names = meal.families().stream().map(f -> Component.translatable("family.fullcourse." + f.key()).getString())
                 .collect(Collectors.joining(", "));
-        return Component.translatable("enchantment.level." + meal.level()).getString() + " · " + names;
+        String time = FoodText.duration((int) Math.min(Integer.MAX_VALUE, meal.remaining(now)));
+        return time + " · " + Component.translatable("enchantment.level." + meal.level()).getString() + " · " + names;
     }
 
     /** {@code s} cut to {@code width} with an ellipsis. */

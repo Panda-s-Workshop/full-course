@@ -44,8 +44,10 @@ class MilestoneTest {
     }
 
     @Test
-    void theFifthSlotIsReachableInABaseInstall() {
-        // 21 of the mod's dishes have three stars or more, plus rabbit stew and cake
-        assertTrue(Milestones.FIFTH <= 21 + 2);
+    void nextSkipsSlotsAlreadyEarned() {
+        // a command gave the third slot, or a datapack rated dishes lower after it was earned
+        assertEquals(new Milestones.Next(4, 3, 1, 15, false), Milestones.next(count(3, 1, false), 1));
+        assertEquals(Milestones.Next.NONE, Milestones.next(count(0, 0, false), 3));
+        assertEquals(Milestones.next(count(12, 9, false)), Milestones.next(count(12, 9, false), 0));
     }
 }

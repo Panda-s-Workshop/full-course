@@ -9,6 +9,7 @@ import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
@@ -24,7 +25,6 @@ public final class ClientSync {
     private static final SystemToast.SystemToastId HINT = new SystemToast.SystemToastId(10_000L);
     /** Ticks to wait after the table arrives, so the player's food state (synced separately) is there too. */
     private static final int HINT_DELAY = 60;
-    private static final SystemToast.SystemToastId SLOT = new SystemToast.SystemToastId(5_000L);
     private static int hintIn = -1;
     private static boolean hinted;
     /** Unlocked slots last seen, once the login's state has arrived; -1 until then, so joining doesn't announce. */
@@ -57,31 +57,29 @@ public final class ClientSync {
         if (slotsSeen < 0 || mc.player == null) return;
         FoodState state = Services.PLATFORM.foodState(mc.player);
         int slots = state.slots();
-        if (slots <= slotsSeen) {
-            slotsSeen = slots;
-            return;
-        }
+        // only ever up: a respawn or a dimension change may show an empty state for a tick, and that's no new slot
+        if (slots <= slotsSeen) return;
         slotsSeen = slots;
         String ordinal = "gui.fullcourse.ordinal." + slots;
         Component title = Language.getInstance().has(ordinal)
                 ? Component.translatable("toast.fullcourse.slot.title", Component.translatable(ordinal))
                 : Component.translatable("toast.fullcourse.slot.title_n", slots);
-        Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()));
+        Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()), state.bonusSlots());
         Component body = next == Milestones.Next.NONE || slots >= FullCourseConfig.maxMealSlots()
                 ? Component.translatable("toast.fullcourse.slot.last")
                 : Component.translatable(next.needsFeast() ? "toast.fullcourse.slot.next_feast" : "toast.fullcourse.slot.next",
                         next.need(), "★".repeat(next.stars()));
-        SystemToast.addOrUpdate(mc.gui.toastManager(), SLOT, title, body);
+        mc.gui.toastManager().addToast(new SlotToast(title, body));
         mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.AMETHYST_BLOCK_CHIME, 1.2F, 1.0F));
         mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.PLAYER_LEVELUP, 1.5F, 0.35F));
     }
 
-    /** The slot toast is on screen (for the harness). */
+    /** The slot toast is on screen (for checks). */
     public static boolean slotToastShowing() {
-        return Minecraft.getInstance().gui.toastManager().getToast(SystemToast.class, SLOT) != null;
+        return Minecraft.getInstance().gui.toastManager().getToast(SlotToast.class, Toast.NO_TOKEN) != null;
     }
 
-    /** The hint is on screen (for the harness). */
+    /** The hint is on screen (for checks). */
     public static boolean hintShowing() {
         return Minecraft.getInstance().gui.toastManager().getToast(SystemToast.class, HINT) != null;
     }

@@ -51,7 +51,7 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * The food rules checked on a real server, shared by both loaders: NeoForge runs each
- * as a GameTest, Fabric runs them all in the harness scenario {@code rules}.
+ * as a GameTest, Fabric runs them all in a dev client.
  * <p>
  * Each check runs inside one server tick: it drives {@link FoodRules#tick(ServerPlayer, long)} and
  * {@link FoodRules#onEatDish} at explicit game times far ahead of the clock, so the player's own ticks can't

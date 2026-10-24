@@ -30,6 +30,8 @@ import net.minecraft.world.level.gamerules.GameRules;
 public final class FoodRules {
     /** Vanilla's cake slice: 2 nutrition. */
     public static final int CAKE_SLICE_NUTRITION = 2;
+    /** How often a player's slots are counted again outside meals (after a login or a datapack reload). */
+    private static final int SLOT_CHECK_TICKS = 100;
     /** Each player's current Saturation effect and its ticks so far: it heals on the first and then every second. */
     private static final Map<UUID, SaturationRun> SATURATION = new HashMap<>();
 
@@ -84,13 +86,17 @@ public final class FoodRules {
     }
 
     /**
-     * The slots the tasted set has earned ({@link Milestones}), each with its advancement. Slots given another way (a
-     * command) are kept, so this only ever adds. The new slot is there for the meal that earned it.
+     * The slots the tasted set has earned ({@link Milestones}), each with its advancement when it really adds a slot (the
+     * config's maximum may stop short of the fifth). Slots given another way (a command) are kept, so this only ever
+     * adds. The new slot is there for the meal that earned it. Also run every few seconds, so a login or a datapack
+     * that rates dishes higher catches up.
      */
     private static FoodState unlockSlots(ServerPlayer player, FoodState s) {
         int reached = Milestones.reached(Tasting.count(s.tasted(), item -> FoodProfiles.get(player.level().getServer(), item)));
         if (reached <= s.bonusSlots()) return s;
-        for (int k = s.bonusSlots(); k < reached; k++) FoodAdvancements.award(player, "slot_" + (k + 3));
+        for (int k = s.bonusSlots(); k < reached; k++) {
+            if (FullCourseConfig.startingMealSlots() + k + 1 <= FullCourseConfig.maxMealSlots()) FoodAdvancements.award(player, "slot_" + (k + 3));
+        }
         return s.withBonusSlots(reached);
     }
 
@@ -105,6 +111,7 @@ public final class FoodRules {
         restoreHealth(player);
         FoodState before = state(player);
         FoodState s = before.withMeals(before.meals().expire(now));
+        if (now % SLOT_CHECK_TICKS == 0) s = unlockSlots(player, s);
         if (!FullCourseConfig.keepVanillaHunger()) {
             if (now % Recovery.NOURISH_TICKS == 0 && s.nourish() > 0) {
                 if (player.isHurt()) player.heal(1F);

@@ -42,7 +42,15 @@ public final class Milestones {
     }
 
     public static Next next(Count c) {
-        return switch (reached(c)) {
+        return next(c, 0);
+    }
+
+    /**
+     * The next milestone past those reached and those already {@code earned} (slots given by a command, or earned before
+     * a datapack rated dishes lower): the one whose slot the player doesn't have yet.
+     */
+    public static Next next(Count c, int earned) {
+        return switch (Math.max(reached(c), earned)) {
             case 0 -> new Next(3, 2, c.prepared(), THIRD, false);
             case 1 -> new Next(4, 3, c.hearty(), FOURTH, false);
             case 2 -> new Next(5, 3, c.hearty(), FIFTH, !c.feast());

@@ -43,11 +43,18 @@ public class JournalScreen extends Screen {
     private static final int LABEL = 0xFF404040, FADE = 0xB08B8B8B, WELL = 0xFF3C3C3C;
 
     private final List<Item> dishes = new ArrayList<>();
+    /** A fixed list to show instead of the server's dishes (for checks: a pack with more dishes than one page). */
+    private final List<Item> fixed;
     private int left, top, scroll;
     private boolean dragging;
 
     public JournalScreen() {
+        this(null);
+    }
+
+    public JournalScreen(List<Item> fixed) {
         super(Component.translatable("item.fullcourse.tasting_journal"));
+        this.fixed = fixed == null ? null : List.copyOf(fixed);
     }
 
     public static void open() {
@@ -59,7 +66,7 @@ public class JournalScreen extends Screen {
         left = (width - W) / 2;
         top = (height - H) / 2;
         dishes.clear();
-        dishes.addAll(dishes(state().tasted()));
+        dishes.addAll(fixed != null ? fixed : dishes(state().tasted()));
         scroll = Mth.clamp(scroll, 0, maxScroll());
     }
 
@@ -155,7 +162,7 @@ public class JournalScreen extends Screen {
     /** "Meal slot 4" and "9 / 15 ★★★", a bar in the counted tier's colour, and the whole rule on hover. */
     private void milestone(GuiGraphicsExtractor g, FoodState state, int mouseX, int mouseY) {
         Milestones.Count count = Tasting.clientCount(state.tasted());
-        Milestones.Next next = Milestones.next(count);
+        Milestones.Next next = Milestones.next(count, state.bonusSlots());
         int y = top + 18;
         if (next == Milestones.Next.NONE || state.slots() >= FullCourseConfig.maxMealSlots()) {
             Component all = Component.translatable("gui.fullcourse.journal.all");
@@ -217,7 +224,7 @@ public class JournalScreen extends Screen {
         scroll = Mth.clamp(Math.round(at * maxScroll()), 0, maxScroll());
     }
 
-    /** The first row shown, for the harness. */
+    /** The first row shown, for checks. */
     public int scroll() {
         return scroll;
     }
