@@ -6,13 +6,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.panda.fullcourse.FullCourse;
+import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.food.FoodProfiles;
+import com.panda.fullcourse.food.FoodState;
 import com.panda.fullcourse.food.Profile;
 import com.panda.fullcourse.kitchen.CookingPotBlockEntity;
 import com.panda.fullcourse.kitchen.CuttingBoardBlockEntity;
 import com.panda.fullcourse.kitchen.KitchenTags;
 import com.panda.fullcourse.logic.Family;
+import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.registry.ModBlocks;
 import com.panda.fullcourse.registry.ModItems;
 import com.panda.fullcourse.registry.ModRecipes;
@@ -22,11 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.permissions.PermissionSet;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.InteractionHand;
@@ -82,6 +87,8 @@ final class KitchenChecks {
         checks.put("wild_onions_in_plains", KitchenChecks::wildOnionsInPlains);
         checks.put("meal_advancements", KitchenChecks::mealAdvancements);
         checks.put("tier_command", KitchenChecks::tierCommand);
+        checks.put("meals_command", KitchenChecks::mealsCommand);
+        checks.put("unlock_command", KitchenChecks::unlockCommand);
         StationChecks.register(checks);
         FeastChecks.register(checks);
     }
@@ -459,5 +466,51 @@ final class KitchenChecks {
         } catch (CommandSyntaxException e) {
             check(false, "/fullcourse tier failed to parse: %s", e.getMessage());
         }
+    }
+
+    /** {@code /fullcourse meals} counts the player's meals; naming a player needs operator rights. */
+    private static void mealsCommand(RuleChecks.Ctx c) {
+        Services.PLATFORM.setFoodState(c.player(), FoodState.EMPTY);
+        FoodRules.onEatDish(c.player(), item("vegetable_stew"), 6);
+        var dispatcher = c.server().getCommands().getDispatcher();
+        var player = c.player().createCommandSourceStack().withPermission(PermissionSet.NO_PERMISSIONS).withSuppressedOutput();
+        try {
+            int own = dispatcher.execute("fullcourse meals", player);
+            int named = dispatcher.execute("fullcourse meals @s", operator(c));
+            check(own == 1 && named == 1, "/fullcourse meals: %s and %s by name (1 meal)", own, named);
+        } catch (CommandSyntaxException e) {
+            check(false, "/fullcourse meals failed to parse: %s", e.getMessage());
+        }
+        check(!parses(c, "fullcourse meals @s", player), "naming a player in /fullcourse meals needs operator rights");
+    }
+
+    private static CommandSourceStack operator(RuleChecks.Ctx c) {
+        return c.server().createCommandSourceStack().withEntity(c.player()).withSuppressedOutput();
+    }
+
+    private static boolean parses(RuleChecks.Ctx c, String command, CommandSourceStack source) {
+        return !c.server().getCommands().getDispatcher().parse(command, source).getReader().canRead();
+    }
+
+    /** {@code /fullcourse unlock} raises the slots, never lowers them, and stops at the config's maximum. */
+    private static void unlockCommand(RuleChecks.Ctx c) {
+        Services.PLATFORM.setFoodState(c.player(), FoodState.EMPTY);
+        var dispatcher = c.server().getCommands().getDispatcher();
+        var source = operator(c);
+        String who = "@s";
+        try {
+            int up = dispatcher.execute("fullcourse unlock " + who + " 4", source);
+            int four = FoodRules.state(c.player()).slots();
+            int down = dispatcher.execute("fullcourse unlock " + who + " 3", source);
+            int still = FoodRules.state(c.player()).slots();
+            int over = dispatcher.execute("fullcourse unlock " + who + " " + (FullCourseConfig.maxMealSlots() + 1), source);
+            check(up == 1 && four == 4 && down == 0 && still == 4 && over == 0,
+                    "/fullcourse unlock: to 4 gave %s (%s slots), to 3 gave %s (%s slots), past the maximum gave %s", up, four, down, still, over);
+        } catch (CommandSyntaxException e) {
+            check(false, "/fullcourse unlock failed to parse: %s", e.getMessage());
+        }
+        check(!parses(c, "fullcourse unlock @s 4", c.player().createCommandSourceStack().withPermission(PermissionSet.NO_PERMISSIONS)),
+                "/fullcourse unlock needs operator rights");
+        Services.PLATFORM.setFoodState(c.player(), FoodState.EMPTY);
     }
 }
