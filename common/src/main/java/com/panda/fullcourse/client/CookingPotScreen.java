@@ -7,10 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.tooltip.BelowOrAboveWidgetTooltipPositioner;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -27,6 +30,8 @@ public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
     /** Vanilla's dark red for text on a container panel. */
     private static final int STATUS_COLOR = 0xFFA0302A;
     public static final int FLAME_X = 49, FLAME_Y = 56, ARROW_X = 89, ARROW_Y = 26;
+    /** Set when a recipe viewer makes the arrow a button with its own tooltip, which then carries {@link #arrowLines()}. */
+    public static boolean arrowTooltipFromViewer;
 
     public CookingPotScreen(CookingPotMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 176, 166);
@@ -61,12 +66,21 @@ public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
         if (isHovering(FLAME_X, FLAME_Y, 14, 14, mouseX, mouseY)) {
             g.setTooltipForNextFrame(font, menu.heated() ? Component.translatable("gui.fullcourse.pot.heated").withStyle(ChatFormatting.GOLD)
                     : Component.translatable("gui.fullcourse.pot.cold"), mouseX, mouseY);
-        } else if (isHovering(ARROW_X, ARROW_Y, 24, 16, mouseX, mouseY)) {
-            List<Component> lines = new ArrayList<>();
-            if (menu.progress() > 0) lines.add(Component.translatable("gui.fullcourse.pot.progress", Math.round(menu.progress() * 100)));
-            lines.addAll(PotPreview.lines(grid()));
-            if (!lines.isEmpty()) g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
+        } else if (!arrowTooltipFromViewer && isHovering(ARROW_X, ARROW_Y, 24, 16, mouseX, mouseY)) {
+            // below the arrow and wrapped to the room on its right, so the tooltip never covers the grid it talks about
+            int room = Math.max(120, width - (leftPos + ARROW_X) - 12);
+            List<FormattedCharSequence> lines = arrowLines().stream().flatMap(c -> font.split(c, room).stream()).toList();
+            var arrow = new ScreenRectangle(leftPos + ARROW_X, topPos + ARROW_Y, 24, 16);
+            if (!lines.isEmpty()) g.setTooltipForNextFrame(font, lines, new BelowOrAboveWidgetTooltipPositioner(arrow), mouseX, mouseY, false);
         }
+    }
+
+    /** What the arrow says: how far the dish is, and what the grid makes or still needs ({@link PotPreview}). */
+    public List<Component> arrowLines() {
+        List<Component> lines = new ArrayList<>();
+        if (menu.progress() > 0) lines.add(Component.translatable("gui.fullcourse.pot.progress", Math.round(menu.progress() * 100)));
+        lines.addAll(PotPreview.lines(grid()));
+        return lines;
     }
 
     /** The items in the ingredient grid, the menu's first slots. */

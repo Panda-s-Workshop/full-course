@@ -16,6 +16,7 @@ import com.panda.fullcourse.neoforge.client.compat.AppleSkinCompat;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModMenus;
+import com.panda.fullcourse.registry.ModRecipes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Hud;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -63,8 +64,12 @@ public final class FullCourseClient {
         if (ModList.get().isLoaded("cookingforblockheads")) CookingForBlockheadsClient.register();
         NeoForge.EVENT_BUS.addListener((GameShuttingDownEvent e) -> DevExit.onClientStopping());
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> ClientSync.disconnected());
-        // before recipe viewers read them (JEI listens at the lowest priority)
-        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, false, (RecipesReceivedEvent e) -> KitchenRecipes.received(type -> e.getRecipeMap().byType((RecipeType) type)));
+        // before recipe viewers read them (JEI listens at the lowest priority); only an event that carries the kitchen's types
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, false, (RecipesReceivedEvent e) -> {
+            if (ModRecipes.kitchenTypes().stream().anyMatch(e.getRecipeTypes()::contains)) {
+                KitchenRecipes.received(type -> e.getRecipeMap().byType((RecipeType) type));
+            }
+        });
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e) -> ClientSync.tick());
     }
 }

@@ -60,6 +60,10 @@ public final class IngredientMatch {
     public static <I, S> int[] missing(List<I> ingredients, List<S> slots, BiPredicate<I, S> accepts, ToIntFunction<S> count,
             BiPredicate<S, S> same, Predicate<S> spare) {
         int n = ingredients.size();
+        for (S slot : slots) {
+            if (count.applyAsInt(slot) <= 0 || spare.test(slot)) continue;
+            if (ingredients.stream().noneMatch(i -> accepts.test(i, slot))) return null;
+        }
         // subsets of the ingredients from the largest down: the first that matches leaves the fewest to add (n is at most 6)
         for (int size = n; size >= 0; size--) {
             for (int mask = 0; mask < 1 << n; mask++) {

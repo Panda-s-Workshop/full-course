@@ -4,6 +4,7 @@ import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.client.BrickOvenScreen;
 import com.panda.fullcourse.client.CookingPotScreen;
 import com.panda.fullcourse.client.KitchenRecipes;
+import com.panda.fullcourse.client.MealList;
 import com.panda.fullcourse.kitchen.BakingRecipe;
 import com.panda.fullcourse.kitchen.CookingRecipe;
 import com.panda.fullcourse.kitchen.CuttingRecipe;
@@ -11,21 +12,33 @@ import com.panda.fullcourse.kitchen.FermentingRecipe;
 import com.panda.fullcourse.kitchen.KitchenTags;
 import com.panda.fullcourse.registry.ModBlocks;
 import com.panda.fullcourse.registry.ModRecipes;
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Supplier;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.gui.builder.ITooltipBuilder;
+import mezz.jei.api.gui.handlers.IGuiClickableArea;
+import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusFactory;
 import mezz.jei.api.recipe.types.IRecipeHolderType;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.runtime.IRecipesGui;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
 /**
  * The kitchen in JEI: a page per station (Cutting Board, Cooking Pot, Brick Oven, Fermenting Crock) with its recipes,
- * the stations and knives as the blocks that make them, and the pot's and oven's arrows open their pages. JEI finds
+ * the stations and knives as the blocks that make them, and the pot's and oven's arrows open their pages (the pot's
+ * tooltip keeps the arrow's preview). JEI keeps its panels out of the meal list beside the inventory. JEI finds
  * this through its annotation on NeoForge and the {@code jei_mod_plugin} entrypoint on Fabric; nothing loads it
  * without JEI.
  */
@@ -70,7 +83,39 @@ public final class FullCourseJeiPlugin implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addRecipeClickArea(CookingPotScreen.class, CookingPotScreen.ARROW_X, CookingPotScreen.ARROW_Y, 24, 16, COOKING.get());
+        // the pot's arrow opens the pot page, and its "show recipes" tooltip carries the arrow's own lines
+        registration.addGuiContainerHandler(CookingPotScreen.class, new IGuiContainerHandler<CookingPotScreen>() {
+            @Override
+            public Collection<IGuiClickableArea> getGuiClickableAreas(CookingPotScreen screen, double mouseX, double mouseY) {
+                IGuiClickableArea basic = IGuiClickableArea.createBasic(CookingPotScreen.ARROW_X, CookingPotScreen.ARROW_Y, 24, 16, COOKING.get());
+                return List.of(new IGuiClickableArea() {
+                    @Override
+                    public Rect2i getArea() {
+                        return basic.getArea();
+                    }
+
+                    @Override
+                    public void getTooltip(ITooltipBuilder tooltip) {
+                        tooltip.addAll(screen.arrowLines());
+                        tooltip.add(Component.translatable("gui.fullcourse.jei.show_recipes").withStyle(ChatFormatting.GRAY));
+                    }
+
+                    @Override
+                    public void onClick(IFocusFactory focusFactory, IRecipesGui recipesGui) {
+                        basic.onClick(focusFactory, recipesGui);
+                    }
+                });
+            }
+        });
+        CookingPotScreen.arrowTooltipFromViewer = true;
+        // JEI's panels stay out of the meal list beside the inventory
+        registration.addGuiContainerHandler(InventoryScreen.class, new IGuiContainerHandler<InventoryScreen>() {
+            @Override
+            public List<Rect2i> getGuiExtraAreas(InventoryScreen screen) {
+                Rect2i area = MealList.area();
+                return area == null ? List.of() : List.of(area);
+            }
+        });
         registration.addRecipeClickArea(BrickOvenScreen.class, BrickOvenScreen.ARROW_X, BrickOvenScreen.ARROW_Y, 24, 16, BAKING.get());
     }
 }

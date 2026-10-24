@@ -1,10 +1,16 @@
 package com.panda.fullcourse.client;
 
+import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodTags;
 import com.panda.fullcourse.kitchen.CookingRecipe;
+import com.panda.fullcourse.kitchen.RecipeHints;
 import com.panda.fullcourse.logic.IngredientMatch;
+import com.panda.fullcourse.logic.Tier;
 import com.panda.fullcourse.registry.ModRecipes;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.ChatFormatting;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
@@ -15,38 +21,112 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 
 /**
- * What the Cooking Pot's arrow says about the grid: the dish it makes, or the nearest dish and what it still needs
- * ("Beef Stew needs any onion, Broth"), or that something in the grid fits no recipe. Read from the recipes the
- * server sent ({@link KitchenRecipes}), so it follows data packs.
+ * What the Cooking Pot's arrow says about the grid: the dish it makes (with its stars and what it's served in), or the
+ * nearest dish and what it still needs ("Beef Stew needs any onion, Broth", with where an ingredient that's made first
+ * comes from), or which item no pot recipe uses. The nearest dish is the one with the fewest ingredients still to add,
+ * the better dish on a tie; a recipe none of the grid counts towards is never nearest. Read from the recipes the server
+ * sent ({@link KitchenRecipes}), so it follows data packs; worked out once per grid, not every frame.
  */
 public final class PotPreview {
+    /** At most this many "where it comes from" lines under a missing list. */
+    private static final int MAX_FROM = 3;
+    private static List<RecipeHolder<CookingRecipe>> cachedRecipes;
+    private static List<ItemStack> cachedGrid = List.of();
+    private static List<Component> cachedLines = List.of();
+
     private PotPreview() {}
 
     /** The arrow's lines for these grid items; empty when the grid is empty or no recipe is known. */
     public static List<Component> lines(List<ItemStack> grid) {
         List<RecipeHolder<CookingRecipe>> recipes = KitchenRecipes.of(ModRecipes.COOKING.get());
+        if (recipes != cachedRecipes || !sameGrid(grid, cachedGrid)) {
+            cachedLines = compute(grid, recipes);
+            cachedRecipes = recipes;
+            cachedGrid = grid.stream().map(ItemStack::copy).toList();
+        }
+        return cachedLines;
+    }
+
+    private static boolean sameGrid(List<ItemStack> a, List<ItemStack> b) {
+        if (a.size() != b.size()) return false;
+        for (int i = 0; i < a.size(); i++) if (!ItemStack.matches(a.get(i), b.get(i))) return false;
+        return true;
+    }
+
+    private static List<Component> compute(List<ItemStack> grid, List<RecipeHolder<CookingRecipe>> recipes) {
         if (recipes.isEmpty() || grid.stream().allMatch(s -> s.isEmpty() || s.is(FoodTags.CONTAINERS))) return List.of();
-        RecipeHolder<CookingRecipe> nearest = null;
+        CookingRecipe nearest = null;
         int[] nearestMissing = null;
         for (RecipeHolder<CookingRecipe> holder : recipes) {
-            List<Ingredient> ingredients = holder.value().ingredients();
+            CookingRecipe recipe = holder.value();
+            List<Ingredient> ingredients = recipe.ingredients();
             int[] missing = IngredientMatch.missing(ingredients, grid, Ingredient::test, ItemStack::getCount,
                     ItemStack::isSameItemSameComponents, s -> s.is(FoodTags.CONTAINERS));
-            // a recipe none of the grid counts towards isn't near
             if (missing == null || missing.length == ingredients.size()) continue;
-            if (missing.length == 0) return List.of(Component.translatable("gui.fullcourse.pot.makes", holder.value().result().create().getHoverName()));
-            if (nearestMissing == null || missing.length < nearestMissing.length) {
-                nearest = holder;
+            if (missing.length == 0) return List.of(Component.translatable("gui.fullcourse.pot.makes", dish(recipe, true)));
+            if (nearestMissing == null || missing.length < nearestMissing.length
+                    || missing.length == nearestMissing.length && stars(recipe) > stars(nearest)) {
+                nearest = recipe;
                 nearestMissing = missing;
             }
         }
-        if (nearest == null) return List.of(Component.translatable("gui.fullcourse.pot.strays").withStyle(ChatFormatting.GRAY));
-        MutableComponent needs = Component.empty();
-        for (int i = 0; i < nearestMissing.length; i++) {
-            if (i > 0) needs.append(Component.literal(", "));
-            needs.append(name(nearest.value().ingredients().get(nearestMissing[i])));
+        if (nearest == null) return List.of(strays(grid, recipes));
+        // one entry per ingredient still missing, counted ("Sugar ×2")
+        Map<String, Integer> counts = new LinkedHashMap<>();
+        Map<String, Component> names = new LinkedHashMap<>();
+        Map<String, Ingredient> ingredients = new LinkedHashMap<>();
+        for (int i : nearestMissing) {
+            Ingredient ingredient = nearest.ingredients().get(i);
+            Component name = name(ingredient);
+            String key = name.getString();
+            counts.merge(key, 1, Integer::sum);
+            names.putIfAbsent(key, name);
+            ingredients.putIfAbsent(key, ingredient);
         }
-        return List.of(Component.translatable("gui.fullcourse.pot.missing", nearest.value().result().create().getHoverName(), needs));
+        MutableComponent needs = Component.empty();
+        boolean first = true;
+        for (var e : counts.entrySet()) {
+            if (!first) needs.append(Component.literal(", "));
+            first = false;
+            Component name = names.get(e.getKey());
+            needs.append(e.getValue() > 1 ? Component.translatable("gui.fullcourse.pot.times", name, e.getValue()) : name);
+        }
+        List<Component> out = new ArrayList<>();
+        out.add(Component.translatable("gui.fullcourse.pot.missing", dish(nearest, false), needs));
+        // where an ingredient that's made first comes from ("Broth: Cooking Pot: Bone, in a Glass Bottle")
+        for (var e : ingredients.entrySet()) {
+            if (out.size() > MAX_FROM) break;
+            var single = e.getValue().getSingleItem();
+            if (single.isEmpty()) continue;
+            List<Component> made = RecipeHints.lines(single.get().value());
+            if (made.isEmpty()) continue;
+            out.add(Component.translatable("gui.fullcourse.pot.from", names.get(e.getKey()), made.getFirst()).withStyle(ChatFormatting.DARK_AQUA));
+        }
+        return List.copyOf(out);
+    }
+
+    /** "Vegetable Stew ★★★, in a Bowl": the dish in its tier colour, its stars, and, if asked, what it's served in. */
+    private static Component dish(CookingRecipe recipe, boolean servedIn) {
+        ItemStack result = recipe.result().create();
+        Tier tier = FoodProfiles.clientReady() ? FoodProfiles.client(result.getItem()).tier() : Tier.RAW;
+        MutableComponent out = result.getHoverName().copy().withColor(tier.color() & 0xFFFFFF);
+        if (tier.stars() > 0) out.append(Component.literal(" " + "★".repeat(tier.stars())));
+        if (servedIn) recipe.container().ifPresent(c -> out.append(Component.translatable("hint.fullcourse.served_in", name(c))));
+        return out;
+    }
+
+    private static int stars(CookingRecipe recipe) {
+        return FoodProfiles.clientReady() ? FoodProfiles.client(recipe.result().create().getItem()).tier().stars() : 0;
+    }
+
+    /** Names the first item no pot recipe uses; when each fits some recipe, says none uses them all. */
+    private static Component strays(List<ItemStack> grid, List<RecipeHolder<CookingRecipe>> recipes) {
+        for (ItemStack stack : grid) {
+            if (stack.isEmpty() || stack.is(FoodTags.CONTAINERS)) continue;
+            boolean used = recipes.stream().anyMatch(h -> h.value().ingredients().stream().anyMatch(i -> i.test(stack)));
+            if (!used) return Component.translatable("gui.fullcourse.pot.unused", stack.getHoverName()).withStyle(ChatFormatting.GRAY);
+        }
+        return Component.translatable("gui.fullcourse.pot.strays").withStyle(ChatFormatting.GRAY);
     }
 
     /** A tag's own name when the mod names it ("any onion"), otherwise its first item's. */

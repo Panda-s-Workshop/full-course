@@ -17,6 +17,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -32,11 +33,20 @@ public final class MealList {
     private static final int MAX_W = 156, MIN_W = 104, ROW = 22, PAD = 4, GAP = 4;
     private static final int BG = 0xD0100010, BORDER = 0xFF2A1A40, TEXT = 0xFFFFFFFF, DIM = 0xFFA0A0A0;
 
+    /** Where the list was drawn last frame; null while it isn't shown. */
+    private static Rect2i shown;
+
     private MealList() {}
+
+    /** The list's area on the inventory screen, for recipe viewers to keep clear; null while it isn't shown. */
+    public static Rect2i area() {
+        return shown;
+    }
 
     public static void extract(GuiGraphicsExtractor g, InventoryScreen screen, int mouseX, int mouseY) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
+        shown = null;
         if (player == null || !FoodProfiles.clientReady() || FullCourseConfig.keepVanillaHunger()) return;
         // the recipe book moves the inventory off centre and takes this space
         if (screen.leftPos != (screen.width - 176) / 2) return;
@@ -60,6 +70,7 @@ public final class MealList {
         }
         int h = PAD + 12 + (meals.isEmpty() ? ROW : rows) + (free > 0 && !meals.isEmpty() ? 11 : 0) + (more ? 22 : 0) + PAD - 2;
         int x = screen.leftPos - GAP - w, y = Math.max(GAP, Math.min(screen.topPos, screen.height - GAP - h));
+        shown = new Rect2i(x, y, w, h);
         g.fill(x, y, x + w, y + h, BG);
         g.outline(x, y, w, h, BORDER);
 
