@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:cooked_beef",
+    "fullcourse:roasted_ember_pepper"
+  ],
+  "result": {
+    "id": "fullcourse:pepper_jerky"
+  }
+}

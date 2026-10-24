@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "fullcourse:block/wild_ember_peppers"
+  }
+}

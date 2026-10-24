@@ -1,0 +1,29 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask anything about playing Full Course: tiers, meal slots and buffs, the kitchen stations, recipes, feasts, the Tasting Journal, servers and modpacks. When someone's answer solves it, mark it as the answer so the next person finds it.
+
+        Found a bug or a crash? [Open an issue](https://github.com/Panda-s-Workshop/full-course/issues/new/choose) instead.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Full Course version
+      placeholder: 0.1.0
+    validations:
+      required: false
+
+  - type: input
+    id: mods
+    attributes:
+      label: Modpack or other mods, if they matter
+    validations:
+      required: false

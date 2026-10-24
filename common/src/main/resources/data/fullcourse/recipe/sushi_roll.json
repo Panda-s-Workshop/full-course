@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "fullcourse:grilled_fillet",
+    "minecraft:dried_kelp"
+  ],
+  "result": {
+    "id": "fullcourse:sushi_roll"
+  }
+}

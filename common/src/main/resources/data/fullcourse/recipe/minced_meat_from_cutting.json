@@ -1,0 +1,8 @@
+{
+  "type": "fullcourse:cutting",
+  "ingredient": "#c:foods/raw_meat",
+  "result": {
+    "id": "fullcourse:minced_meat",
+    "count": 2
+  }
+}

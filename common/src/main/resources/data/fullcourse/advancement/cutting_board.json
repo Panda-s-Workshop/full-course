@@ -1,0 +1,27 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fullcourse:cutting_board"
+    },
+    "title": {
+      "translate": "advancements.fullcourse.cutting_board.title"
+    },
+    "description": {
+      "translate": "advancements.fullcourse.cutting_board.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "parent": "fullcourse:root"
+}

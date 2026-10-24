@@ -1,0 +1,11 @@
+{
+  "type": "fullcourse:cooking",
+  "ingredients": [
+    "minecraft:sugar",
+    "minecraft:sugar"
+  ],
+  "container": "minecraft:glass_bottle",
+  "result": {
+    "id": "fullcourse:syrup"
+  }
+}

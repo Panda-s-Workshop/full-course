@@ -1,0 +1,14 @@
+{
+  "values": [
+    "minecraft:mushroom_stew",
+    "minecraft:rabbit_stew",
+    "minecraft:beetroot_soup",
+    {
+      "id": "#c:foods/soup",
+      "required": false
+    },
+    "fullcourse:pumpkin_soup",
+    "fullcourse:vegetable_stew",
+    "fullcourse:cave_mushroom_soup"
+  ]
+}

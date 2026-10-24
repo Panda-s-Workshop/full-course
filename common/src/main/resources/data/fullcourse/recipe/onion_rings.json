@@ -1,0 +1,10 @@
+{
+  "type": "fullcourse:cooking",
+  "ingredients": [
+    "fullcourse:chopped_onion",
+    "fullcourse:batter"
+  ],
+  "result": {
+    "id": "fullcourse:onion_rings"
+  }
+}

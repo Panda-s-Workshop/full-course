@@ -1,0 +1,10 @@
+{
+  "type": "fullcourse:cooking",
+  "ingredients": [
+    "minecraft:bone"
+  ],
+  "container": "minecraft:glass_bottle",
+  "result": {
+    "id": "fullcourse:broth"
+  }
+}

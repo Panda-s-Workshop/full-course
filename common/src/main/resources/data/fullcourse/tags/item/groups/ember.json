@@ -1,0 +1,11 @@
+{
+  "values": [
+    "minecraft:crimson_fungus",
+    "minecraft:warped_fungus",
+    "minecraft:nether_wart",
+    {
+      "id": "#c:crops/ember_pepper",
+      "required": false
+    }
+  ]
+}

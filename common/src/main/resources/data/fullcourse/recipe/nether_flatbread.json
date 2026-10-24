@@ -1,0 +1,12 @@
+{
+  "type": "fullcourse:baking",
+  "ingredients": [
+    "fullcourse:flatbread",
+    "fullcourse:roasted_ember_pepper",
+    "fullcourse:minced_meat",
+    "fullcourse:cheese"
+  ],
+  "result": {
+    "id": "fullcourse:nether_flatbread"
+  }
+}

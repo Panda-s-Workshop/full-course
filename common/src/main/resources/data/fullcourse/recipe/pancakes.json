@@ -1,0 +1,10 @@
+{
+  "type": "fullcourse:cooking",
+  "ingredients": [
+    "fullcourse:batter",
+    "fullcourse:syrup"
+  ],
+  "result": {
+    "id": "fullcourse:pancakes"
+  }
+}

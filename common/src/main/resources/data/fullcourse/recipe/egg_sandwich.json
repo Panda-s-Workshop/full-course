@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:bread",
+    "fullcourse:fried_egg"
+  ],
+  "result": {
+    "id": "fullcourse:egg_sandwich"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "B": "minecraft:bucket",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "S S",
+    "IBI",
+    "III"
+  ],
+  "result": {
+    "id": "fullcourse:cooking_pot"
+  }
+}

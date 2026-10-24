@@ -1,0 +1,12 @@
+{
+  "type": "fullcourse:fermenting",
+  "ingredients": [
+    "fullcourse:chopped_vegetables",
+    "fullcourse:chopped_vegetables",
+    "minecraft:water_bucket"
+  ],
+  "result": {
+    "id": "fullcourse:pickles",
+    "count": 2
+  }
+}

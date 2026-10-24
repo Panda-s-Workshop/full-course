@@ -1,0 +1,12 @@
+{
+  "type": "fullcourse:cooking",
+  "ingredients": [
+    "minecraft:glow_berries",
+    "minecraft:glow_berries",
+    "minecraft:sugar"
+  ],
+  "container": "minecraft:glass_bottle",
+  "result": {
+    "id": "fullcourse:glow_berry_jam"
+  }
+}

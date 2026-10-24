@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/crop",
+  "textures": {
+    "crop": "fullcourse:block/ember_peppers_stage2"
+  }
+}

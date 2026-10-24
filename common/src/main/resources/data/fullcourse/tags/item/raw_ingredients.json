@@ -1,0 +1,50 @@
+{
+  "values": [
+    "minecraft:apple",
+    "minecraft:melon_slice",
+    "minecraft:chorus_fruit",
+    "minecraft:carrot",
+    "minecraft:potato",
+    "minecraft:beetroot",
+    "minecraft:wheat",
+    "minecraft:sugar_cane",
+    "minecraft:honey_bottle",
+    "minecraft:milk_bucket",
+    "minecraft:kelp",
+    "minecraft:cocoa_beans",
+    "minecraft:pumpkin",
+    "minecraft:sweet_berries",
+    "minecraft:glow_berries",
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom",
+    "minecraft:egg",
+    "minecraft:crimson_fungus",
+    "minecraft:warped_fungus",
+    "minecraft:rotten_flesh",
+    "minecraft:spider_eye",
+    {
+      "id": "#c:crops",
+      "required": false
+    },
+    {
+      "id": "#c:foods/raw_meat",
+      "required": false
+    },
+    {
+      "id": "#c:foods/raw_fish",
+      "required": false
+    },
+    {
+      "id": "#c:foods/berry",
+      "required": false
+    },
+    {
+      "id": "#c:eggs",
+      "required": false
+    },
+    {
+      "id": "#c:mushrooms",
+      "required": false
+    }
+  ]
+}

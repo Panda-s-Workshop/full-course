@@ -1,0 +1,29 @@
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share your finds: your kitchens, feast tables, favourite meal loadouts, and modpacks with Full Course. Seeds and coordinates let others visit the same places.
+
+  - type: textarea
+    id: show
+    attributes:
+      label: What you'd like to share
+      description: Drag screenshots straight into this box.
+    validations:
+      required: true
+
+  - type: input
+    id: seed
+    attributes:
+      label: Seed and coordinates
+      placeholder: Seed 1111, a village kitchen at 152 70 -40
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Full Course version
+      placeholder: 0.1.0
+    validations:
+      required: false

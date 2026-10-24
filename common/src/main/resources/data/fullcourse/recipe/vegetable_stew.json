@@ -1,0 +1,13 @@
+{
+  "type": "fullcourse:cooking",
+  "ingredients": [
+    "fullcourse:chopped_vegetables",
+    "fullcourse:chopped_onion",
+    "minecraft:baked_potato",
+    "fullcourse:broth"
+  ],
+  "container": "minecraft:bowl",
+  "result": {
+    "id": "fullcourse:vegetable_stew"
+  }
+}

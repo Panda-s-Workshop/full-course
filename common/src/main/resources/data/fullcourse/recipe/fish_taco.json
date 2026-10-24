@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "fullcourse:flatbread",
+    "fullcourse:grilled_fillet",
+    "fullcourse:chopped_onion"
+  ],
+  "result": {
+    "id": "fullcourse:fish_taco"
+  }
+}

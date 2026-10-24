@@ -1,0 +1,11 @@
+{
+  "type": "fullcourse:cooking",
+  "ingredients": [
+    "minecraft:chorus_fruit",
+    "fullcourse:syrup"
+  ],
+  "container": "minecraft:glass_bottle",
+  "result": {
+    "id": "fullcourse:chorus_jelly"
+  }
+}

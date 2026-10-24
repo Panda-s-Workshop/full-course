@@ -1,0 +1,12 @@
+{
+  "type": "fullcourse:baking",
+  "ingredients": [
+    "fullcourse:minced_meat",
+    "fullcourse:chopped_vegetables",
+    "minecraft:baked_potato",
+    "fullcourse:butter"
+  ],
+  "result": {
+    "id": "fullcourse:shepherds_pie"
+  }
+}

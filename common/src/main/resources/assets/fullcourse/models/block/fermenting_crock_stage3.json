@@ -1,0 +1,285 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "fullcourse:block/fermenting_crock_side",
+    "side": "fullcourse:block/fermenting_crock_side",
+    "inside": "fullcourse:block/fermenting_crock_inside",
+    "lid": "fullcourse:block/fermenting_crock_lid",
+    "lid_top": "fullcourse:block/fermenting_crock_lid_ready"
+  },
+  "elements": [
+    {
+      "from": [
+        3,
+        0,
+        3
+      ],
+      "to": [
+        13,
+        11,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#side",
+          "uv": [
+            3,
+            5,
+            13,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#side",
+          "uv": [
+            3,
+            5,
+            13,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#side",
+          "uv": [
+            3,
+            5,
+            13,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side",
+          "uv": [
+            3,
+            5,
+            13,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#side",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#inside",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        11,
+        4
+      ],
+      "to": [
+        12,
+        12,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#side",
+          "uv": [
+            4,
+            4,
+            12,
+            5
+          ]
+        },
+        "south": {
+          "texture": "#side",
+          "uv": [
+            4,
+            4,
+            12,
+            5
+          ]
+        },
+        "east": {
+          "texture": "#side",
+          "uv": [
+            4,
+            4,
+            12,
+            5
+          ]
+        },
+        "west": {
+          "texture": "#side",
+          "uv": [
+            4,
+            4,
+            12,
+            5
+          ]
+        },
+        "up": {
+          "texture": "#inside",
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        12,
+        4
+      ],
+      "to": [
+        12,
+        13,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lid",
+          "uv": [
+            4,
+            0,
+            12,
+            2
+          ]
+        },
+        "south": {
+          "texture": "#lid",
+          "uv": [
+            4,
+            0,
+            12,
+            2
+          ]
+        },
+        "east": {
+          "texture": "#lid",
+          "uv": [
+            4,
+            0,
+            12,
+            2
+          ]
+        },
+        "west": {
+          "texture": "#lid",
+          "uv": [
+            4,
+            0,
+            12,
+            2
+          ]
+        },
+        "up": {
+          "texture": "#lid_top",
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ]
+        },
+        "down": {
+          "texture": "#lid",
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ]
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          12,
+          12
+        ],
+        "axis": "x",
+        "angle": 22.5
+      }
+    },
+    {
+      "from": [
+        7,
+        13,
+        7
+      ],
+      "to": [
+        9,
+        14,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#lid",
+          "uv": [
+            7,
+            7,
+            9,
+            9
+          ]
+        },
+        "south": {
+          "texture": "#lid",
+          "uv": [
+            7,
+            7,
+            9,
+            9
+          ]
+        },
+        "east": {
+          "texture": "#lid",
+          "uv": [
+            7,
+            7,
+            9,
+            9
+          ]
+        },
+        "west": {
+          "texture": "#lid",
+          "uv": [
+            7,
+            7,
+            9,
+            9
+          ]
+        },
+        "up": {
+          "texture": "#lid",
+          "uv": [
+            7,
+            7,
+            9,
+            9
+          ]
+        }
+      },
+      "rotation": {
+        "origin": [
+          8,
+          12,
+          12
+        ],
+        "axis": "x",
+        "angle": 22.5
+      }
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "values": [
+    "minecraft:sugar_cane",
+    "minecraft:sugar",
+    "minecraft:honey_bottle",
+    "minecraft:cocoa_beans",
+    {
+      "id": "#c:foods/candy",
+      "required": false
+    }
+  ]
+}

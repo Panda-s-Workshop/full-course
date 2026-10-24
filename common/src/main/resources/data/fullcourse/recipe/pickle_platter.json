@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "fullcourse:pickles",
+    "fullcourse:cheese",
+    "minecraft:bread"
+  ],
+  "result": {
+    "id": "fullcourse:pickle_platter"
+  }
+}

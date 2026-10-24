@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "cookingtime": 600,
+  "experience": 0.35,
+  "ingredient": "fullcourse:ember_pepper",
+  "result": {
+    "id": "fullcourse:roasted_ember_pepper"
+  }
+}

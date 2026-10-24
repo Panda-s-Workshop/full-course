@@ -1,0 +1,11 @@
+{
+  "values": [
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom",
+    "minecraft:glow_berries",
+    {
+      "id": "#c:mushrooms",
+      "required": false
+    }
+  ]
+}

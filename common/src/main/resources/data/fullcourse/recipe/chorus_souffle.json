@@ -1,0 +1,12 @@
+{
+  "type": "fullcourse:baking",
+  "ingredients": [
+    "fullcourse:charred_chorus",
+    "minecraft:egg",
+    "fullcourse:sweet_cream",
+    "fullcourse:syrup"
+  ],
+  "result": {
+    "id": "fullcourse:chorus_souffle"
+  }
+}

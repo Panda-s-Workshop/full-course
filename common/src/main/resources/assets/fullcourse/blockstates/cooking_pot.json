@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "cooking=false,facing=north": {
+      "model": "fullcourse:block/cooking_pot"
+    },
+    "cooking=false,facing=east": {
+      "model": "fullcourse:block/cooking_pot",
+      "y": 90
+    },
+    "cooking=false,facing=south": {
+      "model": "fullcourse:block/cooking_pot",
+      "y": 180
+    },
+    "cooking=false,facing=west": {
+      "model": "fullcourse:block/cooking_pot",
+      "y": 270
+    },
+    "cooking=true,facing=north": {
+      "model": "fullcourse:block/cooking_pot_cooking"
+    },
+    "cooking=true,facing=east": {
+      "model": "fullcourse:block/cooking_pot_cooking",
+      "y": 90
+    },
+    "cooking=true,facing=south": {
+      "model": "fullcourse:block/cooking_pot_cooking",
+      "y": 180
+    },
+    "cooking=true,facing=west": {
+      "model": "fullcourse:block/cooking_pot_cooking",
+      "y": 270
+    }
+  }
+}

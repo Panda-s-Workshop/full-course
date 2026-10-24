@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": "#minecraft:wooden_slabs",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "S##"
+  ],
+  "result": {
+    "id": "fullcourse:cutting_board"
+  }
+}

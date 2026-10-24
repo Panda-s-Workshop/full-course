@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#fullcourse:has_wild_onions",
+  "features": "fullcourse:patch_wild_onions",
+  "step": "vegetal_decoration"
+}

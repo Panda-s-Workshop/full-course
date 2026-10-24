@@ -1,0 +1,11 @@
+{
+  "type": "fullcourse:baking",
+  "ingredients": [
+    "fullcourse:minced_meat",
+    "minecraft:brown_mushroom",
+    "fullcourse:pastry"
+  ],
+  "result": {
+    "id": "fullcourse:mushroom_wellington"
+  }
+}

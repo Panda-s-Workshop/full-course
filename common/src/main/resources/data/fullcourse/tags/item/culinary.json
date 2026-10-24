@@ -1,0 +1,42 @@
+{
+  "values": [
+    "minecraft:wheat",
+    "minecraft:sugar",
+    "minecraft:sugar_cane",
+    "minecraft:cocoa_beans",
+    "minecraft:milk_bucket",
+    "minecraft:pumpkin",
+    "minecraft:kelp",
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom",
+    "minecraft:crimson_fungus",
+    "minecraft:warped_fungus",
+    "minecraft:nether_wart",
+    {
+      "id": "#c:eggs",
+      "required": false
+    },
+    {
+      "id": "#c:mushrooms",
+      "required": false
+    },
+    {
+      "id": "#c:crops",
+      "required": false
+    },
+    "fullcourse:flour",
+    "fullcourse:dough",
+    "fullcourse:batter",
+    "fullcourse:broth",
+    "fullcourse:syrup",
+    "fullcourse:minced_meat",
+    "fullcourse:fish_fillet",
+    "fullcourse:chopped_vegetables",
+    "fullcourse:chopped_onion",
+    "fullcourse:butter",
+    "fullcourse:cheese",
+    "fullcourse:pastry",
+    "fullcourse:sweet_cream",
+    "fullcourse:pickles"
+  ]
+}

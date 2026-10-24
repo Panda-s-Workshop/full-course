@@ -1,0 +1,11 @@
+{
+  "type": "fullcourse:baking",
+  "ingredients": [
+    "minecraft:apple",
+    "minecraft:sugar",
+    "fullcourse:pastry"
+  ],
+  "result": {
+    "id": "fullcourse:apple_pie"
+  }
+}

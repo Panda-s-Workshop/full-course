@@ -1,0 +1,11 @@
+{
+  "type": "fullcourse:fermenting",
+  "ingredients": [
+    "minecraft:milk_bucket",
+    "minecraft:brown_mushroom"
+  ],
+  "result": {
+    "id": "fullcourse:cheese",
+    "count": 2
+  }
+}

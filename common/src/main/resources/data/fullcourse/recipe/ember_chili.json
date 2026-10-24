@@ -1,0 +1,13 @@
+{
+  "type": "fullcourse:cooking",
+  "ingredients": [
+    "fullcourse:minced_meat",
+    "fullcourse:ember_pepper",
+    "fullcourse:chopped_onion",
+    "fullcourse:broth"
+  ],
+  "container": "minecraft:bowl",
+  "result": {
+    "id": "fullcourse:ember_chili"
+  }
+}

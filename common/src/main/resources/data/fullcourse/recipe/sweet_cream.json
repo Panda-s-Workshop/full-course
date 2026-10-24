@@ -1,0 +1,13 @@
+{
+  "type": "fullcourse:fermenting",
+  "ingredients": [
+    "minecraft:milk_bucket",
+    "minecraft:sugar",
+    "minecraft:glass_bottle",
+    "minecraft:glass_bottle"
+  ],
+  "result": {
+    "id": "fullcourse:sweet_cream",
+    "count": 2
+  }
+}

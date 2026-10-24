@@ -1,0 +1,7 @@
+{
+  "type": "fullcourse:cutting",
+  "ingredient": "minecraft:wheat",
+  "result": {
+    "id": "fullcourse:flour"
+  }
+}

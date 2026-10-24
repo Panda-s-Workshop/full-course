@@ -1,0 +1,27 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fullcourse:cooking_pot"
+    },
+    "title": {
+      "translate": "advancements.fullcourse.root.title"
+    },
+    "description": {
+      "translate": "advancements.fullcourse.root.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "background": "minecraft:gui/advancements/backgrounds/husbandry"
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

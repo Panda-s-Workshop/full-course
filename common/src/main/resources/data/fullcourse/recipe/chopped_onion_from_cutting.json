@@ -1,0 +1,8 @@
+{
+  "type": "fullcourse:cutting",
+  "ingredient": "fullcourse:onion",
+  "result": {
+    "id": "fullcourse:chopped_onion",
+    "count": 2
+  }
+}

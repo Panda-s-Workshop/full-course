@@ -1,0 +1,12 @@
+{
+  "type": "fullcourse:baking",
+  "ingredients": [
+    "fullcourse:chopped_vegetables",
+    "fullcourse:cheese",
+    "minecraft:baked_potato",
+    "fullcourse:flour"
+  ],
+  "result": {
+    "id": "fullcourse:cheese_bake"
+  }
+}

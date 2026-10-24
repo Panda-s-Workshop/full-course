@@ -1,0 +1,10 @@
+{
+  "type": "fullcourse:fermenting",
+  "ingredients": [
+    "minecraft:milk_bucket"
+  ],
+  "result": {
+    "id": "fullcourse:butter",
+    "count": 2
+  }
+}

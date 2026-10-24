@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#fullcourse:has_wild_ember_peppers",
+  "features": "fullcourse:patch_wild_ember_peppers",
+  "step": "vegetal_decoration"
+}

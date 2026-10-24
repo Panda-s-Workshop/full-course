@@ -1,0 +1,976 @@
+[
+  {
+    "id": "flint_knife",
+    "kind": "tool",
+    "material": "flint",
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "minecraft:flint",
+          "minecraft:stick"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "iron_knife",
+    "kind": "tool",
+    "material": "iron",
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "minecraft:iron_ingot",
+          "minecraft:stick"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "onion",
+    "kind": "crop",
+    "block": "onions",
+    "nutrition": 2,
+    "saturation": 0.3
+  },
+  {
+    "id": "ember_pepper",
+    "kind": "crop",
+    "block": "ember_peppers",
+    "nutrition": 2,
+    "saturation": 0.3
+  },
+  {
+    "id": "flour",
+    "kind": "ingredient",
+    "made": [
+      {
+        "station": "board",
+        "from": [
+          "minecraft:wheat"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dough",
+    "kind": "ingredient",
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "fullcourse:flour",
+          "minecraft:water_bucket"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "batter",
+    "kind": "ingredient",
+    "container": "minecraft:bowl",
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "fullcourse:flour",
+          "minecraft:egg",
+          "minecraft:milk_bucket",
+          "minecraft:bowl"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "broth",
+    "kind": "ingredient",
+    "container": "minecraft:glass_bottle",
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "minecraft:bone"
+        ],
+        "container": "minecraft:glass_bottle"
+      }
+    ]
+  },
+  {
+    "id": "syrup",
+    "kind": "ingredient",
+    "container": "minecraft:glass_bottle",
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "minecraft:sugar",
+          "minecraft:sugar"
+        ],
+        "container": "minecraft:glass_bottle"
+      }
+    ]
+  },
+  {
+    "id": "minced_meat",
+    "kind": "ingredient",
+    "made": [
+      {
+        "station": "board",
+        "from": [
+          "#c:foods/raw_meat"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fish_fillet",
+    "kind": "ingredient",
+    "made": [
+      {
+        "station": "board",
+        "from": [
+          "#c:foods/raw_fish"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "chopped_vegetables",
+    "kind": "ingredient",
+    "made": [
+      {
+        "station": "board",
+        "from": [
+          [
+            "minecraft:carrot",
+            "minecraft:potato",
+            "minecraft:beetroot"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "id": "chopped_onion",
+    "kind": "ingredient",
+    "made": [
+      {
+        "station": "board",
+        "from": [
+          "fullcourse:onion"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "grilled_fillet",
+    "kind": "ingredient",
+    "nutrition": 4,
+    "saturation": 0.6,
+    "tier": 1,
+    "families": [
+      "tide"
+    ],
+    "made": [
+      {
+        "station": "fire",
+        "from": [
+          "fullcourse:fish_fillet"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "flatbread",
+    "kind": "ingredient",
+    "nutrition": 3,
+    "saturation": 0.6,
+    "tier": 1,
+    "families": [
+      "diligence"
+    ],
+    "made": [
+      {
+        "station": "fire",
+        "from": [
+          "fullcourse:flour"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "butter",
+    "kind": "ingredient",
+    "made": [
+      {
+        "station": "crock",
+        "from": [
+          "minecraft:milk_bucket"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cheese",
+    "kind": "ingredient",
+    "made": [
+      {
+        "station": "crock",
+        "from": [
+          "minecraft:milk_bucket",
+          "minecraft:brown_mushroom"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pastry",
+    "kind": "ingredient",
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "fullcourse:dough",
+          "fullcourse:butter"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sweet_cream",
+    "kind": "ingredient",
+    "container": "minecraft:glass_bottle",
+    "made": [
+      {
+        "station": "crock",
+        "from": [
+          "minecraft:milk_bucket",
+          "minecraft:sugar",
+          "minecraft:glass_bottle",
+          "minecraft:glass_bottle"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pickles",
+    "kind": "ingredient",
+    "made": [
+      {
+        "station": "crock",
+        "from": [
+          "fullcourse:chopped_vegetables",
+          "fullcourse:chopped_vegetables",
+          "minecraft:water_bucket"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fried_egg",
+    "kind": "dish",
+    "nutrition": 4,
+    "saturation": 0.6,
+    "tier": 1,
+    "families": [
+      "fortitude"
+    ],
+    "made": [
+      {
+        "station": "fire",
+        "from": [
+          "minecraft:egg"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "baked_onion",
+    "kind": "dish",
+    "nutrition": 4,
+    "saturation": 0.6,
+    "tier": 1,
+    "families": [
+      "vigor"
+    ],
+    "made": [
+      {
+        "station": "fire",
+        "from": [
+          "fullcourse:onion"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "berry_skewer",
+    "kind": "dish",
+    "nutrition": 3,
+    "saturation": 0.6,
+    "tier": 1,
+    "families": [
+      "swift"
+    ],
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "minecraft:sweet_berries",
+          "minecraft:sweet_berries",
+          "minecraft:stick"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mushroom_skewer",
+    "kind": "dish",
+    "nutrition": 3,
+    "saturation": 0.6,
+    "tier": 1,
+    "families": [
+      "night_eye"
+    ],
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "minecraft:brown_mushroom",
+          "minecraft:red_mushroom",
+          "minecraft:stick"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "roasted_ember_pepper",
+    "kind": "dish",
+    "nutrition": 3,
+    "saturation": 0.6,
+    "tier": 1,
+    "families": [
+      "ember"
+    ],
+    "made": [
+      {
+        "station": "fire",
+        "from": [
+          "fullcourse:ember_pepper"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "charred_chorus",
+    "kind": "dish",
+    "nutrition": 4,
+    "saturation": 0.6,
+    "tier": 1,
+    "families": [
+      "lightfoot"
+    ],
+    "made": [
+      {
+        "station": "fire",
+        "from": [
+          "minecraft:chorus_fruit"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hot_cocoa",
+    "kind": "dish",
+    "nutrition": 3,
+    "saturation": 0.6,
+    "container": "minecraft:glass_bottle",
+    "drink": true,
+    "tier": 1,
+    "families": [
+      "fortune"
+    ],
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "minecraft:cocoa_beans",
+          "minecraft:milk_bucket"
+        ],
+        "container": "minecraft:glass_bottle"
+      }
+    ]
+  },
+  {
+    "id": "meatballs",
+    "kind": "dish",
+    "nutrition": 6,
+    "saturation": 0.6,
+    "container": "minecraft:bowl",
+    "tier": 2,
+    "families": [
+      "brawn",
+      "vigor"
+    ],
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "fullcourse:minced_meat",
+          "fullcourse:chopped_onion"
+        ],
+        "container": "minecraft:bowl"
+      }
+    ]
+  },
+  {
+    "id": "glazed_apple",
+    "kind": "dish",
+    "nutrition": 5,
+    "saturation": 0.6,
+    "tier": 2,
+    "families": [
+      "swift",
+      "fortune"
+    ],
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "minecraft:apple",
+          "minecraft:sugar"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "honey_toast",
+    "kind": "dish",
+    "nutrition": 6,
+    "saturation": 0.6,
+    "tier": 2,
+    "families": [
+      "diligence",
+      "fortune"
+    ],
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "minecraft:bread",
+          "minecraft:honey_bottle"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pepper_jerky",
+    "kind": "dish",
+    "nutrition": 6,
+    "saturation": 0.6,
+    "tier": 2,
+    "families": [
+      "brawn",
+      "ember"
+    ],
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "minecraft:cooked_beef",
+          "fullcourse:roasted_ember_pepper"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "egg_sandwich",
+    "kind": "dish",
+    "nutrition": 7,
+    "saturation": 0.6,
+    "tier": 2,
+    "families": [
+      "diligence",
+      "fortitude"
+    ],
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "minecraft:bread",
+          "fullcourse:fried_egg"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pumpkin_soup",
+    "kind": "dish",
+    "nutrition": 6,
+    "saturation": 0.6,
+    "container": "minecraft:bowl",
+    "tier": 2,
+    "families": [
+      "vigor",
+      "mending"
+    ],
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "minecraft:pumpkin",
+          "fullcourse:chopped_onion"
+        ],
+        "container": "minecraft:bowl"
+      }
+    ]
+  },
+  {
+    "id": "fruit_salad",
+    "kind": "dish",
+    "nutrition": 6,
+    "saturation": 0.6,
+    "container": "minecraft:bowl",
+    "tier": 2,
+    "families": [
+      "swift",
+      "fortune"
+    ],
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "minecraft:apple",
+          "minecraft:melon_slice",
+          "minecraft:sweet_berries",
+          "minecraft:honey_bottle",
+          "minecraft:bowl"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "glow_berry_jam",
+    "kind": "dish",
+    "nutrition": 4,
+    "saturation": 0.6,
+    "container": "minecraft:glass_bottle",
+    "drink": true,
+    "tier": 2,
+    "families": [
+      "swift",
+      "fortune"
+    ],
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "minecraft:glow_berries",
+          "minecraft:glow_berries",
+          "minecraft:sugar"
+        ],
+        "container": "minecraft:glass_bottle"
+      }
+    ]
+  },
+  {
+    "id": "vegetable_stew",
+    "kind": "dish",
+    "nutrition": 8,
+    "saturation": 0.6,
+    "container": "minecraft:bowl",
+    "tier": 3,
+    "families": [
+      "vigor",
+      "mending"
+    ],
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "fullcourse:chopped_vegetables",
+          "fullcourse:chopped_onion",
+          "minecraft:baked_potato",
+          "fullcourse:broth"
+        ],
+        "container": "minecraft:bowl"
+      }
+    ]
+  },
+  {
+    "id": "fish_chowder",
+    "kind": "dish",
+    "nutrition": 8,
+    "saturation": 0.6,
+    "container": "minecraft:bowl",
+    "tier": 3,
+    "families": [
+      "tide",
+      "fortitude"
+    ],
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "fullcourse:fish_fillet",
+          "minecraft:baked_potato",
+          "minecraft:milk_bucket",
+          "fullcourse:broth"
+        ],
+        "container": "minecraft:bowl"
+      }
+    ]
+  },
+  {
+    "id": "ember_chili",
+    "kind": "dish",
+    "nutrition": 8,
+    "saturation": 0.6,
+    "container": "minecraft:bowl",
+    "tier": 3,
+    "families": [
+      "ember",
+      "brawn"
+    ],
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "fullcourse:minced_meat",
+          "fullcourse:ember_pepper",
+          "fullcourse:chopped_onion",
+          "fullcourse:broth"
+        ],
+        "container": "minecraft:bowl"
+      }
+    ]
+  },
+  {
+    "id": "cave_mushroom_soup",
+    "kind": "dish",
+    "nutrition": 8,
+    "saturation": 0.6,
+    "container": "minecraft:bowl",
+    "tier": 3,
+    "families": [
+      "night_eye",
+      "mending"
+    ],
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "minecraft:brown_mushroom",
+          "minecraft:red_mushroom",
+          "fullcourse:chopped_onion",
+          "fullcourse:broth"
+        ],
+        "container": "minecraft:bowl"
+      }
+    ]
+  },
+  {
+    "id": "sushi_roll",
+    "kind": "dish",
+    "nutrition": 7,
+    "saturation": 0.6,
+    "tier": 3,
+    "families": [
+      "tide",
+      "vigor"
+    ],
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "fullcourse:grilled_fillet",
+          "minecraft:dried_kelp"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cheese_toast",
+    "kind": "dish",
+    "nutrition": 8,
+    "saturation": 0.6,
+    "tier": 3,
+    "families": [
+      "fortitude",
+      "diligence"
+    ],
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "minecraft:bread",
+          "fullcourse:cheese"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "onion_rings",
+    "kind": "dish",
+    "nutrition": 7,
+    "saturation": 0.6,
+    "tier": 3,
+    "families": [
+      "vigor",
+      "diligence"
+    ],
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "fullcourse:chopped_onion",
+          "fullcourse:batter"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "chorus_jelly",
+    "kind": "dish",
+    "nutrition": 5,
+    "saturation": 0.6,
+    "container": "minecraft:glass_bottle",
+    "drink": true,
+    "tier": 3,
+    "families": [
+      "lightfoot",
+      "fortune"
+    ],
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "minecraft:chorus_fruit",
+          "fullcourse:syrup"
+        ],
+        "container": "minecraft:glass_bottle"
+      }
+    ]
+  },
+  {
+    "id": "pancakes",
+    "kind": "dish",
+    "nutrition": 8,
+    "saturation": 0.6,
+    "tier": 3,
+    "families": [
+      "diligence",
+      "fortitude"
+    ],
+    "made": [
+      {
+        "station": "pot",
+        "from": [
+          "fullcourse:batter",
+          "fullcourse:syrup"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fish_taco",
+    "kind": "dish",
+    "nutrition": 8,
+    "saturation": 0.6,
+    "tier": 3,
+    "families": [
+      "tide",
+      "diligence"
+    ],
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "fullcourse:flatbread",
+          "fullcourse:grilled_fillet",
+          "fullcourse:chopped_onion"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "shepherds_pie",
+    "kind": "dish",
+    "nutrition": 10,
+    "saturation": 0.6,
+    "tier": 4,
+    "families": [
+      "brawn",
+      "vigor",
+      "fortitude"
+    ],
+    "made": [
+      {
+        "station": "oven",
+        "from": [
+          "fullcourse:minced_meat",
+          "fullcourse:chopped_vegetables",
+          "minecraft:baked_potato",
+          "fullcourse:butter"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fish_pie",
+    "kind": "dish",
+    "nutrition": 10,
+    "saturation": 0.6,
+    "tier": 4,
+    "families": [
+      "tide",
+      "fortitude",
+      "diligence"
+    ],
+    "made": [
+      {
+        "station": "oven",
+        "from": [
+          "fullcourse:fish_fillet",
+          "fullcourse:pastry",
+          "fullcourse:sweet_cream"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nether_flatbread",
+    "kind": "dish",
+    "nutrition": 10,
+    "saturation": 0.6,
+    "tier": 4,
+    "families": [
+      "ember",
+      "brawn",
+      "fortitude"
+    ],
+    "made": [
+      {
+        "station": "oven",
+        "from": [
+          "fullcourse:flatbread",
+          "fullcourse:roasted_ember_pepper",
+          "fullcourse:minced_meat",
+          "fullcourse:cheese"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mushroom_wellington",
+    "kind": "dish",
+    "nutrition": 10,
+    "saturation": 0.6,
+    "tier": 4,
+    "families": [
+      "brawn",
+      "night_eye",
+      "diligence"
+    ],
+    "made": [
+      {
+        "station": "oven",
+        "from": [
+          "fullcourse:minced_meat",
+          "minecraft:brown_mushroom",
+          "fullcourse:pastry"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "apple_pie",
+    "kind": "dish",
+    "nutrition": 9,
+    "saturation": 0.6,
+    "tier": 4,
+    "families": [
+      "swift",
+      "fortune",
+      "diligence"
+    ],
+    "made": [
+      {
+        "station": "oven",
+        "from": [
+          "minecraft:apple",
+          "minecraft:sugar",
+          "fullcourse:pastry"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cheese_bake",
+    "kind": "dish",
+    "nutrition": 10,
+    "saturation": 0.6,
+    "tier": 4,
+    "families": [
+      "vigor",
+      "fortitude",
+      "diligence"
+    ],
+    "made": [
+      {
+        "station": "oven",
+        "from": [
+          "fullcourse:chopped_vegetables",
+          "fullcourse:cheese",
+          "minecraft:baked_potato",
+          "fullcourse:flour"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "chorus_souffle",
+    "kind": "dish",
+    "nutrition": 8,
+    "saturation": 0.6,
+    "tier": 4,
+    "families": [
+      "lightfoot",
+      "fortitude",
+      "fortune"
+    ],
+    "made": [
+      {
+        "station": "oven",
+        "from": [
+          "fullcourse:charred_chorus",
+          "minecraft:egg",
+          "fullcourse:sweet_cream",
+          "fullcourse:syrup"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pickle_platter",
+    "kind": "dish",
+    "nutrition": 10,
+    "saturation": 0.6,
+    "tier": 4,
+    "families": [
+      "vigor",
+      "fortitude",
+      "diligence"
+    ],
+    "made": [
+      {
+        "station": "craft",
+        "from": [
+          "fullcourse:pickles",
+          "fullcourse:cheese",
+          "minecraft:bread"
+        ]
+      }
+    ]
+  }
+]

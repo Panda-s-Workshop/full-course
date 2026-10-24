@@ -1,0 +1,11 @@
+{
+  "type": "fullcourse:baking",
+  "ingredients": [
+    "fullcourse:fish_fillet",
+    "fullcourse:pastry",
+    "fullcourse:sweet_cream"
+  ],
+  "result": {
+    "id": "fullcourse:fish_pie"
+  }
+}

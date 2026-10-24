@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "fullcourse:flour",
+    "minecraft:egg",
+    "minecraft:milk_bucket",
+    "minecraft:bowl"
+  ],
+  "result": {
+    "id": "fullcourse:batter"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:bread",
+    "fullcourse:cheese"
+  ],
+  "result": {
+    "id": "fullcourse:cheese_toast"
+  }
+}

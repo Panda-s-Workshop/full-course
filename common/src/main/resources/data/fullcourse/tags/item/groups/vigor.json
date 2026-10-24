@@ -1,0 +1,11 @@
+{
+  "values": [
+    {
+      "id": "#c:foods/vegetable",
+      "required": false
+    },
+    "minecraft:kelp",
+    "minecraft:dried_kelp",
+    "minecraft:pumpkin"
+  ]
+}

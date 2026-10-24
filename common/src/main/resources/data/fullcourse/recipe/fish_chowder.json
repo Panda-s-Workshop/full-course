@@ -1,0 +1,13 @@
+{
+  "type": "fullcourse:cooking",
+  "ingredients": [
+    "fullcourse:fish_fillet",
+    "minecraft:baked_potato",
+    "minecraft:milk_bucket",
+    "fullcourse:broth"
+  ],
+  "container": "minecraft:bowl",
+  "result": {
+    "id": "fullcourse:fish_chowder"
+  }
+}

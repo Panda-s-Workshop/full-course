@@ -1,0 +1,13 @@
+{
+  "type": "fullcourse:cooking",
+  "ingredients": [
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom",
+    "fullcourse:chopped_onion",
+    "fullcourse:broth"
+  ],
+  "container": "minecraft:bowl",
+  "result": {
+    "id": "fullcourse:cave_mushroom_soup"
+  }
+}

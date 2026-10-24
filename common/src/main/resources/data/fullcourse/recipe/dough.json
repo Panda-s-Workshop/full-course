@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "fullcourse:flour",
+    "minecraft:water_bucket"
+  ],
+  "result": {
+    "id": "fullcourse:dough"
+  }
+}

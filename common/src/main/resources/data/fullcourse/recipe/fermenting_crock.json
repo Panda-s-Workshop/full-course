@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "T": "minecraft:terracotta",
+    "S": "#minecraft:wooden_slabs"
+  },
+  "pattern": [
+    " S ",
+    "T T",
+    "TTT"
+  ],
+  "result": {
+    "id": "fullcourse:fermenting_crock"
+  }
+}

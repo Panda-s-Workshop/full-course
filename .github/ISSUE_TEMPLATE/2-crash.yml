@@ -1,0 +1,77 @@
+name: 💥 Crash report
+description: The game or server crashes, freezes or won't start.
+labels: ["type: crash", "status: needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The crash report is the most useful thing you can send. It's in the `crash-reports` folder of your game or server, or shown in the launcher.
+
+  - type: input
+    id: crash
+    attributes:
+      label: Crash report
+      description: Upload the crash report to [mclo.gs](https://mclo.gs) and paste the link. If there's no crash report, upload `logs/latest.log` instead.
+      placeholder: https://mclo.gs/...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: when
+    attributes:
+      label: When does it crash?
+      options:
+        - While the game starts
+        - Creating or loading a world
+        - Eating
+        - Using a kitchen station
+        - Opening the Tasting Journal
+        - Placing or serving a feast
+        - Starting or running a dedicated server
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What were you doing?
+      placeholder: Took the stew out of the Cooking Pot and the game froze.
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Full Course version
+      description: From the jar's name or the mods list, such as 0.1.0.
+      placeholder: 0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: neoforge
+    attributes:
+      label: NeoForge version
+      description: Full Course is for Minecraft 26.3 on NeoForge and Fabric.
+      placeholder: 26.3.0.89
+    validations:
+      required: true
+
+  - type: textarea
+    id: mods
+    attributes:
+      label: Other mods
+      description: Your mod list, the modpack's name and version, or "none".
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I'm on the latest Full Course release.
+          required: false
+        - label: I searched the open and closed issues for this crash.
+          required: true

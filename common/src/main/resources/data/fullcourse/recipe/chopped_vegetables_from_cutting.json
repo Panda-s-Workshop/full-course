@@ -1,0 +1,11 @@
+{
+  "type": "fullcourse:cutting",
+  "ingredient": [
+    "minecraft:carrot",
+    "minecraft:potato",
+    "minecraft:beetroot"
+  ],
+  "result": {
+    "id": "fullcourse:chopped_vegetables"
+  }
+}

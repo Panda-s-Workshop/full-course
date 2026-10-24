@@ -1,0 +1,8 @@
+{
+  "type": "fullcourse:cutting",
+  "ingredient": "#c:foods/raw_fish",
+  "result": {
+    "id": "fullcourse:fish_fillet",
+    "count": 2
+  }
+}

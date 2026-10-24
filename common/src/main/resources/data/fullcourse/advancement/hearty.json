@@ -1,0 +1,27 @@
+{
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "fullcourse:vegetable_stew"
+    },
+    "title": {
+      "translate": "advancements.fullcourse.hearty.title"
+    },
+    "description": {
+      "translate": "advancements.fullcourse.hearty.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ],
+  "parent": "fullcourse:first_meal"
+}

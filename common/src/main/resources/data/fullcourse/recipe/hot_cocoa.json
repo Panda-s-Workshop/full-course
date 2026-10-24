@@ -1,0 +1,11 @@
+{
+  "type": "fullcourse:cooking",
+  "ingredients": [
+    "minecraft:cocoa_beans",
+    "minecraft:milk_bucket"
+  ],
+  "container": "minecraft:glass_bottle",
+  "result": {
+    "id": "fullcourse:hot_cocoa"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "fullcourse:ember_pepper",
+          "modifier": [
+            {
+              "type": "minecraft:set_count",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "fullcourse:ember_peppers",
+                "state": {
+                  "age": "3"
+                }
+              },
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 4
+              }
+            },
+            {
+              "type": "minecraft:apply_bonus",
+              "condition": {
+                "type": "minecraft:match_block",
+                "blocks": "fullcourse:ember_peppers",
+                "state": {
+                  "age": "3"
+                }
+              },
+              "enchantment": "minecraft:fortune",
+              "formula": "minecraft:uniform_bonus_count",
+              "parameters": {
+                "bonusMultiplier": 1
+              }
+            }
+          ]
+        }
+      ],
+      "modifier": {
+        "type": "minecraft:explosion_decay"
+      },
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "fullcourse:blocks/ember_peppers"
+}
