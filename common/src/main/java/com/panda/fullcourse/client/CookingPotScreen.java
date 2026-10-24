@@ -3,6 +3,7 @@ package com.panda.fullcourse.client;
 import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.kitchen.CookingPotBlockEntity;
 import com.panda.fullcourse.kitchen.CookingPotMenu;
+import com.panda.fullcourse.kitchen.KitchenHeat;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.ChatFormatting;
@@ -64,8 +65,14 @@ public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
     protected void extractTooltip(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         super.extractTooltip(g, mouseX, mouseY);
         if (isHovering(FLAME_X, FLAME_Y, 14, 14, mouseX, mouseY)) {
-            g.setTooltipForNextFrame(font, menu.heated() ? Component.translatable("gui.fullcourse.pot.heated").withStyle(ChatFormatting.GOLD)
-                    : Component.translatable("gui.fullcourse.pot.cold"), mouseX, mouseY);
+            if (menu.heated()) {
+                g.setTooltipForNextFrame(font, Component.translatable("gui.fullcourse.pot.heated").withStyle(ChatFormatting.GOLD), mouseX, mouseY);
+            } else {
+                List<Component> lines = new ArrayList<>();
+                lines.add(Component.translatable("gui.fullcourse.pot.cold"));
+                lines.addAll(KitchenHeat.notes());
+                g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
+            }
         } else if (!arrowTooltipFromViewer && isHovering(ARROW_X, ARROW_Y, 24, 16, mouseX, mouseY)) {
             // below the arrow and wrapped to the room on its right, so the tooltip never covers the grid it talks about
             int room = Math.max(120, width - (leftPos + ARROW_X) - 12);

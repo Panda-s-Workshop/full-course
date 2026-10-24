@@ -30,7 +30,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
@@ -102,17 +101,15 @@ public class CookingPotBlockEntity extends BaseContainerBlockEntity implements W
     }
 
     /**
-     * Heat comes from the block below: anything in {@code #fullcourse:heat_sources}, while lit if it can be unlit, or
-     * while burning by its block entity's own say ({@link KitchenHeat}). It rises through one
-     * {@code #fullcourse:heat_conductors} block (a hopper) to the pot above it.
+     * Heat comes from the block below: anything in {@code #fullcourse:heat_sources} while it burns ({@link KitchenHeat}:
+     * its block entity's own say, a lit state, or always). It rises through one {@code #fullcourse:heat_conductors}
+     * block (a hopper) to the pot above it.
      */
     public static boolean heated(Level level, BlockPos pos) {
         BlockPos below = pos.below();
         if (level.getBlockState(below).is(KitchenTags.HEAT_CONDUCTORS)) below = below.below();
         BlockState heat = level.getBlockState(below);
-        if (!heat.is(KitchenTags.HEAT_SOURCES)) return false;
-        if (heat.hasProperty(BlockStateProperties.LIT)) return heat.getValue(BlockStateProperties.LIT);
-        return KitchenHeat.burning(level.getBlockEntity(below)).orElse(true);
+        return heat.is(KitchenTags.HEAT_SOURCES) && KitchenHeat.burning(heat, level.getBlockEntity(below));
     }
 
     public CookingInput input() {
