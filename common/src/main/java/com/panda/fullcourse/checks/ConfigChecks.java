@@ -13,6 +13,8 @@ import static com.panda.fullcourse.checks.RuleChecks.ticks;
 import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodRules;
+import com.panda.fullcourse.food.FoodState;
+import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.logic.Tier;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,7 @@ final class ConfigChecks {
         checks.put("config_keep_vanilla_hunger", ConfigChecks::keepVanillaHunger);
         checks.put("config_recovery_timing", ConfigChecks::recoveryTiming);
         checks.put("config_starting_slots", ConfigChecks::startingSlots);
+        checks.put("config_max_meal_slots", ConfigChecks::maxMealSlots);
         checks.put("config_keep_meals_on_death", ConfigChecks::keepMealsOnDeath);
         checks.put("config_duration_multiplier", ConfigChecks::durationMultiplier);
         checks.put("config_tier_thresholds", ConfigChecks::tierThresholds);
@@ -55,6 +58,12 @@ final class ConfigChecks {
             hurtAt(c, t);
             ticks(c, t + 1, t + 400);
             health(c, 10F, "Recovery is off with vanilla hunger");
+            // with a full bar, vanilla regeneration heals instead
+            food.setFoodLevel(20);
+            food.setSaturation(5F);
+            for (int i = 0; i < 200; i++) food.tick(c.player());
+            check(c.player().getHealth() > 10F, "health %s after a full bar with vanilla hunger, expected vanilla regeneration", c.player().getHealth());
+            c.player().setHealth(10F);
             eat(c, Items.BREAD, t + 400);
             check(dishes(c).equals(List.of(id(Items.BREAD))), "meals still come with vanilla hunger: %s", dishes(c));
         });
@@ -89,6 +98,23 @@ final class ConfigChecks {
             eat(c, Items.BREAD, t + 100);
             eat(c, Items.BAKED_POTATO, t + 200);
             check(dishes(c).size() == 3, "three meals held: %s", dishes(c));
+        });
+    }
+
+    /** A maximum of three: slots unlocked past it don't count, and a fourth meal still leaves three held. */
+    private static void maxMealSlots(RuleChecks.Ctx c) {
+        var three = new FullCourseConfig.Snapshot(false, D.recoveryDelaySeconds(), D.recoveryIntervalTicks(), D.startingMealSlots(), 3,
+                D.keepMealsOnDeath(), D.durationMultiplier(), D.tierThresholds());
+        FullCourseConfig.with(three, () -> {
+            Services.PLATFORM.setFoodState(c.player(), FoodState.EMPTY.withBonusSlots(5));
+            check(state(c).slots() == 3, "slots %s with five unlocked past a maximum of 3, expected 3", state(c).slots());
+            long t = c.t();
+            eat(c, Items.COOKED_BEEF, t);
+            eat(c, Items.BREAD, t + 100);
+            eat(c, Items.BAKED_POTATO, t + 200);
+            eat(c, Items.COOKED_CHICKEN, t + 300);
+            check(dishes(c).size() == 3, "three meals held at a maximum of 3: %s", dishes(c));
+            Services.PLATFORM.setFoodState(c.player(), FoodState.EMPTY);
         });
     }
 

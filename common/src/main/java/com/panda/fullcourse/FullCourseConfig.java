@@ -54,7 +54,7 @@ public final class FullCourseConfig {
                 int delay = buf.readInt(), interval = buf.readInt(), start = buf.readInt(), max = buf.readInt();
                 boolean keepMeals = buf.readBoolean();
                 double multiplier = buf.readDouble();
-                int[] thresholds = new int[Math.min(buf.readByte(), 5)];
+                int[] thresholds = new int[buf.readUnsignedByte()];
                 for (int i = 0; i < thresholds.length; i++) thresholds[i] = buf.readInt();
                 return new Snapshot(keep, delay, interval, start, max, keepMeals, multiplier, thresholds);
             }
@@ -65,14 +65,15 @@ public final class FullCourseConfig {
                         .writeInt(s.startingMealSlots()).writeInt(s.maxMealSlots()).writeBoolean(s.keepMealsOnDeath())
                         .writeDouble(s.durationMultiplier());
                 int[] t = s.tierThresholds();
-                buf.writeByte(Math.min(t.length, 5));
-                for (int i = 0; i < Math.min(t.length, 5); i++) buf.writeInt(t[i]);
+                buf.writeByte(t.length);
+                for (int value : t) buf.writeInt(value);
             }
         };
 
+        /** The values {@code s} plays by, thresholds already checked, so a client never reads a list the server rejected. */
         public static Snapshot of(Source s) {
             return new Snapshot(s.keepVanillaHunger(), s.recoveryDelaySeconds(), s.recoveryIntervalTicks(), s.startingMealSlots(),
-                    s.maxMealSlots(), s.keepMealsOnDeath(), s.durationMultiplier(), s.tierThresholds().clone());
+                    s.maxMealSlots(), s.keepMealsOnDeath(), s.durationMultiplier(), validThresholds(s.tierThresholds()));
         }
     }
 
@@ -149,11 +150,15 @@ public final class FullCourseConfig {
 
     /** Thresholds, ascending; the defaults if the configured list is malformed. */
     public static int[] tierThresholds() {
-        int[] t = source.tierThresholds();
+        return validThresholds(source.tierThresholds());
+    }
+
+    /** {@code t} when it holds five ascending scores, otherwise the defaults. */
+    public static int[] validThresholds(int[] t) {
         if (t == null || t.length != 5) return Tier.DEFAULT_THRESHOLDS.clone();
         for (int i = 1; i < t.length; i++) {
             if (t[i] < t[i - 1]) return Tier.DEFAULT_THRESHOLDS.clone();
         }
-        return t;
+        return t.clone();
     }
 }

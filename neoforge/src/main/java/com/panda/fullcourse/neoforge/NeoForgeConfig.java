@@ -31,8 +31,9 @@ public final class NeoForgeConfig implements FullCourseConfig.Source {
             .comment("Multiplies every meal's duration.")
             .defineInRange("durationMultiplier", D.durationMultiplier(), 0.05, 20.0);
     private static final ModConfigSpec.ConfigValue<List<? extends Integer>> THRESHOLDS = B
-            .comment("Lowest recipe-chain score of tiers 1 to 5 (Simple, Prepared, Hearty, Gourmet, Feast), ascending.")
-            .defineList("tierThresholds", List.of(1, 3, 5, 8, 12), () -> 1, o -> o instanceof Integer i && i >= 0 && i < 1000);
+            .comment("Lowest recipe-chain score of tiers 1 to 5 (Simple, Prepared, Hearty, Gourmet, Feast): exactly five, ascending.")
+            .defineList(List.of("tierThresholds"), () -> List.of(1, 3, 5, 8, 12), () -> 1, o -> o instanceof Integer i && i >= 0 && i < 1000,
+                    ModConfigSpec.Range.of(5, 5));
 
     public static final ModConfigSpec SPEC = B.build();
 
