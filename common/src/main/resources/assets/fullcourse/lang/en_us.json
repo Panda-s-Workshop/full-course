@@ -227,6 +227,7 @@
   "tooltip.fullcourse.cooking_pot.use": "Cooks over heat below it, such as a lit campfire",
   "tooltip.fullcourse.cutting_board.craft": "Crafting: 2 wooden slabs and a stick",
   "tooltip.fullcourse.cutting_board.use": "Place food on it, then use a knife on it",
+  "tooltip.fullcourse.feast_bonus": "Feast bonus: +1 level, one helping each",
   "tooltip.fullcourse.fermenting_crock.craft": "Crafting: 5 terracotta and a wooden slab",
   "tooltip.fullcourse.fermenting_crock.use": "Use ingredients on it, then an empty hand to seal it",
   "tooltip.fullcourse.glow_berry_tart.use": "Place it, then use it: 4 servings, nothing is left after the last",

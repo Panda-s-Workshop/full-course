@@ -6,6 +6,7 @@ import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.food.FoodState;
+import com.panda.fullcourse.food.FoodText;
 import com.panda.fullcourse.food.Profile;
 import com.panda.fullcourse.kitchen.FeastBlock;
 import com.panda.fullcourse.logic.Meals;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -107,6 +109,9 @@ final class FeastChecks {
             check(state(c).nourish() == 6, "a serving heals 6, nourish %s", state(c).nourish());
             check(servings(c) == 7, "one serving gone, %s left", servings(c));
             check(state(c).tasted().contains(FullCourse.id("roast_banquet")), "the banquet counts as tasted");
+            Item banquet = ModBlocks.ROAST_BANQUET.get().asItem();
+            List<String> lines = FoodText.lines(FoodProfiles.get(c.server(), banquet), 6, false, false).stream().map(Component::getString).toList();
+            check(lines.contains("Feast bonus: +1 level, one helping each"), "the tooltip says why the levels are IV: %s", lines);
         });
     }
 

@@ -42,6 +42,8 @@ public final class FoodText {
             if (nutrition > 0) out.add(heal(nutrition).withStyle(ChatFormatting.GRAY));
         } else {
             for (Family family : p.families()) out.add(benefit(family, tier.level()).withStyle(ChatFormatting.BLUE));
+            // why a feast's benefits are a level above a gourmet dish's
+            if (tier == Tier.FEAST) out.add(Component.translatable("tooltip.fullcourse.feast_bonus").withStyle(ChatFormatting.LIGHT_PURPLE));
             MutableComponent lasts = Component.translatable("tooltip.fullcourse.lasts",
                     duration(tier.durationTicks(FullCourseConfig.durationMultiplier())));
             if (nutrition > 0) lasts.append(Component.literal(" · ")).append(heal(nutrition));
