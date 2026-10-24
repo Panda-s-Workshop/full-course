@@ -243,7 +243,7 @@ final class StationChecks {
             crock.age(1);
             check(crock.done(c.level()) && crock.stage(c.level()) == 3, "ready at 12 000 ticks");
             List<ItemStack> out = crock.open(c.level());
-            check(count(out, item("butter")) == 2 && count(out, Items.BUCKET) == 1 && out.size() == 2, "2 butter and the bucket: %s", out);
+            check(count(out, item("butter")) == 3 && count(out, Items.BUCKET) == 1 && out.size() == 2, "3 butter and the bucket: %s", out);
             check(!crock.sealed() && crock.stage(c.level()) == 0, "open again");
         });
     }
@@ -269,7 +269,7 @@ final class StationChecks {
             crock.seal(c.level(), recipe);
             crock.age(recipe.time());
             List<ItemStack> out = crock.open(c.level());
-            check(count(out, item("butter")) == 8 && count(out, Items.BUCKET) == 4, "four buckets make 8 butter: %s", out);
+            check(count(out, item("butter")) == 12 && count(out, Items.BUCKET) == 4, "four buckets make 12 butter: %s", out);
         });
     }
 
@@ -313,8 +313,8 @@ final class StationChecks {
             crock.age(FermentingRecipe.DEFAULT_TIME);
             int before = inv.countItem(item("butter"));
             click(c, pos, ItemStack.EMPTY, false);
-            check(inv.countItem(item("butter")) - before == 2 && !crock.sealed(), "lifting the lid gives the butter");
-            take(inv, item("butter"), 2);
+            check(inv.countItem(item("butter")) - before == 3 && !crock.sealed(), "lifting the lid gives the butter");
+            take(inv, item("butter"), 3);
             take(inv, Items.BUCKET, 1);
         });
     }
@@ -373,7 +373,7 @@ final class StationChecks {
             crock.seal(level, crock.recipe(level).orElseThrow().value());
             crock.age(FermentingRecipe.DEFAULT_TIME);
             List<ItemStack> out = crock.open(level);
-            check(count(out, item("butter")) == 2, "the crock makes butter: %s", out);
+            check(count(out, item("butter")) == 3, "the crock makes butter: %s", out);
         });
         ItemStack pastry = craft(c, dough, new ItemStack(item("butter")));
         check(pastry.is(item("pastry")), "dough and butter make pastry: %s", pastry);
