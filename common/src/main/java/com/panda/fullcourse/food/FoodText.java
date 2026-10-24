@@ -48,12 +48,18 @@ public final class FoodText {
             out.add(lasts.withStyle(ChatFormatting.GRAY));
         }
         if (shift) {
-            out.add(Component.translatable("tooltip.fullcourse.chain", p.steps(), p.stations(), p.ingredients()).withStyle(ChatFormatting.GRAY));
+            out.add(Component.translatable("tooltip.fullcourse.chain", count("steps", p.steps()), count("stations", p.stations()),
+                    count("ingredients", p.ingredients())).withStyle(ChatFormatting.GRAY));
             out.add(score(p).withStyle(ChatFormatting.GRAY));
         } else if (p.steps() > 0) {
             out.add(Component.translatable("tooltip.fullcourse.shift").withStyle(ChatFormatting.DARK_GRAY));
         }
         return out;
+    }
+
+    /** "1 step", "3 steps": one of the recipe chain's counts. */
+    private static Component count(String part, int n) {
+        return Component.translatable("tooltip.fullcourse.chain." + part + (n == 1 ? ".one" : ""), n);
     }
 
     /** "Vigor II: +4 max health": the family, its level and what it does at that level. */
