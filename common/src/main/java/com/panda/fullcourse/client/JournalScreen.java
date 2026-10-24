@@ -40,7 +40,7 @@ public class JournalScreen extends Screen {
     /** The layout drawn into textures/gui/journal.png: panel, bar, grid and scrollbar track. */
     public static final int W = 212, H = 194, GRID_X = 8, GRID_Y = 46, COLS = 10, ROWS = 7, BAR_X = 8, BAR_Y = 30, BAR_W = 196,
             BAR_H = 4, SCROLL_X = 195, SCROLL_Y = 46, SCROLL_H = ROWS * 18 - 2;
-    private static final int LABEL = 0xFF404040, FADE = 0xB08B8B8B;
+    private static final int LABEL = 0xFF404040, FADE = 0xB08B8B8B, WELL = 0xFF3C3C3C;
 
     private final List<Item> dishes = new ArrayList<>();
     private int left, top, scroll;
@@ -121,7 +121,11 @@ public class JournalScreen extends Screen {
             Item item = dishes.get(i);
             int x = left + GRID_X + (i % COLS) * 18, y = top + GRID_Y + (i / COLS - scroll) * 18;
             boolean has = tasted.contains(BuiltInRegistries.ITEM.getKey(item));
-            if (has) g.outline(x - 1, y - 1, 18, 18, FoodProfiles.client(item).tier().color());
+            if (has) {
+                // a dark well under the tier's frame, so the light iron of two stars shows on the grey panel too
+                g.fill(x - 1, y - 1, x + 17, y + 17, WELL);
+                g.outline(x - 1, y - 1, 18, 18, FoodProfiles.client(item).tier().color());
+            }
             g.item(new ItemStack(item), x, y);
             if (!has) g.fill(x, y, x + 16, y + 16, FADE);
             if (mouseX >= x - 1 && mouseX < x + 17 && mouseY >= y - 1 && mouseY < y + 17) {
