@@ -29,7 +29,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
 /** The Fabric entry point: registers the common content and wires the common hooks to Fabric API's events. */
@@ -51,8 +50,8 @@ public final class FullCourseFabric implements ModInitializer {
                     return i < 0 ? FIRST.size() : i;
                 }))
                 .forEach(FullCourseFabric::registerAll);
-        // players get Recovery's rate: vanilla's player attributes plus ours (NeoForge adds it to the existing set instead)
-        FabricDefaultAttributeRegistry.register(EntityTypes.PLAYER, Player.createAttributes().add(ModAttributes.RECOVERY_RATE.holder()));
+        // players get Recovery's rate, added to their existing attributes (re-registering the set would replace other mods')
+        FabricDefaultAttributeRegistry.MODIFY.register(ctx -> ctx.modify(EntityTypes.PLAYER, (type, builder) -> builder.add(ModAttributes.RECOVERY_RATE.holder())));
 
         PayloadTypeRegistry.clientboundPlay().register(ProfilesPayload.TYPE, ProfilesPayload.STREAM_CODEC);
         ModRecipes.kitchenSerializers().forEach(RecipeSynchronization::synchronizeRecipeSerializer); // for recipe viewers
