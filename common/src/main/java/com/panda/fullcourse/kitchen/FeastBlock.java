@@ -2,16 +2,22 @@ package com.panda.fullcourse.kitchen;
 
 import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.FoodRules;
+import com.panda.fullcourse.food.FoodText;
+import com.panda.fullcourse.logic.Meals;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -33,12 +39,15 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * A feast: placed on a solid block and served by using it, a tier-5 meal per serving for whoever takes it. The
+ * A feast: placed on a solid block and served by using it, a tier-5 meal per serving for whoever takes it, one helping
+ * per player every five minutes; a Queasy player is turned away without spending a serving. The
  * banquet and the pie leave their empty platter after the last serving; the tart goes with its last quarter. Broken
  * untouched it comes back whole; broken started, it's lost, as a cake is.
  */
 public class FeastBlock extends Block {
     public static final int MAX_SERVINGS = 8;
+    /** One helping per player in this long: a feast is shared, not eaten by whoever holds the button. */
+    public static final int HELPING_TICKS = 5 * 60 * 20;
     public static final IntegerProperty SERVINGS = IntegerProperty.create("servings", 0, MAX_SERVINGS);
     /** The side it's served from, toward whoever placed it: the pie is cut and the tart taken from there. */
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -109,6 +118,11 @@ public class FeastBlock extends Block {
         }
         if (!player.canEat(false)) return InteractionResult.PASS;
         if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
+        Component refused = refusal(server);
+        if (refused != null) {
+            server.sendOverlayMessage(refused);
+            return InteractionResult.SUCCESS;
+        }
         if (FullCourseConfig.keepVanillaHunger()) server.getFoodData().eat(serving, 0.8F);
         FoodRules.onEatDish(server, asItem(), serving);
         level.playSound(null, pos, SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS, 0.8F, 0.9F + level.getRandom().nextFloat() * 0.2F);
@@ -120,6 +134,27 @@ public class FeastBlock extends Block {
             level.gameEvent(player, GameEvent.BLOCK_DESTROY, pos);
         }
         return InteractionResult.SUCCESS;
+    }
+
+    /**
+     * Why {@code player} can't take a serving now, or null: Queasy (the serving would give no meal), or a helping of this
+     * feast within the last {@link #HELPING_TICKS}, so holding the use key can't clear the table for everyone else.
+     */
+    private Component refusal(ServerPlayer player) {
+        Component name = asItem().getName(new ItemStack(asItem()));
+        if (player.hasEffect(MobEffects.HUNGER)) {
+            return Component.translatable("message.fullcourse.feast.queasy", name).withStyle(ChatFormatting.GREEN);
+        }
+        Identifier id = BuiltInRegistries.ITEM.getKey(asItem());
+        long now = player.level().getGameTime();
+        for (Meals.Meal<Identifier> meal : FoodRules.state(player).meals().active()) {
+            long since = now - meal.start();
+            if (meal.dish().equals(id) && since >= 0 && since < HELPING_TICKS) {
+                return Component.translatable("message.fullcourse.feast.had_share", name, FoodText.duration((int) (HELPING_TICKS - since)))
+                        .withStyle(ChatFormatting.GRAY);
+            }
+        }
+        return null;
     }
 
     @Override

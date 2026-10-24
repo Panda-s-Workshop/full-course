@@ -8,8 +8,10 @@ import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.food.FoodState;
 import com.panda.fullcourse.food.Profile;
 import com.panda.fullcourse.kitchen.FeastBlock;
+import com.panda.fullcourse.logic.Meals;
 import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.logic.Tier;
+import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.registry.ModBlocks;
 import com.panda.fullcourse.registry.ModItems;
 import java.util.ArrayList;
@@ -19,6 +21,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -40,6 +45,8 @@ final class FeastChecks {
         checks.put("feast_last_serving", FeastChecks::feastLastServing);
         checks.put("feast_untouched_drops", FeastChecks::feastUntouchedDrops);
         checks.put("feast_needs_ground", FeastChecks::feastNeedsGround);
+        checks.put("feast_one_helping", FeastChecks::feastOneHelping);
+        checks.put("feast_refuses_queasy", FeastChecks::feastRefusesQueasy);
         checks.put("slot_unlocks_at_milestone", FeastChecks::slotUnlocksAtMilestone);
         checks.put("journal_recipe", FeastChecks::journalRecipe);
         checks.put("tasting_advancements", FeastChecks::tastingAdvancements);
@@ -63,9 +70,20 @@ final class FeastChecks {
         }
     }
 
+    /** A right-click on the feast with {@code held} in hand, through the server's own handling of it. */
+    private static void serve(RuleChecks.Ctx c, ItemStack held) {
+        c.player().setItemInHand(InteractionHand.MAIN_HAND, held);
+        c.player().gameMode.useItemOn(c.player(), c.level(), held, InteractionHand.MAIN_HAND, KitchenChecks.hit(c.spot()));
+        c.player().setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+    }
+
     private static void serve(RuleChecks.Ctx c) {
-        BlockPos pos = c.spot();
-        c.level().getBlockState(pos).useWithoutItem(c.level(), c.player(), KitchenChecks.hit(pos));
+        serve(c, ItemStack.EMPTY);
+    }
+
+    /** As if another player came to the table: a helping is per player. */
+    private static void nextGuest(RuleChecks.Ctx c) {
+        Services.PLATFORM.setFoodState(c.player(), FoodState.EMPTY);
     }
 
     private static int servings(RuleChecks.Ctx c) {
@@ -79,7 +97,7 @@ final class FeastChecks {
     private static void feastServingGivesMeal(RuleChecks.Ctx c) {
         placed(c, ModBlocks.ROAST_BANQUET.get().defaultBlockState(), () -> {
             check(servings(c) == 8, "a placed banquet serves 8, has %s", servings(c));
-            serve(c);
+            serve(c, new ItemStack(Items.IRON_SWORD)); // whatever is in hand, as cake
             var meals = state(c).meals().active();
             check(meals.size() == 1 && meals.getFirst().dish().equals(FullCourse.id("roast_banquet")), "a serving gives a banquet meal: %s", meals);
             var meal = meals.getFirst();
@@ -97,6 +115,7 @@ final class FeastChecks {
         placed(c, ModBlocks.ROAST_BANQUET.get().defaultBlockState().setValue(FeastBlock.SERVINGS, 1), () -> {
             serve(c);
             check(servings(c) == 0, "the empty platter stays: %s", c.level().getBlockState(c.spot()));
+            nextGuest(c);
             int meals = state(c).meals().active().size();
             long nourish = state(c).nourish();
             serve(c);
@@ -131,6 +150,39 @@ final class FeastChecks {
             c.level().setBlock(c.spot().below(), Blocks.AIR.defaultBlockState(), 3);
             check(!pie.canSurvive(c.level(), c.spot()), "a pie can't stand on air");
             check(c.level().getBlockState(c.spot()).isAir(), "taking the table away breaks the pie: %s", c.level().getBlockState(c.spot()));
+        });
+    }
+
+    /**
+     * Holding the use key takes one helping, not the table: a second right-click within five minutes is refused and
+     * the servings stay; the next guest takes theirs; after five minutes the same player may take another.
+     */
+    private static void feastOneHelping(RuleChecks.Ctx c) {
+        placed(c, ModBlocks.ROAST_BANQUET.get().defaultBlockState(), () -> {
+            serve(c);
+            serve(c);
+            check(servings(c) == 7, "two right-clicks back to back take one serving, %s left", servings(c));
+            nextGuest(c);
+            serve(c);
+            check(servings(c) == 6, "the next guest takes theirs, %s left", servings(c));
+            var meals = state(c).meals().active();
+            var later = new Meals.Meal<>(meals.getFirst().dish(), meals.getFirst().tier(), meals.getFirst().families(), meals.getFirst().level(),
+                    meals.getFirst().start() - FeastBlock.HELPING_TICKS, meals.getFirst().end() - FeastBlock.HELPING_TICKS);
+            Services.PLATFORM.setFoodState(c.player(), state(c).withMeals(new Meals<>(List.of(later))));
+            serve(c);
+            check(servings(c) == 5, "five minutes on, another helping, %s left", servings(c));
+        });
+    }
+
+    /** A Queasy player would get no meal, so the feast turns them away and keeps the serving. */
+    private static void feastRefusesQueasy(RuleChecks.Ctx c) {
+        placed(c, ModBlocks.HARVEST_PIE.get().defaultBlockState(), () -> {
+            c.player().addEffect(new MobEffectInstance(MobEffects.HUNGER, 200));
+            serve(c);
+            check(servings(c) == 6 && state(c).meals().isEmpty(), "Queasy: no serving taken, no meal: %s left", servings(c));
+            c.player().removeAllEffects();
+            serve(c);
+            check(servings(c) == 5, "well again, a serving: %s left", servings(c));
         });
     }
 
