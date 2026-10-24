@@ -1,7 +1,10 @@
 package com.panda.fullcourse.client;
 
 import com.panda.fullcourse.FullCourse;
+import com.panda.fullcourse.kitchen.CookingPotBlockEntity;
 import com.panda.fullcourse.kitchen.CookingPotMenu;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -10,10 +13,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * The Cooking Pot's screen: vanilla's furnace arrow for progress and its flame for heat. A line beside the title says why the pot isn't cooking (no heat, a missing bowl, a full output, no recipe).
- * Hovering the flame says where heat comes from; hovering the arrow says how far the dish is.
+ * Hovering the flame says where heat comes from; hovering the arrow says how far the dish is and what the grid makes,
+ * or what the nearest dish still needs ({@link PotPreview}).
  */
 public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
     private static final Identifier TEXTURE = FullCourse.id("textures/gui/container/cooking_pot.png");
@@ -56,8 +61,18 @@ public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
         if (isHovering(FLAME_X, FLAME_Y, 14, 14, mouseX, mouseY)) {
             g.setTooltipForNextFrame(font, menu.heated() ? Component.translatable("gui.fullcourse.pot.heated").withStyle(ChatFormatting.GOLD)
                     : Component.translatable("gui.fullcourse.pot.cold"), mouseX, mouseY);
-        } else if (isHovering(ARROW_X, ARROW_Y, 24, 16, mouseX, mouseY) && menu.progress() > 0) {
-            g.setTooltipForNextFrame(font, Component.translatable("gui.fullcourse.pot.progress", Math.round(menu.progress() * 100)), mouseX, mouseY);
+        } else if (isHovering(ARROW_X, ARROW_Y, 24, 16, mouseX, mouseY)) {
+            List<Component> lines = new ArrayList<>();
+            if (menu.progress() > 0) lines.add(Component.translatable("gui.fullcourse.pot.progress", Math.round(menu.progress() * 100)));
+            lines.addAll(PotPreview.lines(grid()));
+            if (!lines.isEmpty()) g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
         }
+    }
+
+    /** The items in the ingredient grid, the menu's first slots. */
+    public List<ItemStack> grid() {
+        List<ItemStack> out = new ArrayList<>(CookingPotBlockEntity.INGREDIENTS);
+        for (int i = 0; i < CookingPotBlockEntity.INGREDIENTS; i++) out.add(menu.getSlot(i).getItem());
+        return out;
     }
 }

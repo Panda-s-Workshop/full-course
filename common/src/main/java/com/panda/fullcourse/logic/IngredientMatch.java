@@ -52,6 +52,29 @@ public final class IngredientMatch {
         return place(0, ingredients, slots, accepts, left, pool, required, uses, assigned, unused) ? assigned : null;
     }
 
+    /**
+     * What is still to add for a recipe: the indices of its ingredients that the slots can't meet, as few as possible, with
+     * everything in the slots used as {@link #match} wants. Empty when the recipe matches; {@code null} when the slots hold
+     * something the recipe doesn't use, so no amount of adding makes it.
+     */
+    public static <I, S> int[] missing(List<I> ingredients, List<S> slots, BiPredicate<I, S> accepts, ToIntFunction<S> count,
+            BiPredicate<S, S> same, Predicate<S> spare) {
+        int n = ingredients.size();
+        // subsets of the ingredients from the largest down: the first that matches leaves the fewest to add (n is at most 6)
+        for (int size = n; size >= 0; size--) {
+            for (int mask = 0; mask < 1 << n; mask++) {
+                if (Integer.bitCount(mask) != size) continue;
+                List<I> kept = new java.util.ArrayList<>(size);
+                for (int i = 0; i < n; i++) if ((mask & 1 << i) != 0) kept.add(ingredients.get(i));
+                if (match(kept, slots, accepts, count, same, spare) == null) continue;
+                int[] out = new int[n - size];
+                for (int i = 0, k = 0; i < n; i++) if ((mask & 1 << i) == 0) out[k++] = i;
+                return out;
+            }
+        }
+        return null;
+    }
+
     private static <I, S> boolean place(int i, List<I> ingredients, List<S> slots, BiPredicate<I, S> accepts, int[] left, int[] pool,
             boolean[] required, int[] uses, int[] assigned, int unused) {
         if (i == ingredients.size()) return unused == 0;

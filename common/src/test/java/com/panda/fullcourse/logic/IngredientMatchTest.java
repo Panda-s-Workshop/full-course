@@ -86,4 +86,33 @@ class IngredientMatchTest {
     void spareCanStillBeAnIngredient() {
         assertArrayEquals(new int[] {0, 1}, pot(List.of(Set.of("bottle"), Set.of("sugar")), new Slot("bottle", 1), new Slot("sugar", 1)));
     }
+
+    private static int[] missing(List<Set<String>> ingredients, Slot... slots) {
+        return IngredientMatch.missing(ingredients, List.of(slots), (ing, slot) -> ing.contains(slot.item()), Slot::count,
+                (a, b) -> a.item().equals(b.item()), slot -> slot.item().equals("bowl"));
+    }
+
+    @Test
+    void missingIsEmptyWhenTheRecipeMatches() {
+        assertArrayEquals(new int[0], missing(List.of(Set.of("meat"), Set.of("onion")), new Slot("onion", 1), new Slot("meat", 1)));
+    }
+
+    @Test
+    void missingNamesWhatIsStillToAdd() {
+        List<Set<String>> stew = List.of(Set.of("meat"), Set.of("onion"), Set.of("broth"));
+        assertArrayEquals(new int[] {1, 2}, missing(stew, new Slot("meat", 1)));
+        assertArrayEquals(new int[] {0, 1, 2}, missing(stew, EMPTY), "an empty pot misses everything");
+    }
+
+    @Test
+    void missingCountsRepeatsAndSpares() {
+        assertArrayEquals(new int[] {1}, missing(List.of(Set.of("sugar"), Set.of("sugar")), new Slot("sugar", 1)), "one sugar of two");
+        assertArrayEquals(new int[] {1}, missing(List.of(Set.of("meat"), Set.of("onion")), new Slot("meat", 1), new Slot("bowl", 1)),
+                "an empty bowl in the grid is no stray");
+    }
+
+    @Test
+    void aStrayItemMeansTheRecipeCantBeMade() {
+        assertNull(missing(List.of(Set.of("meat"), Set.of("onion")), new Slot("meat", 1), new Slot("dirt", 1)));
+    }
 }
