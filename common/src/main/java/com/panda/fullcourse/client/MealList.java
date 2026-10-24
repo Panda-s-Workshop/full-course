@@ -67,7 +67,8 @@ public final class MealList {
         g.text(font, Component.translatable("gui.fullcourse.meals.title", meals.size(), state.slots()), x + PAD, cy, TEXT, true);
         cy += 12;
         if (meals.isEmpty()) {
-            g.text(font, fit(font, Component.translatable("gui.fullcourse.meals.none").getString(), w - 2 * PAD), x + PAD, cy + 6, DIM, false);
+            List<FormattedCharSequence> none = font.split(Component.translatable("gui.fullcourse.meals.none"), w - 2 * PAD);
+            for (int l = 0; l < Math.min(2, none.size()); l++) g.text(font, none.get(l), x + PAD, cy + 1 + 10 * l, DIM, false);
             cy += ROW;
         }
         ItemStack hovered = null;
