@@ -559,6 +559,9 @@ public final class RuleChecks {
         check(shift.contains("Score 5 · Gourmet at 8"), "score line %s", shift);
         List<String> steak = text(c, Items.COOKED_BEEF, true, false);
         check(steak.contains("1 step · 1 station · 1 ingredient"), "a one-step chain reads in the singular: %s", steak);
+        // 0.10 a level times 3 is 0.30000000000000004 in floating point
+        String diligence = FoodText.benefit(Family.DILIGENCE, 3).getString();
+        check(diligence.equals("Diligence III: +30% mining speed"), "whole percentages read without a decimal: %s", diligence);
         List<String> raw = text(c, Items.BEEF, false, false);
         check(raw.get(1).contains("Cook it") && raw.get(2).equals("Heals 1.5 ❤ over 3 s"), "raw lines %s", raw);
         List<String> remedy = text(c, Items.GOLDEN_APPLE, false, false);
