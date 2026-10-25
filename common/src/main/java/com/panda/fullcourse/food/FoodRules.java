@@ -134,11 +134,14 @@ public final class FoodRules {
         if (s.meals().active().size() < before.meals().active().size()) cue(player, ModSounds.MEAL_END);
         if (now % SLOT_CHECK_TICKS == 0) s = unlockSlots(player, s);
         if (!FullCourseConfig.keepVanillaHunger()) {
+            // naturalHealthRegeneration off (UHC packs): food heals nothing, as in vanilla
+            boolean regenerates = player.level().getGameRules().get(GameRules.NATURAL_HEALTH_REGENERATION);
             if (now % Recovery.NOURISH_TICKS == 0 && s.nourish() > 0) {
-                if (player.isHurt()) player.heal(1F);
+                if (player.isHurt() && regenerates) player.heal(1F);
                 s = s.withNourish(s.nourish() - 1);
             }
-            saturation(player);
+            if (regenerates) saturation(player);
+            else SATURATION.remove(player);
             if (recovers(player)) {
                 int interval = Recovery.interval(FullCourseConfig.recoveryIntervalTicks(), recoveryRate(player));
                 if (Recovery.healsNow(now - player.lastDamageStamp, FullCourseConfig.recoveryDelayTicks(), interval)) {

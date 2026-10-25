@@ -34,6 +34,9 @@ slots always match the server.
 Restart the server (or the game, in single player) after editing either file. NeoForge's in-game config screen marks
 these keys the same way: they take effect on the next world load.
 
+The `naturalHealthRegeneration` gamerule works as in vanilla: turned off (as UHC packs do), nothing heals on its own,
+neither Recovery nor food. Healing potions, golden apples and other effects still work.
+
 | Key | Default | What it does |
 |---|---|---|
 | `keepVanillaHunger` | `false` | Keep the vanilla food bar and regeneration. Meals still give their benefits. |

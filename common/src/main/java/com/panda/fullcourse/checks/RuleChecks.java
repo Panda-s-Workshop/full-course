@@ -89,6 +89,7 @@ public final class RuleChecks {
         CHECKS.put("recovery_respects_gamerule", RuleChecks::recoveryRespectsGamerule);
         CHECKS.put("recovery_off_on_peaceful", RuleChecks::recoveryOffOnPeaceful);
         CHECKS.put("recovery_holds_under_tick_freeze", RuleChecks::recoveryHoldsUnderTickFreeze);
+        CHECKS.put("food_respects_gamerule", RuleChecks::foodRespectsGamerule);
         CHECKS.put("candle_cake_refusal_drops_nothing", RuleChecks::candleCakeRefusalDropsNothing);
         CHECKS.put("mending_shortens_recovery", RuleChecks::mendingShortensRecovery);
         CHECKS.put("recovery_rate_attribute", RuleChecks::recoveryRateAttribute);
@@ -279,6 +280,25 @@ public final class RuleChecks {
             rules.set(GameRules.NATURAL_HEALTH_REGENERATION, before, c.server());
         }
         health(c, 10F, "naturalHealthRegeneration off");
+    }
+
+    /** With naturalHealthRegeneration off food heals nothing, as in vanilla: UHC packs heal only by their own means. */
+    private static void foodRespectsGamerule(Ctx c) {
+        long t = c.t();
+        c.player().setHealth(10F);
+        c.player().lastDamageStamp = t - 10_000;
+        GameRules rules = c.level().getGameRules();
+        boolean before = rules.get(GameRules.NATURAL_HEALTH_REGENERATION);
+        rules.set(GameRules.NATURAL_HEALTH_REGENERATION, false, c.server());
+        try {
+            FoodRules.onEatDish(c.player(), Items.COOKED_BEEF, 8, t);
+            c.player().addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.SATURATION, 40, 1));
+            ticks(c, t + 1, t + 200);
+        } finally {
+            rules.set(GameRules.NATURAL_HEALTH_REGENERATION, before, c.server());
+            c.player().removeEffect(net.minecraft.world.effect.MobEffects.SATURATION);
+        }
+        health(c, 10F, "food and Saturation with naturalHealthRegeneration off");
     }
 
     private static void recoveryOffOnPeaceful(Ctx c) {
