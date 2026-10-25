@@ -9,6 +9,7 @@ import com.panda.fullcourse.food.Profile;
 import com.panda.fullcourse.kitchen.FeastBlock;
 import com.panda.fullcourse.kitchen.RecipeHints;
 import com.panda.fullcourse.platform.Services;
+import com.panda.fullcourse.registry.ModItems;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -64,6 +65,7 @@ public final class FoodTooltips {
             // what the mod changes about another's item (cake: one slice per helping)
             lines.addAll(1, wrap(List.of(Component.translatable("tooltip.fullcourse." + id.toLanguageKey() + ".use").withStyle(ChatFormatting.GRAY))));
         }
+        int foodEnd = 1;
         if (food) {
             boolean tasted = mc.player != null
                     && Services.PLATFORM.foodState(mc.player).tasted().contains(BuiltInRegistries.ITEM.getKey(FoodProfiles.clientTastedAs(stack.getItem())));
@@ -71,7 +73,10 @@ public final class FoodTooltips {
             // a feast heals per serving, not as an item
             int nutrition = component != null ? component.nutrition()
                     : stack.getItem() instanceof BlockItem b && b.getBlock() instanceof FeastBlock feast ? feast.serving() : 0;
-            lines.addAll(1, wrap(FoodText.lines(p, nutrition, shift, tasted)));
+            List<Component> foodLines = wrap(FoodText.lines(p, nutrition, shift, tasted));
+            lines.addAll(1, foodLines);
+            // above FoodText's "Shift: recipe chain" line, the last when Shift is up
+            foodEnd = 1 + foodLines.size() - (!shift && p.steps() > 0 ? 1 : 0);
             // under the stars: an untasted dish that would move the next meal slot along, as the journal marks it
             if (!tasted && mc.player != null
                     && JournalScreen.countsToward(JournalScreen.nextSlot(Services.PLATFORM.foodState(mc.player)), FoodProfiles.clientTastedAs(stack.getItem()))) {
@@ -80,6 +85,11 @@ public final class FoodTooltips {
             }
         } else if (!made.isEmpty() && !shift) {
             lines.add(1, Component.translatable("tooltip.fullcourse.shift_recipe").withStyle(ChatFormatting.GRAY));
+        }
+        // an ingredient says what it's for: the mod's dishes that take it
+        if (id.getNamespace().equals(FullCourse.MODID) && !ModItems.dishes().contains(stack.getItem())) {
+            int at = Math.min(foodEnd, lines.size());
+            RecipeHints.usedIn(stack.getItem()).ifPresent(used -> lines.addAll(at, wrap(List.of(used))));
         }
         if (shift) lines.addAll(wrap(made));
         if (!FullCourseConfig.keepVanillaHunger()) markNeedsHunger(lines);

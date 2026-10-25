@@ -154,6 +154,8 @@
   "hint.fullcourse.tag.c.foods.raw_fish": "any raw fish",
   "hint.fullcourse.tag.c.foods.raw_meat": "any raw meat",
   "hint.fullcourse.tag.fullcourse.journal_foods": "any simple dish",
+  "hint.fullcourse.used_in": "Used in: %s",
+  "hint.fullcourse.used_in_more": "Used in: %s and %s more",
   "item.fullcourse.apple_pie": "Apple Pie",
   "item.fullcourse.baked_onion": "Baked Onion",
   "item.fullcourse.batter": "Batter",

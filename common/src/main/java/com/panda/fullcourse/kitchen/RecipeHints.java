@@ -8,9 +8,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -27,9 +29,13 @@ import net.minecraft.world.item.Item;
 public final class RecipeHints {
     /** At most this many "where it comes from" lines under a recipe. */
     private static final int MAX_SOURCES = 4;
+    /** At most this many dishes named on a "Used in" line. */
+    private static final int MAX_USES = 2;
     private static Map<Item, List<Component>> hints;
     /** Each item's first recipe's ingredients, as item ids and tags. */
     private static final Map<Item, List<String>> firstRecipe = new HashMap<>();
+    /** Each item's ingredients over all its recipes, as item ids and tags, alternatives included. */
+    private static final Map<Item, Set<String>> takes = new LinkedHashMap<>();
 
     private RecipeHints() {}
 
@@ -65,6 +71,35 @@ public final class RecipeHints {
             queue.addAll(made(next));
         }
         return out;
+    }
+
+    /**
+     * What one of the mod's ingredients is for: "Used in: Vegetable Stew, Fish Chowder and 3 more", from the
+     * mod's recipes that take it by id or by a tag it's in. Empty for an item no recipe takes.
+     */
+    public static Optional<Component> usedIn(Item item) {
+        hints();
+        List<Item> users = new ArrayList<>();
+        for (var e : takes.entrySet()) {
+            if (e.getKey() != item && e.getValue().stream().anyMatch(id -> matches(id, item))) users.add(e.getKey());
+        }
+        if (users.isEmpty()) return Optional.empty();
+        MutableComponent names = Component.empty();
+        for (int i = 0; i < Math.min(MAX_USES, users.size()); i++) {
+            if (i > 0) names.append(Component.literal(", "));
+            names.append(Component.translatable(users.get(i).getDescriptionId()));
+        }
+        Component line = users.size() > MAX_USES
+                ? Component.translatable("hint.fullcourse.used_in_more", names, users.size() - MAX_USES)
+                : Component.translatable("hint.fullcourse.used_in", names);
+        return Optional.of(line.copy().withStyle(ChatFormatting.GRAY));
+    }
+
+    /** {@code id} names the item, or a tag it's in. */
+    private static boolean matches(String id, Item item) {
+        if (!id.startsWith("#")) return BuiltInRegistries.ITEM.getKey(item).equals(Identifier.parse(id));
+        var tag = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, Identifier.parse(id.substring(1)));
+        return item.builtInRegistryHolder().is(tag);
     }
 
     /** The mod's items among {@code item}'s first recipe's ingredients, tags resolved to the mod's own item in them. */
@@ -126,6 +161,14 @@ public final class RecipeHints {
                 if (i.isJsonPrimitive()) first.add(i.getAsString());
             }
             firstRecipe.put(item, List.copyOf(first));
+            Set<String> all = new LinkedHashSet<>();
+            for (JsonElement m : e.getAsJsonArray("made")) {
+                for (JsonElement i : m.getAsJsonObject().getAsJsonArray("from")) {
+                    if (i.isJsonArray()) i.getAsJsonArray().forEach(alt -> all.add(alt.getAsString()));
+                    else all.add(i.getAsString());
+                }
+            }
+            takes.put(item, all);
         }
         return out;
     }
