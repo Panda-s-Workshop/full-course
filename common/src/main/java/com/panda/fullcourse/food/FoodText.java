@@ -119,16 +119,22 @@ public final class FoodText {
         return Component.translatable("tooltip.fullcourse.heal", number(nutrition / 2.0), nutrition);
     }
 
-    /** "Score 5 · Gourmet at 8", the top tier, or "set to Simple" when data or a rule set the tier, not the score. */
+    /**
+     * "Score 5 · Hearty: 5–7", the scores of the dish's own tier (a scale, not a goal: a dish can't be cooked better),
+     * "Feast: 12+" for the top tier, or "set to Simple" when data or a rule set the tier, not the score.
+     */
     static MutableComponent score(Profile p) {
         int[] thresholds = FullCourseConfig.tierThresholds();
+        Component name = Component.translatable("tier.fullcourse." + p.tier().ordinal());
         if (Tier.fromScore(p.score(), thresholds) != p.tier()) {
-            return Component.translatable("tooltip.fullcourse.score_set", p.score(), Component.translatable("tier.fullcourse." + p.tier().ordinal()));
+            return Component.translatable("tooltip.fullcourse.score_set", p.score(), name);
         }
-        int next = p.tier().ordinal(); // thresholds[i] is the lowest score of tier i + 1
-        if (next >= thresholds.length || next >= Tier.FEAST.ordinal()) return Component.translatable("tooltip.fullcourse.score_top", p.score());
-        return Component.translatable("tooltip.fullcourse.score", p.score(),
-                Component.translatable("tier.fullcourse." + (next + 1)), thresholds[next]);
+        int tier = p.tier().ordinal(); // thresholds[i] is the lowest score of tier i + 1
+        int lowest = tier == 0 ? 0 : thresholds[tier - 1];
+        if (tier >= thresholds.length || tier >= Tier.FEAST.ordinal()) {
+            return Component.translatable("tooltip.fullcourse.score_top", p.score(), name, lowest);
+        }
+        return Component.translatable("tooltip.fullcourse.score", p.score(), name, lowest, thresholds[tier] - 1);
     }
 
     /** "30", "2.5": one decimal at most, none for a whole number (rounded first: 0.1 × 3 × 100 is 30.000000000000004). */
