@@ -12,6 +12,7 @@ import java.util.Optional;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -27,9 +28,10 @@ import net.minecraft.world.level.Level;
 
 /**
  * {@code fullcourse:cooking}: up to six ingredients, shapeless, plus an optional container the dish is served
- * in, cooked over heat for {@code time} ticks.
+ * in, cooked over heat for {@code time} ticks. {@code soup_color} ("#RRGGBB") tints the soup in the pot while it cooks.
  */
-public record CookingRecipe(List<Ingredient> ingredients, Optional<Ingredient> container, ItemStackTemplate result, int time)
+public record CookingRecipe(List<Ingredient> ingredients, Optional<Ingredient> container, ItemStackTemplate result, int time,
+                            Optional<Integer> soupColor)
         implements Recipe<CookingInput> {
     public static final int MAX_INGREDIENTS = 6;
     public static final int DEFAULT_TIME = 200;
@@ -40,7 +42,8 @@ public record CookingRecipe(List<Ingredient> ingredients, Optional<Ingredient> c
             Ingredient.CODEC.listOf(1, MAX_INGREDIENTS).fieldOf("ingredients").forGetter(CookingRecipe::ingredients),
             Ingredient.CODEC.optionalFieldOf("container").forGetter(CookingRecipe::container),
             ItemStackTemplate.CODEC.fieldOf("result").forGetter(CookingRecipe::result),
-            Codec.intRange(1, MAX_TIME).optionalFieldOf("time", DEFAULT_TIME).forGetter(CookingRecipe::time)
+            Codec.intRange(1, MAX_TIME).optionalFieldOf("time", DEFAULT_TIME).forGetter(CookingRecipe::time),
+            ExtraCodecs.STRING_RGB_COLOR.optionalFieldOf("soup_color").forGetter(CookingRecipe::soupColor)
     ).apply(i, CookingRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, CookingRecipe> STREAM_CODEC = StreamCodec.composite(
@@ -48,6 +51,7 @@ public record CookingRecipe(List<Ingredient> ingredients, Optional<Ingredient> c
             Ingredient.OPTIONAL_CONTENTS_STREAM_CODEC, CookingRecipe::container,
             ItemStackTemplate.STREAM_CODEC, CookingRecipe::result,
             ByteBufCodecs.VAR_INT, CookingRecipe::time,
+            ByteBufCodecs.optional(ByteBufCodecs.INT), CookingRecipe::soupColor,
             CookingRecipe::new);
 
     /**

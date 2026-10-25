@@ -7,5 +7,6 @@
   "container": "minecraft:glass_bottle",
   "result": {
     "id": "fullcourse:chorus_jelly"
-  }
+  },
+  "soup_color": "#C890E0"
 }

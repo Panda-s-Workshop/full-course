@@ -8,5 +8,6 @@
   "container": "minecraft:glass_bottle",
   "result": {
     "id": "fullcourse:glow_berry_jam"
-  }
+  },
+  "soup_color": "#FFB840"
 }

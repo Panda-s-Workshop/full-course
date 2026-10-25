@@ -7,10 +7,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -63,6 +68,9 @@ public class CookingPotBlockEntity extends BaseContainerBlockEntity implements W
     /** The raw item id of the container the found recipe wants, when it's missing. */
     private int needs = -1;
     private ResourceKey<Recipe<?>> cooking;
+    /** The soup's colour while it cooks, sent to clients for {@code PotSoupTint}. */
+    public static final int DEFAULT_SOUP = 0xE8A253;
+    private int soupColor = DEFAULT_SOUP;
     private RecipeManager.CachedCheck<CookingInput, CookingRecipe> check;
 
     private final ContainerData data = new ContainerData() {
@@ -129,6 +137,10 @@ public class CookingPotBlockEntity extends BaseContainerBlockEntity implements W
         return status;
     }
 
+    public int soupColor() {
+        return soupColor;
+    }
+
     public static void serverTick(Level level, BlockPos pos, BlockState state, CookingPotBlockEntity pot) {
         if (!(level instanceof ServerLevel server)) return;
         pot.heated = heated(level, pos);
@@ -148,6 +160,11 @@ public class CookingPotBlockEntity extends BaseContainerBlockEntity implements W
         if (found.isPresent()) {
             CookingRecipe recipe = found.get().value();
             pot.time = recipe.time();
+            int soup = recipe.soupColor().orElse(DEFAULT_SOUP) & 0xFFFFFF;
+            if (soup != pot.soupColor) {
+                pot.soupColor = soup;
+                level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
+            }
             boolean served = recipe.container().map(cont -> cont.test(pot.items.get(CONTAINER))).orElse(true);
             if (!served) {
                 status = Status.NEEDS_CONTAINER;
@@ -291,6 +308,22 @@ public class CookingPotBlockEntity extends BaseContainerBlockEntity implements W
         items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         ContainerHelper.loadAllItems(in, items);
         progress = in.getIntOr("progress", 0);
+        soupColor = in.getIntOr("soup_color", DEFAULT_SOUP);
+        // on a client, a new colour redraws the soup
+        if (level != null && level.isClientSide()) level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_IMMEDIATE);
+    }
+
+    /** Clients get only the soup's colour; the screen has its own sync for the contents. */
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = new CompoundTag();
+        tag.putInt("soup_color", soupColor);
+        return tag;
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override

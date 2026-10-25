@@ -7,5 +7,6 @@
   "container": "minecraft:glass_bottle",
   "result": {
     "id": "fullcourse:hot_cocoa"
-  }
+  },
+  "soup_color": "#8A5A3C"
 }

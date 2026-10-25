@@ -9,5 +9,6 @@
   "container": "minecraft:bowl",
   "result": {
     "id": "fullcourse:fish_chowder"
-  }
+  },
+  "soup_color": "#FBF5E4"
 }

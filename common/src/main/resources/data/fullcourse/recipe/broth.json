@@ -6,5 +6,6 @@
   "container": "minecraft:glass_bottle",
   "result": {
     "id": "fullcourse:broth"
-  }
+  },
+  "soup_color": "#E8C878"
 }

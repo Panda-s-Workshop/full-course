@@ -7,5 +7,6 @@
   "container": "minecraft:bowl",
   "result": {
     "id": "fullcourse:meatballs"
-  }
+  },
+  "soup_color": "#F27A52"
 }

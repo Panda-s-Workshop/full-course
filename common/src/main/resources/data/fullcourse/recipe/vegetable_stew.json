@@ -9,5 +9,6 @@
   "container": "minecraft:bowl",
   "result": {
     "id": "fullcourse:vegetable_stew"
-  }
+  },
+  "soup_color": "#E8A253"
 }

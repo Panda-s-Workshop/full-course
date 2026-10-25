@@ -9,5 +9,6 @@
   "container": "minecraft:bowl",
   "result": {
     "id": "fullcourse:ember_chili"
-  }
+  },
+  "soup_color": "#E0482C"
 }

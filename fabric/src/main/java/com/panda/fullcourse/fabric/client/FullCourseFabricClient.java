@@ -9,10 +9,12 @@ import com.panda.fullcourse.client.FoodTooltips;
 import com.panda.fullcourse.client.JournalScreen;
 import com.panda.fullcourse.client.KitchenRecipes;
 import com.panda.fullcourse.client.MealHud;
+import com.panda.fullcourse.client.PotSoupTint;
 import com.panda.fullcourse.client.compat.cfb.CookingForBlockheadsClient;
 import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.registry.ModBlockEntities;
+import com.panda.fullcourse.registry.ModBlocks;
 import com.panda.fullcourse.registry.ModMenus;
 import java.util.List;
 import net.fabricmc.api.ClientModInitializer;
@@ -22,6 +24,7 @@ import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.recipe.v1.sync.ClientRecipeSynchronizedEvent;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.loader.api.FabricLoader;
@@ -44,6 +47,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
         MenuScreens.register(ModMenus.COOKING_POT.get(), CookingPotScreen::new);
         MenuScreens.register(ModMenus.BRICK_OVEN.get(), BrickOvenScreen::new);
         BlockEntityRenderers.register(ModBlockEntities.CUTTING_BOARD.get(), CuttingBoardRenderer::new);
+        BlockColorRegistry.register(List.of(new PotSoupTint()), ModBlocks.COOKING_POT.get());
         // the meal row replaces the food bar, sits above the mount's hearts when riding, and lifts the air bubbles over it
         HudElementRegistry.replaceElement(VanillaHudElements.FOOD_BAR, vanilla -> (g, delta) -> {
             if (!MealHud.active()) vanilla.extractRenderState(g, delta);

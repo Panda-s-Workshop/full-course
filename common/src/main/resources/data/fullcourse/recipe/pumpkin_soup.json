@@ -7,5 +7,6 @@
   "container": "minecraft:bowl",
   "result": {
     "id": "fullcourse:pumpkin_soup"
-  }
+  },
+  "soup_color": "#FFC066"
 }

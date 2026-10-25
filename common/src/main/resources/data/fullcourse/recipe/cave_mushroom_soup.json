@@ -9,5 +9,6 @@
   "container": "minecraft:bowl",
   "result": {
     "id": "fullcourse:cave_mushroom_soup"
-  }
+  },
+  "soup_color": "#CBAE8E"
 }

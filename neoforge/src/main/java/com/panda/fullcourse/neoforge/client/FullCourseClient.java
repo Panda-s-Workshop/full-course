@@ -10,13 +10,16 @@ import com.panda.fullcourse.client.FoodTooltips;
 import com.panda.fullcourse.client.JournalScreen;
 import com.panda.fullcourse.client.KitchenRecipes;
 import com.panda.fullcourse.client.MealHud;
+import com.panda.fullcourse.client.PotSoupTint;
 import com.panda.fullcourse.client.compat.cfb.CookingForBlockheadsClient;
 import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.neoforge.client.compat.AppleSkinCompat;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.registry.ModBlockEntities;
+import com.panda.fullcourse.registry.ModBlocks;
 import com.panda.fullcourse.registry.ModMenus;
 import com.panda.fullcourse.registry.ModRecipes;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Hud;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -30,6 +33,7 @@ import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RecipesReceivedEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
@@ -50,6 +54,7 @@ public final class FullCourseClient {
         });
         modBus.addListener((EntityRenderersEvent.RegisterRenderers e) ->
                 e.registerBlockEntityRenderer(ModBlockEntities.CUTTING_BOARD.get(), CuttingBoardRenderer::new));
+        modBus.addListener((RegisterColorHandlersEvent.BlockTintSources e) -> e.register(List.of(new PotSoupTint()), ModBlocks.COOKING_POT.get()));
         // the meal row sits where the food bar was, above the mount's hearts when riding; it stacks the rows above it
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAbove(VanillaGuiLayers.VEHICLE_HEALTH, MealHud.LAYER, (g, delta) -> {
             Hud hud = Minecraft.getInstance().gui.hud;
