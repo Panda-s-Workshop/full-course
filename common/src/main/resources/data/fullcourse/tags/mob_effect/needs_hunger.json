@@ -1,0 +1,13 @@
+{
+  "values": [
+    "minecraft:hunger",
+    {
+      "id": "farmersdelight:nourishment",
+      "required": false
+    },
+    {
+      "id": "farmersdelight:comfort",
+      "required": false
+    }
+  ]
+}

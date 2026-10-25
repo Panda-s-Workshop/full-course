@@ -1,20 +1,25 @@
 package com.panda.fullcourse.client;
 
 import com.panda.fullcourse.FullCourse;
+import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.FoodProfiles;
+import com.panda.fullcourse.food.FoodTags;
 import com.panda.fullcourse.food.FoodText;
 import com.panda.fullcourse.food.Profile;
 import com.panda.fullcourse.kitchen.FeastBlock;
 import com.panda.fullcourse.kitchen.RecipeHints;
 import com.panda.fullcourse.platform.Services;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -55,5 +60,33 @@ public final class FoodTooltips {
             lines.add(1, Component.translatable("tooltip.fullcourse.shift_recipe").withStyle(ChatFormatting.DARK_GRAY));
         }
         if (shift) lines.addAll(made);
+        if (!FullCourseConfig.keepVanillaHunger()) markNeedsHunger(lines);
+    }
+
+    /** Greys out each line naming an effect in {@code #fullcourse:needs_hunger}, and says it does nothing here. */
+    static void markNeedsHunger(List<Component> lines) {
+        Set<String> keys = new HashSet<>();
+        BuiltInRegistries.MOB_EFFECT.getTagOrEmpty(FoodTags.NEEDS_HUNGER).forEach(h -> keys.add(h.value().getDescriptionId()));
+        if (keys.isEmpty()) return;
+        for (int i = 0; i < lines.size(); i++) {
+            if (names(lines.get(i), keys)) {
+                lines.set(i, lines.get(i).copy().withStyle(ChatFormatting.DARK_GRAY)
+                        .append(Component.translatable("tooltip.fullcourse.needs_hunger").withStyle(ChatFormatting.DARK_GRAY)));
+            }
+        }
+    }
+
+    /** The component, its arguments or its siblings name one of the translation keys. */
+    private static boolean names(Component c, Set<String> keys) {
+        if (c.getContents() instanceof TranslatableContents t) {
+            if (keys.contains(t.getKey())) return true;
+            for (Object arg : t.getArgs()) {
+                if (arg instanceof Component a && names(a, keys)) return true;
+            }
+        }
+        for (Component sibling : c.getSiblings()) {
+            if (names(sibling, keys)) return true;
+        }
+        return false;
     }
 }
