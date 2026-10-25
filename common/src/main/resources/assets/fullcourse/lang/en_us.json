@@ -291,7 +291,7 @@
   "tier.fullcourse.3": "Hearty",
   "tier.fullcourse.4": "Gourmet",
   "tier.fullcourse.5": "Feast",
-  "toast.fullcourse.hint.body": "Food heals and gives meals. Cook better dishes for bigger, longer benefits.",
+  "toast.fullcourse.hint.body": "Food heals. Cooked dishes fill the row where the food bar was; its padlocks open as you taste more. Your inventory lists your meals.",
   "toast.fullcourse.hint.title": "Hunger is gone",
   "toast.fullcourse.slot.last": "Every meal slot is open",
   "toast.fullcourse.slot.next": "Next: %s / %s dishes with %s",

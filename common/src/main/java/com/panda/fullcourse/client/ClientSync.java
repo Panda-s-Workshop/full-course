@@ -9,7 +9,6 @@ import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.registry.ModSounds;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -26,7 +25,6 @@ import net.minecraft.world.phys.Vec3;
  * call {@link #received} with the server's table, {@link #tick} every client tick and {@link #disconnected} on leaving.
  */
 public final class ClientSync {
-    private static final SystemToast.SystemToastId HINT = new SystemToast.SystemToastId(10_000L);
     /** Ticks to wait after the table arrives, so the player's food state (synced separately) is there too. */
     private static final int HINT_DELAY = 60;
     private static int hintIn = -1;
@@ -51,8 +49,8 @@ public final class ClientSync {
         if (hinted || FullCourseConfig.keepVanillaHunger()) return;
         hinted = true;
         if (!Services.PLATFORM.foodState(mc.player).tasted().isEmpty()) return;
-        SystemToast.addOrUpdate(mc.gui.toastManager(), HINT, Component.translatable("toast.fullcourse.hint.title"),
-                Component.translatable("toast.fullcourse.hint.body"));
+        mc.gui.toastManager().addToast(SlotToast.hint(Component.translatable("toast.fullcourse.hint.title"),
+                Component.translatable("toast.fullcourse.hint.body")));
     }
 
     /** A slot just unlocked: a toast naming it and what the next one asks for, and a chime. */
@@ -114,7 +112,7 @@ public final class ClientSync {
 
     /** The hint is on screen (for checks). */
     public static boolean hintShowing() {
-        return Minecraft.getInstance().gui.toastManager().getToast(SystemToast.class, HINT) != null;
+        return Minecraft.getInstance().gui.toastManager().getToast(SlotToast.class, SlotToast.HINT) != null;
     }
 
     public static void disconnected() {
