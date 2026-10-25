@@ -251,6 +251,8 @@ public final class FoodProfiles {
             Tier tier = remedy || (setTier.isEmpty() && rawCuts.containsKey(dish)) ? Tier.RAW
                     : setTier.map(Tier::ofStars).orElseGet(() -> Tier.fromScore(score.score(), thresholds));
             if (setTier.isEmpty() && cutThenCooked(score) && tier.stars() > Tier.SIMPLE.stars()) tier = Tier.SIMPLE;
+            // Feast is a placed, shared dish's tier (one helping each): anything else stops at Gourmet unless a file says so
+            if (setTier.isEmpty() && tier == Tier.FEAST && !dish.builtInRegistryHolder().is(FoodTags.PLACED_MEALS)) tier = Tier.GOURMET;
             List<Family> families;
             if (remedy) {
                 families = List.of();

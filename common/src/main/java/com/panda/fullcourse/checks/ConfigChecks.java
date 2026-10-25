@@ -186,6 +186,15 @@ final class ConfigChecks {
                 check(banquet.families().equals(List.of(com.panda.fullcourse.logic.Family.BRAWN)), "a one-star banquet gives %s, expected its file's first family",
                         banquet.families());
             });
+            // low thresholds: a stew's score reaches Feast, but only a placed dish is a feast
+            FullCourseConfig.with(new FullCourseConfig.Snapshot(false, D.recoveryDelaySeconds(), D.recoveryIntervalTicks(), D.startingMealSlots(),
+                    D.maxMealSlots(), D.keepMealsOnDeath(), D.durationMultiplier(), new int[] {1, 2, 3, 4, 5}), () -> {
+                FoodProfiles.reset();
+                Tier stew = profile(c, Items.RABBIT_STEW).tier();
+                check(stew == Tier.GOURMET, "rabbit stew is %s with thresholds 1..5, expected Gourmet: it isn't placed", stew);
+                Tier banquet = profile(c, com.panda.fullcourse.registry.ModItems.item("roast_banquet")).tier();
+                check(banquet == Tier.FEAST, "the banquet is %s with thresholds 1..5, expected Feast", banquet);
+            });
         } finally {
             FoodProfiles.reset();
         }
