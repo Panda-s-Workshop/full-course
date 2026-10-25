@@ -26,10 +26,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 abstract class CakeBlockMixin {
     @Inject(method = "eat", at = @At("HEAD"), cancellable = true)
     private static void fullcourse$oneHelping(LevelAccessor level, BlockPos pos, BlockState state, Player player, CallbackInfoReturnable<InteractionResult> cir) {
-        if (!(player instanceof ServerPlayer server) || FullCourseConfig.keepVanillaHunger()) return;
-        Component refused = FeastBlock.refusal(server, Items.CAKE);
+        if (FullCourseConfig.keepVanillaHunger()) return;
+        // refused on the client as well, which would otherwise take the bite until the server puts it back
+        Component refused = FeastBlock.refusal(player, Items.CAKE);
         if (refused == null) return;
-        server.sendOverlayMessage(refused);
+        if (player instanceof ServerPlayer server) server.sendOverlayMessage(refused);
         // FAIL, not SUCCESS: a candle cake drops its candle whenever eating consumed the click
         cir.setReturnValue(InteractionResult.FAIL);
     }

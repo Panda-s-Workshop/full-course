@@ -129,6 +129,11 @@ public final class FoodProfiles {
         return dish != item && get(mcServer, dish).givesMeal() ? dish : item;
     }
 
+    /** {@link #dishOf} on the client, from the table the server sent. */
+    public static Item clientDishOf(Item item) {
+        return clientServings.getOrDefault(item, item);
+    }
+
     /** {@link #tastedAs} on the client, from the table the server sent. */
     public static Item clientTastedAs(Item item) {
         Item dish = clientServings.getOrDefault(item, item);

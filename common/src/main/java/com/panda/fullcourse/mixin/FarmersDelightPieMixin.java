@@ -26,10 +26,11 @@ abstract class FarmersDelightPieMixin {
     @Inject(method = "consumeBite", at = @At("HEAD"), cancellable = true, require = 0)
     private void fullcourse$oneHelping(Level level, BlockPos pos, BlockState state, Player player, CallbackInfoReturnable<InteractionResult> cir) {
         // with keepVanillaHunger the food bar refuses bites, as for any pie
-        if (!(player instanceof ServerPlayer server) || FullCourseConfig.keepVanillaHunger()) return;
-        Component refused = FeastBlock.refusal(server, ((Block) (Object) this).asItem());
+        if (FullCourseConfig.keepVanillaHunger()) return;
+        // refused on the client as well, which would otherwise take the bite until the server puts it back
+        Component refused = FeastBlock.refusal(player, ((Block) (Object) this).asItem());
         if (refused == null) return;
-        server.sendOverlayMessage(refused);
+        if (player instanceof ServerPlayer server) server.sendOverlayMessage(refused);
         cir.setReturnValue(InteractionResult.FAIL);
     }
 }

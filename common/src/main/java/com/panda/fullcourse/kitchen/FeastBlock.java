@@ -4,6 +4,7 @@ import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.food.FoodText;
+import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.registry.ModSounds;
 import java.util.Map;
 import net.minecraft.ChatFormatting;
@@ -142,19 +143,22 @@ public class FeastBlock extends Block {
     /**
      * Why {@code player} can't take a serving of {@code dish} (a feast, cake, another mod's pie) now, or null: Queasy
      * (the serving would give no meal), or a helping of it or one of its servings within the last {@link #HELPING_TICKS},
-     * so holding the use key can't clear the table for everyone else.
+     * so holding the use key can't clear the table for everyone else. On a client too, from the synced state, so a
+     * cake or pie the server will refuse isn't bitten there first; null on a client of a server without Full Course.
      */
-    public static Component refusal(ServerPlayer player, Item dish) {
+    public static Component refusal(Player player, Item dish) {
+        if (!(player instanceof ServerPlayer) && !FoodProfiles.clientReady()) return null;
         Component name = dish.getName(new ItemStack(dish));
         if (player.hasEffect(MobEffects.HUNGER)) {
             return Component.translatable("message.fullcourse.feast.queasy", name).withStyle(ChatFormatting.GREEN);
         }
         Identifier id = BuiltInRegistries.ITEM.getKey(dish);
         long now = player.level().getGameTime();
-        for (Map.Entry<Identifier, Long> helping : FoodRules.state(player).helpings().entrySet()) {
+        for (Map.Entry<Identifier, Long> helping : Services.PLATFORM.foodState(player).helpings().entrySet()) {
             long since = now - helping.getValue();
             boolean same = helping.getKey().equals(id) || BuiltInRegistries.ITEM.get(helping.getKey())
-                    .map(h -> FoodProfiles.dishOf(player.level().getServer(), h.value()) == dish).orElse(false);
+                    .map(h -> (player instanceof ServerPlayer server ? FoodProfiles.dishOf(server.level().getServer(), h.value())
+                            : FoodProfiles.clientDishOf(h.value())) == dish).orElse(false);
             if (same && since >= 0 && since < HELPING_TICKS) {
                 return Component.translatable("message.fullcourse.feast.had_share", name, FoodText.duration((int) (HELPING_TICKS - since)));
             }
