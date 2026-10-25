@@ -86,7 +86,10 @@ public class CuttingBoardBlock extends Block implements EntityBlock {
         if (!(level.getBlockEntity(pos) instanceof CuttingBoardBlockEntity board)) return InteractionResult.PASS;
         if (stack.isEmpty()) return InteractionResult.TRY_WITH_EMPTY_HAND;
         if (stack.is(KitchenTags.KNIVES)) {
-            if (board.item().isEmpty()) return InteractionResult.PASS;
+            if (board.item().isEmpty()) {
+                if (!level.isClientSide()) player.sendOverlayMessage(Component.translatable("message.fullcourse.board.empty"));
+                return InteractionResult.SUCCESS;
+            }
             if (level instanceof ServerLevel server) cut(server, pos, board, stack, player, hand);
             return InteractionResult.SUCCESS;
         }

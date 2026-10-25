@@ -114,7 +114,7 @@ public class FeastBlock extends Block {
         int left = Math.min(state.getValue(SERVINGS), servings);
         if (left == 0) {
             if (!level.isClientSide()) {
-                player.sendOverlayMessage(Component.translatable("message.fullcourse.feast.empty").withStyle(ChatFormatting.GRAY));
+                player.sendOverlayMessage(Component.translatable("message.fullcourse.feast.empty"));
             }
             return InteractionResult.SUCCESS;
         }
@@ -153,8 +153,7 @@ public class FeastBlock extends Block {
         for (Meals.Meal<Identifier> meal : FoodRules.state(player).meals().active()) {
             long since = now - meal.start();
             if (meal.dish().equals(id) && since >= 0 && since < HELPING_TICKS) {
-                return Component.translatable("message.fullcourse.feast.had_share", name, FoodText.duration((int) (HELPING_TICKS - since)))
-                        .withStyle(ChatFormatting.GRAY);
+                return Component.translatable("message.fullcourse.feast.had_share", name, FoodText.duration((int) (HELPING_TICKS - since)));
             }
         }
         return null;

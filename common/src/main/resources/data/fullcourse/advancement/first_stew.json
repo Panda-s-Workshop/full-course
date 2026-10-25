@@ -4,7 +4,11 @@
       "trigger": "minecraft:consume_item",
       "conditions": {
         "item": {
-          "items": "#fullcourse:soups"
+          "items": [
+            "fullcourse:pumpkin_soup",
+            "fullcourse:vegetable_stew",
+            "fullcourse:cave_mushroom_soup"
+          ]
         }
       }
     }

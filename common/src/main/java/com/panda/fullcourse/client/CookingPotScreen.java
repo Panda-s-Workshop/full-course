@@ -29,6 +29,8 @@ public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
     private static final Identifier FLAME = Identifier.withDefaultNamespace("container/furnace/lit_progress");
     /** Vanilla's dark red for text on a container panel. */
     private static final int STATUS_COLOR = 0xFFA0302A;
+    /** Vanilla's grey for container labels. */
+    private static final int INCOMPLETE_COLOR = 0xFF404040;
     public static final int FLAME_X = 49, FLAME_Y = 56, ARROW_X = 89, ARROW_Y = 26;
     /** Set when a recipe viewer makes the arrow a button that opens the pot's recipes; the arrow's tooltip then says so. */
     public static boolean arrowOpensViewer;
@@ -48,18 +50,19 @@ public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
         if (arrow > 0) g.blitSprite(RenderPipelines.GUI_TEXTURED, ARROW, 24, 16, 0, 0, leftPos + ARROW_X, topPos + ARROW_Y, arrow, 16);
     }
 
-    /** The pot's status, right-aligned on the title row: red when something stops it. */
+    /** The pot's status, right-aligned on the title row: red when something stops it, grey while the grid is incomplete. */
     @Override
     protected void extractLabels(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         super.extractLabels(g, mouseX, mouseY);
+        boolean incomplete = menu.status() == CookingPotBlockEntity.Status.NO_RECIPE && PotPreview.incomplete(grid());
         Component line = switch (menu.status()) {
             case NO_HEAT -> Component.translatable("gui.fullcourse.pot.status.no_heat");
             case NEEDS_CONTAINER -> Component.translatable("gui.fullcourse.pot.status.needs", menu.needs().getHoverName());
             case OUTPUT_FULL -> Component.translatable("gui.fullcourse.pot.status.full");
-            case NO_RECIPE -> Component.translatable("gui.fullcourse.pot.status.no_recipe");
+            case NO_RECIPE -> Component.translatable(incomplete ? "gui.fullcourse.pot.status.incomplete" : "gui.fullcourse.pot.status.no_recipe");
             default -> null;
         };
-        if (line != null) g.text(font, line, imageWidth - 8 - font.width(line), titleLabelY, STATUS_COLOR, false);
+        if (line != null) g.text(font, line, imageWidth - 8 - font.width(line), titleLabelY, incomplete ? INCOMPLETE_COLOR : STATUS_COLOR, false);
     }
 
     @Override

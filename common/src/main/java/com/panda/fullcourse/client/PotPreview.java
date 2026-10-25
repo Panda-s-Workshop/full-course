@@ -15,6 +15,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -51,6 +52,13 @@ public final class PotPreview {
         if (a.size() != b.size()) return false;
         for (int i = 0; i < a.size(); i++) if (!ItemStack.matches(a.get(i), b.get(i))) return false;
         return true;
+    }
+
+    /** Some pot recipe takes all of these and needs more: the grid is on its way, not wrong. */
+    public static boolean incomplete(List<ItemStack> grid) {
+        List<Component> lines = lines(grid);
+        return !lines.isEmpty() && lines.getFirst().getContents() instanceof TranslatableContents t
+                && t.getKey().equals("gui.fullcourse.pot.missing");
     }
 
     /** The arrow's lines for these grid items against these recipes, uncached. */

@@ -4,7 +4,6 @@ import com.panda.fullcourse.food.FoodText;
 import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModSounds;
 import java.util.List;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -80,13 +79,13 @@ public class FermentingCrockBlock extends Block implements EntityBlock {
         if (!(level instanceof ServerLevel server)) return InteractionResult.SUCCESS;
         if (!FermentingCrockBlockEntity.ferments(server, stack)) {
             level.playSound(null, pos, ModSounds.CROCK_REFUSE.get(), SoundSource.BLOCKS, 1F, 1F);
-            player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.not_fermentable", stack.getHoverName()).withStyle(ChatFormatting.GRAY));
+            player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.not_fermentable", stack.getHoverName()));
             return InteractionResult.SUCCESS;
         }
         ItemStack moving = player.hasInfiniteMaterials() ? stack.copy() : stack;
         if (crock.insert(moving) == 0) {
             level.playSound(null, pos, ModSounds.CROCK_REFUSE.get(), SoundSource.BLOCKS, 1F, 1F);
-            player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.full").withStyle(ChatFormatting.GRAY));
+            player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.full"));
             return InteractionResult.SUCCESS;
         }
         level.playSound(null, pos, ModSounds.CROCK_FILL.get(), SoundSource.BLOCKS, 1F, 0.9F + level.getRandom().nextFloat() * 0.2F);
@@ -94,7 +93,7 @@ public class FermentingCrockBlock extends Block implements EntityBlock {
             FermentingRecipe r = holder.value();
             ItemStack made = r.result().create();
             player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.ready_to_seal", crock.batches(r) * made.getCount(),
-                    made.getHoverName()).withStyle(ChatFormatting.GRAY));
+                    made.getHoverName()));
         });
         return InteractionResult.SUCCESS;
     }
@@ -111,7 +110,7 @@ public class FermentingCrockBlock extends Block implements EntityBlock {
             } else {
                 int left = (int) Math.min(Integer.MAX_VALUE, crock.ticksLeft(server));
                 player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.fermenting",
-                        Math.round(crock.progress(server) * 100), FoodText.duration(left)).withStyle(ChatFormatting.GRAY));
+                        Math.round(crock.progress(server) * 100), FoodText.duration(left)));
             }
             return InteractionResult.SUCCESS;
         }
@@ -127,10 +126,10 @@ public class FermentingCrockBlock extends Block implements EntityBlock {
             int batches = crock.batches(r);
             ItemStack made = r.result().create();
             player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.sealed", batches * made.getCount(), made.getHoverName(),
-                    FoodText.duration(r.time())).withStyle(ChatFormatting.GRAY));
+                    FoodText.duration(r.time())));
             level.playSound(null, pos, ModSounds.CROCK_SEAL.get(), SoundSource.BLOCKS, 1F, 1F);
         } else {
-            player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.no_recipe").withStyle(ChatFormatting.GRAY));
+            player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.no_recipe"));
         }
         return InteractionResult.SUCCESS;
     }
