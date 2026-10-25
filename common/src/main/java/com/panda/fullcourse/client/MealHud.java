@@ -93,7 +93,7 @@ public final class MealHud {
         int right = g.guiWidth() / 2 + 91;
         int firstTop = bottom - FRAME;
         ItemStack held = heldMeal(player);
-        Meals.Target target = held.isEmpty() ? null : state.meals().target(BuiltInRegistries.ITEM.getKey(held.getItem()), slots);
+        Meals.Target target = preview(player, state);
         for (int i = 0; i < max; i++) {
             int col = i % PER_ROW;
             int x = right - (col + 1) * FRAME - col, top = firstTop - (i / PER_ROW) * HEIGHT;
@@ -140,7 +140,8 @@ public final class MealHud {
     public static Meals.Target preview(LocalPlayer player, FoodState state) {
         ItemStack held = heldMeal(player);
         if (held.isEmpty()) return null;
-        return state.meals().target(BuiltInRegistries.ITEM.getKey(held.getItem()), state.slots());
+        // a slice fills its cake's slot, as eating it does
+        return state.meals().target(BuiltInRegistries.ITEM.getKey(FoodProfiles.clientTastedAs(held.getItem())), state.slots());
     }
 
     /** The food in the main hand, else the off hand, that would give a meal; empty if neither would. */
