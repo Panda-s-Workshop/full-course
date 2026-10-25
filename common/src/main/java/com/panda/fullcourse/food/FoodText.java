@@ -5,6 +5,7 @@ import com.panda.fullcourse.logic.Family;
 import com.panda.fullcourse.logic.Tier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -86,15 +87,18 @@ public final class FoodText {
 
     /**
      * The action-bar line on eating a meal: "Rabbit Stew: Vigor II, Mending II · 10:00", and "· replaces Steak" when
-     * it took a full row's meal with the least time left ({@code replaced}, else null).
+     * it took a full row's meal with the least time left ({@code replaced}, else null). A family another held meal
+     * gives at a higher level ({@code others}) is grey: the strongest wins, so this meal adds nothing there.
      */
-    public static Component mealMessage(Component dish, Profile p, Component replaced) {
+    public static Component mealMessage(Component dish, Profile p, Map<Family, Integer> others, Component replaced) {
         MutableComponent families = Component.empty();
         for (int i = 0; i < p.families().size(); i++) {
+            Family family = p.families().get(i);
             if (i > 0) families.append(Component.literal(", "));
-            families.append(Component.translatable("family.fullcourse." + p.families().get(i).key()))
+            MutableComponent named = Component.translatable("family.fullcourse." + family.key())
                     .append(Component.literal(" "))
                     .append(Component.translatable("enchantment.level." + p.tier().level()));
+            families.append(others.getOrDefault(family, 0) > p.tier().level() ? named.withStyle(ChatFormatting.GRAY) : named);
         }
         MutableComponent line = Component.translatable("message.fullcourse.meal", dish, families,
                 duration(p.tier().durationTicks(FullCourseConfig.durationMultiplier())));

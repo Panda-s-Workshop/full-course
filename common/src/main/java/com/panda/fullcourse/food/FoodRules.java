@@ -2,6 +2,7 @@ package com.panda.fullcourse.food;
 
 import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.kitchen.FeastBlock;
+import com.panda.fullcourse.logic.Family;
 import com.panda.fullcourse.logic.Meals;
 import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.logic.Recovery;
@@ -87,7 +88,8 @@ public final class FoodRules {
                 Meals.Target target = s.meals().target(id, s.slots());
                 Component replaced = target.fill() == Meals.Fill.REPLACE ? itemName(s.meals().active().get(target.slot()).dish()) : null;
                 s = s.withMeals(s.meals().eat(meal, s.slots()));
-                player.sendSystemMessage(FoodText.mealMessage(name, profile, replaced), true);
+                Map<Family, Integer> others = new Meals<>(s.meals().active().stream().filter(m -> !m.dish().equals(id)).toList()).strongest();
+                player.sendSystemMessage(FoodText.mealMessage(name, profile, others, replaced), true);
                 cue(player, ModSounds.MEAL_START);
                 FoodAdvancements.onMeal(player, profile.tier(), s.tasted());
             }

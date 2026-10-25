@@ -651,9 +651,17 @@ public final class RuleChecks {
         List<String> flatbread = text(c, com.panda.fullcourse.registry.ModItems.item("flatbread"), true, false);
         check(flatbread.stream().anyMatch(l -> l.matches("Score \\d+ · set to Simple")), "a set tier's score line: %s", flatbread);
         check(FoodText.benefit(Family.FORTUNE, 1).getString().equals("Fortune I: +1 luck (better fishing)"), "luck only helps fishing");
-        String replaces = FoodText.mealMessage(Items.RABBIT_STEW.getName(new ItemStack(Items.RABBIT_STEW)), profile(c, Items.RABBIT_STEW),
-                Items.COOKED_BEEF.getName(new ItemStack(Items.COOKED_BEEF))).getString();
-        check(replaces.equals("Rabbit Stew: Vigor II, Mending II · 10:00 · replaces Steak"), "a full row names the meal replaced: %s", replaces);
+        Component message = FoodText.mealMessage(Items.RABBIT_STEW.getName(new ItemStack(Items.RABBIT_STEW)), profile(c, Items.RABBIT_STEW),
+                Map.of(Family.VIGOR, 3), Items.COOKED_BEEF.getName(new ItemStack(Items.COOKED_BEEF)));
+        check(message.getString().equals("Rabbit Stew: Vigor II, Mending II · 10:00 · replaces Steak"), "a full row names the meal replaced: %s", message.getString());
+        // Vigor III held elsewhere outranks this Vigor II: grey; Mending II adds something: the tier's colour
+        Map<String, Integer> colours = new java.util.HashMap<>();
+        message.visit((style, text) -> {
+            if (style.getColor() != null) colours.merge(text.strip(), style.getColor().getValue(), (a, b) -> a);
+            return java.util.Optional.empty();
+        }, net.minecraft.network.chat.Style.EMPTY);
+        check(colours.get("Vigor").equals(net.minecraft.network.chat.TextColor.GRAY.getValue()) && !colours.get("Mending").equals(net.minecraft.network.chat.TextColor.GRAY.getValue()),
+                "an outranked family is grey: %s", colours);
         List<String> steak = text(c, Items.COOKED_BEEF, true, false);
         check(steak.contains("1 step · 1 station · 1 ingredient"), "a one-step chain reads in the singular: %s", steak);
         // 0.10 a level times 3 is 0.30000000000000004 in floating point
