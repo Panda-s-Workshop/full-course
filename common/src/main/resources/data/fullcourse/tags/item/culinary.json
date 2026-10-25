@@ -24,6 +24,14 @@
       "id": "#c:crops",
       "required": false
     },
+    {
+      "id": "#c:foods/dough",
+      "required": false
+    },
+    {
+      "id": "#c:flours",
+      "required": false
+    },
     "fullcourse:flour",
     "fullcourse:dough",
     "fullcourse:batter",
