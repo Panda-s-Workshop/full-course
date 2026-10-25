@@ -65,7 +65,7 @@ public final class FoodText {
                     count("ingredients", p.ingredients())).withStyle(ChatFormatting.GRAY));
             out.add(score(p).withStyle(ChatFormatting.GRAY));
         } else if (p.steps() > 0) {
-            out.add(Component.translatable("tooltip.fullcourse.shift").withStyle(ChatFormatting.DARK_GRAY));
+            out.add(Component.translatable("tooltip.fullcourse.shift").withStyle(ChatFormatting.GRAY));
         }
         return out;
     }

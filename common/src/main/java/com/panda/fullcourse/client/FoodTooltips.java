@@ -73,7 +73,7 @@ public final class FoodTooltips {
                     : stack.getItem() instanceof BlockItem b && b.getBlock() instanceof FeastBlock feast ? feast.serving() : 0;
             lines.addAll(1, wrap(FoodText.lines(p, nutrition, shift, tasted)));
         } else if (!made.isEmpty() && !shift) {
-            lines.add(1, Component.translatable("tooltip.fullcourse.shift_recipe").withStyle(ChatFormatting.DARK_GRAY));
+            lines.add(1, Component.translatable("tooltip.fullcourse.shift_recipe").withStyle(ChatFormatting.GRAY));
         }
         if (shift) lines.addAll(wrap(made));
         if (!FullCourseConfig.keepVanillaHunger()) markNeedsHunger(lines);
