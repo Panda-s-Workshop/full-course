@@ -103,6 +103,7 @@ public final class RuleChecks {
         CHECKS.put("meal_survives_milk", RuleChecks::mealSurvivesMilk);
         CHECKS.put("meals_lost_on_death", RuleChecks::mealsLostOnDeath);
         CHECKS.put("relog_keeps_vigor_hearts", RuleChecks::relogKeepsVigorHearts);
+        CHECKS.put("removed_mods_meal_ends", RuleChecks::removedModsMealEnds);
         CHECKS.put("relog_keeps_recovery_delay", RuleChecks::relogKeepsRecoveryDelay);
         CHECKS.put("end_exit_keeps_vigor_hearts", RuleChecks::endExitKeepsVigorHearts);
         CHECKS.put("vanilla_tiers", RuleChecks::vanillaTiers);
@@ -447,6 +448,21 @@ public final class RuleChecks {
         eatForReal(c, Items.MILK_BUCKET);
         check(dishes(c).equals(List.of(id(Items.RABBIT_STEW))), "milk left the meal alone: %s", dishes(c));
         check(hasModifier(c, Attributes.MAX_HEALTH, Family.VIGOR), "milk left the benefit alone");
+    }
+
+    /** A meal of a dish whose mod is gone (a save from a bigger pack) ends at the next tick, and its benefit with it. */
+    private static void removedModsMealEnds(Ctx c) {
+        eat(c, Items.COOKED_BEEF, c.t());
+        Identifier gone = Identifier.fromNamespaceAndPath("fc_removed_mod", "lucky_pie");
+        var meals = new java.util.ArrayList<>(state(c).meals().active());
+        meals.add(new Meals.Meal<>(gone, Tier.HEARTY, List.of(Family.FORTUNE), 2, c.t(), c.t() + 20_000));
+        Services.PLATFORM.setFoodState(c.player(), state(c).withMeals(new Meals<>(meals)));
+        Benefits.apply(c.player(), state(c).meals().strongest());
+        check(hasModifier(c, Attributes.LUCK, Family.FORTUNE), "the removed mod's meal gave its benefit before the tick");
+        FoodRules.tick(c.player(), c.t() + 1); // off the 20-tick beat
+        check(dishes(c).equals(List.of(id(Items.COOKED_BEEF))), "the removed mod's meal ended, the other stayed: %s", dishes(c));
+        check(!hasModifier(c, Attributes.LUCK, Family.FORTUNE), "the removed mod's benefit ended with it");
+        check(hasModifier(c, Attributes.ATTACK_DAMAGE, Family.BRAWN), "the cooked beef's benefit stays");
     }
 
     private static void mealsLostOnDeath(Ctx c) {
