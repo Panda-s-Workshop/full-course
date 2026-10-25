@@ -40,8 +40,6 @@ public final class FoodRules {
     private static final int SLOT_CHECK_TICKS = 100;
     /** Each player's current Saturation effect and its ticks so far: it heals on the first and then every second. */
     private static final Map<ServerPlayer, SaturationRun> SATURATION = new WeakHashMap<>();
-    /** The game time each player's rules last ran at, so a frozen clock doesn't run them again every tick. */
-    private static final Map<ServerPlayer, Long> LAST_TICK = new WeakHashMap<>();
 
     private record SaturationRun(MobEffectInstance effect, int ticks) {}
 
@@ -118,8 +116,9 @@ public final class FoodRules {
     /** One tick at game time {@code now} (rule checks step through time with it). */
     public static void tick(ServerPlayer player, long now) {
         if (!player.isAlive()) return;
-        Long last = LAST_TICK.put(player, now);
-        if (last != null && last == now) return;
+        // under /tick freeze players keep ticking while the game time stands still (a /tick step moves it)
+        var clock = player.level().tickRateManager();
+        if (clock.isFrozen() && !clock.isSteppingForward()) return;
         restoreHealth(player);
         FoodState before = state(player);
         FoodState s = before.withMeals(before.meals().expire(now));

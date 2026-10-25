@@ -88,6 +88,7 @@ public final class RuleChecks {
         CHECKS.put("recovery_reset_by_damage", RuleChecks::recoveryResetByDamage);
         CHECKS.put("recovery_respects_gamerule", RuleChecks::recoveryRespectsGamerule);
         CHECKS.put("recovery_off_on_peaceful", RuleChecks::recoveryOffOnPeaceful);
+        CHECKS.put("recovery_holds_under_tick_freeze", RuleChecks::recoveryHoldsUnderTickFreeze);
         CHECKS.put("mending_shortens_recovery", RuleChecks::mendingShortensRecovery);
         CHECKS.put("recovery_rate_attribute", RuleChecks::recoveryRateAttribute);
         CHECKS.put("steak_heals_eight_over_eight_seconds", RuleChecks::steakHeals);
@@ -285,6 +286,21 @@ public final class RuleChecks {
         c.server().setDifficulty(Difficulty.PEACEFUL, true);
         FoodRules.tick(c.player(), t + 160);
         health(c, 10F, "Peaceful heals its own way");
+    }
+
+    /** {@code /tick freeze} stops the game clock while players keep ticking: nothing heals until it thaws. */
+    private static void recoveryHoldsUnderTickFreeze(Ctx c) {
+        long t = c.t();
+        hurtAt(c, t);
+        c.server().tickRateManager().setFrozen(true);
+        try {
+            ticks(c, t + 160, t + 400);
+        } finally {
+            c.server().tickRateManager().setFrozen(false);
+        }
+        health(c, 10F, "frozen clock");
+        FoodRules.tick(c.player(), t + 400);
+        health(c, 11F, "thawed");
     }
 
     /** Rabbit stew is a soup: Mending II halves the interval to 40 ticks. */
