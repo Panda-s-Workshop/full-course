@@ -267,8 +267,9 @@ public final class FoodProfiles {
             Optional<RecipeFields.Read> fields = RecipeFields.read(recipe);
             if (fields.isEmpty()) {
                 String type = station(recipe.getType());
-                // vanilla's own unplaceable recipes (special crafting, smithing) make no food
-                if (!recipe.isSpecial() && type.contains(":") && !type.startsWith("minecraft:")) unread.merge(type, 1, Integer::sum);
+                // vanilla's own unplaceable recipes (special crafting, smithing) make no food; other mods' may (Create
+                // marks every machine recipe special)
+                if (type.contains(":") && !type.startsWith("minecraft:")) unread.merge(type, 1, Integer::sum);
                 return;
             }
             ingredients = fields.get().ingredients();

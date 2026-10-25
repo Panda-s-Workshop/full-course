@@ -6,6 +6,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.panda.fullcourse.FullCourse;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.ItemStackTemplate;
+import com.panda.fullcourse.compat.RecipeFields;
 import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.food.FoodProfiles;
@@ -65,8 +68,35 @@ import net.minecraft.world.phys.Vec3;
 final class KitchenChecks {
     private KitchenChecks() {}
 
+    /** Shaped like Create's processing output: a result made through {@code create()}. */
+    public record Output(Item item, int count) {
+        public ItemStack create() {
+            return new ItemStack(item, count);
+        }
+    }
+
+    /** Shaped like Create's sized ingredient: a class handing its ingredient over. */
+    public static final class Sized {
+        private final Ingredient ingredient;
+
+        Sized(Ingredient ingredient) {
+            this.ingredient = ingredient;
+        }
+
+        public Ingredient getIngredient() {
+            return ingredient;
+        }
+    }
+
+    /** Shaped like Create's mixing recipe: outputs first, fluids, then sized ingredients. */
+    public record Mixing(int time, List<Output> results, List<String> fluidIngredients, List<Sized> ingredients) {}
+
+    /** Shaped like Create's sequenced assembly: a transitional item before the results. */
+    public record Assembly(Ingredient ingredient, ItemStackTemplate transitionalItem, List<Output> results) {}
+
     static void register(Map<String, Consumer<RuleChecks.Ctx>> checks) {
         checks.put("recipes_loaded", KitchenChecks::recipesLoaded);
+        checks.put("machine_recipe_fields", KitchenChecks::machineRecipeFields);
         checks.put("roster_tiers", KitchenChecks::rosterTiers);
         checks.put("board_cuts_with_knife", KitchenChecks::boardCutsWithKnife);
         checks.put("board_needs_recipe", KitchenChecks::boardNeedsRecipe);
@@ -100,7 +130,19 @@ final class KitchenChecks {
     // ---- data ---------------------------------------------------------------------------------------------------
 
     /** Every table item but the crops has a recipe that makes it; each station has its recipe type. */
-    private static void recipesLoaded(RuleChecks.Ctx c) {
+    /** Machine records are read from their fields, the way Create keeps them. */
+    private static void machineRecipeFields(RuleChecks.Ctx c) {
+        var mixing = RecipeFields.fields(new Mixing(100, List.of(new Output(Items.BREAD, 2)), List.of("milk"),
+                List.of(new Sized(Ingredient.of(Items.WHEAT)), new Sized(Ingredient.of(Items.SUGAR)))));
+        check(mixing.isPresent() && mixing.get().ingredients().size() == 2 && mixing.get().result().is(Items.BREAD)
+                && mixing.get().result().getCount() == 2, "a mixing record reads 2 sized ingredients and its output: %s", mixing);
+        var assembly = RecipeFields.fields(new Assembly(Ingredient.of(Items.WHEAT), new ItemStackTemplate(Items.STICK),
+                List.of(new Output(Items.CAKE, 1))));
+        check(assembly.isPresent() && assembly.get().result().is(Items.CAKE),
+                "an assembly's result is its results, not its transitional item: %s", assembly);
+    }
+
+        private static void recipesLoaded(RuleChecks.Ctx c) {
         var context = SlotDisplayContext.fromLevel(c.level());
         Set<Item> made = new HashSet<>();
         int cutting = 0, cooking = 0, baking = 0, fermenting = 0;
