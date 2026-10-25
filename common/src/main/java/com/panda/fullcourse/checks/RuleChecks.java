@@ -108,6 +108,7 @@ public final class RuleChecks {
         CHECKS.put("queasy_blocks_benefit", RuleChecks::queasyBlocksBenefit);
         CHECKS.put("golden_apple_is_remedy", RuleChecks::goldenAppleIsRemedy);
         CHECKS.put("cake_slice_gives_meal", RuleChecks::cakeSliceGivesMeal);
+        CHECKS.put("cake_one_helping", RuleChecks::cakeOneHelping);
         CHECKS.put("tooltip_lines", RuleChecks::tooltipLines);
         KitchenChecks.register(CHECKS);
         ConfigChecks.register(CHECKS);
@@ -541,6 +542,24 @@ public final class RuleChecks {
             check(state(c).meals().active().getFirst().tier() == Tier.HEARTY, "cake is Hearty");
             check(state(c).nourish() == 2, "a slice heals 2, nourish %s", state(c).nourish());
             check(c.level().getBlockState(pos).is(Blocks.CAKE), "the cake is still there, one slice less");
+        } finally {
+            c.level().setBlock(pos, before, 3);
+        }
+    }
+
+    /** Holding the use key on a cake takes one slice, not the cake: the second right-click is refused. */
+    private static void cakeOneHelping(Ctx c) {
+        BlockPos pos = c.spot();
+        BlockState before = c.level().getBlockState(pos);
+        c.level().setBlock(pos, Blocks.CAKE.defaultBlockState(), 3);
+        try {
+            BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false);
+            c.level().getBlockState(pos).useWithoutItem(c.level(), c.player(), hit);
+            c.level().getBlockState(pos).useWithoutItem(c.level(), c.player(), hit);
+            c.level().getBlockState(pos).useWithoutItem(c.level(), c.player(), hit);
+            int bites = c.level().getBlockState(pos).getValue(net.minecraft.world.level.block.CakeBlock.BITES);
+            check(bites == 1, "three right-clicks take one slice, bites %s", bites);
+            check(state(c).meals().active().size() == 1, "one cake meal: %s", dishes(c));
         } finally {
             c.level().setBlock(pos, before, 3);
         }

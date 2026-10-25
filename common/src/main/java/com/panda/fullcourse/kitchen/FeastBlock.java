@@ -17,6 +17,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -119,7 +120,7 @@ public class FeastBlock extends Block {
         }
         if (!player.canEat(false)) return InteractionResult.PASS;
         if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
-        Component refused = refusal(server);
+        Component refused = refusal(server, asItem());
         if (refused != null) {
             server.sendOverlayMessage(refused);
             return InteractionResult.SUCCESS;
@@ -138,15 +139,16 @@ public class FeastBlock extends Block {
     }
 
     /**
-     * Why {@code player} can't take a serving now, or null: Queasy (the serving would give no meal), or a helping of this
-     * feast within the last {@link #HELPING_TICKS}, so holding the use key can't clear the table for everyone else.
+     * Why {@code player} can't take a serving of {@code dish} (a feast, or cake) now, or null: Queasy (the serving would
+     * give no meal), or a helping of it within the last {@link #HELPING_TICKS}, so holding the use key can't clear the
+     * table for everyone else.
      */
-    private Component refusal(ServerPlayer player) {
-        Component name = asItem().getName(new ItemStack(asItem()));
+    public static Component refusal(ServerPlayer player, Item dish) {
+        Component name = dish.getName(new ItemStack(dish));
         if (player.hasEffect(MobEffects.HUNGER)) {
             return Component.translatable("message.fullcourse.feast.queasy", name).withStyle(ChatFormatting.GREEN);
         }
-        Identifier id = BuiltInRegistries.ITEM.getKey(asItem());
+        Identifier id = BuiltInRegistries.ITEM.getKey(dish);
         long now = player.level().getGameTime();
         for (Meals.Meal<Identifier> meal : FoodRules.state(player).meals().active()) {
             long since = now - meal.start();
