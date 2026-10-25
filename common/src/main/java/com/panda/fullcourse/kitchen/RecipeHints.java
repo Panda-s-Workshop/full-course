@@ -1,5 +1,6 @@
 package com.panda.fullcourse.kitchen;
 
+import com.panda.fullcourse.FullCourse;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.panda.fullcourse.registry.ModItems;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
@@ -51,8 +53,9 @@ public final class RecipeHints {
             Item next = queue.poll();
             if (!seen.add(next)) continue;
             List<Component> recipe = lines(next);
-            if (recipe.isEmpty()) continue;
-            out.add(Component.translatable("hint.fullcourse.from", Component.translatable(next.getDescriptionId()), recipe.getFirst())
+            Component from = recipe.isEmpty() ? (wild(next) ? Component.translatable(useKey(next)) : null) : recipe.getFirst();
+            if (from == null) continue;
+            out.add(Component.translatable("hint.fullcourse.from", Component.translatable(next.getDescriptionId()), from)
                     .withStyle(ChatFormatting.DARK_GRAY));
             queue.addAll(made(next));
         }
@@ -66,17 +69,31 @@ public final class RecipeHints {
             if (id.startsWith("#")) {
                 var tag = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, Identifier.parse(id.substring(1)));
                 for (var holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) {
-                    if (holder.value() != item && hints.containsKey(holder.value())) {
+                    if (holder.value() != item && traced(holder.value())) {
                         out.add(holder.value());
                         break;
                     }
                 }
             } else {
                 Item ingredient = BuiltInRegistries.ITEM.getValue(Identifier.parse(id));
-                if (hints.containsKey(ingredient)) out.add(ingredient);
+                if (traced(ingredient)) out.add(ingredient);
             }
         }
         return out;
+    }
+
+    /** Made by one of the mod's recipes, or one of its crops found growing wild. */
+    private static boolean traced(Item item) {
+        return hints.containsKey(item) || wild(item);
+    }
+
+    /** The mod's own raw ingredient with a line on where to find it (Onion: "Grows wild in plains..."). */
+    private static boolean wild(Item item) {
+        return BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(FullCourse.MODID) && Language.getInstance().has(useKey(item));
+    }
+
+    private static String useKey(Item item) {
+        return "tooltip.fullcourse." + BuiltInRegistries.ITEM.getKey(item).getPath() + ".use";
     }
 
     private static Map<Item, List<Component>> load() {
