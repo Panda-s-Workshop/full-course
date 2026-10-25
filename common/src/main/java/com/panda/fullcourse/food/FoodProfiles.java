@@ -257,15 +257,8 @@ public final class FoodProfiles {
             } else if (setFamilies.isPresent()) {
                 families = setFamilies.get();
             } else {
-                families = TierScorer.families(dish, score.leaves(), FoodProfiles::groupsOf, tier.benefits());
-                // a food whose ingredients belong to no group still counts: a good meal helps you heal
-                if (families.isEmpty() && tier.benefits() > 0) families = List.of(Family.MENDING);
-                // a soup always mends: Mending joins if the tier has room, else takes the weakest-counted place
-                if (tier.benefits() > 0 && !families.contains(Family.MENDING) && dish.builtInRegistryHolder().is(FoodTags.SOUPS)) {
-                    List<Family> withMending = new ArrayList<>(families.size() < tier.benefits() ? families : families.subList(0, families.size() - 1));
-                    withMending.add(Family.MENDING);
-                    families = List.copyOf(withMending);
-                }
+                families = TierScorer.benefits(dish, score.leaves(), FoodProfiles::groupsOf, dish.builtInRegistryHolder().is(FoodTags.SOUPS),
+                        tier.benefits());
             }
             out.put(item, new Profile(tier, score.score(), score.depth(), score.stations().size(), score.leaves().size(), families, remedy,
                     usedIn.contains(item)));

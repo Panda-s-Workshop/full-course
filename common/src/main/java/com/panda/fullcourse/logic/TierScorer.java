@@ -201,4 +201,21 @@ public final class TierScorer<T> {
         present.sort((a, b) -> counts[b.ordinal()] != counts[a.ordinal()] ? counts[b.ordinal()] - counts[a.ordinal()] : a.ordinal() - b.ordinal());
         return List.copyOf(present.subList(0, Math.min(n, present.size())));
     }
+
+    /**
+     * The {@code n} benefits a food rated from its recipes gives: its {@link #families}, then two rules. A soup always
+     * mends: Mending joins if there's room, else takes the least-counted place. A food whose groups don't fill its
+     * tier's count is made up with Mending, so a two-star salad of vegetables alone still gives two benefits: a good
+     * meal helps you heal.
+     */
+    public static <T> List<Family> benefits(T item, Set<T> leaves, java.util.function.Function<T, Set<Family>> groupsOf, boolean soup, int n) {
+        if (n <= 0) return List.of();
+        List<Family> out = new ArrayList<>(families(item, leaves, groupsOf, n));
+        if (soup && !out.contains(Family.MENDING)) {
+            if (out.size() == n) out.removeLast();
+            out.add(Family.MENDING);
+        }
+        if (out.size() < n && !out.contains(Family.MENDING)) out.add(Family.MENDING);
+        return List.copyOf(out);
+    }
 }

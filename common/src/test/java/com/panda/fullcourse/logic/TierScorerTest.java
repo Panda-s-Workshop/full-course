@@ -222,6 +222,24 @@ class TierScorerTest {
     }
 
     @Test
+    void aFullSoupGivesUpItsLeastCountedFamilyForMending() {
+        Map<String, Set<Family>> groups = Map.of("rabbit", Set.of(Family.BRAWN), "carrot", Set.of(Family.VIGOR), "potato", Set.of(Family.VIGOR));
+        java.util.function.Function<String, Set<Family>> of = s -> groups.getOrDefault(s, Set.of());
+        Set<String> leaves = Set.of("rabbit", "carrot", "potato");
+        assertEquals(List.of(Family.VIGOR, Family.BRAWN), TierScorer.benefits("stew", leaves, of, false, 2));
+        assertEquals(List.of(Family.VIGOR, Family.MENDING), TierScorer.benefits("stew", leaves, of, true, 2));
+        assertEquals(List.of(Family.VIGOR, Family.BRAWN, Family.MENDING), TierScorer.benefits("stew", leaves, of, true, 3), "room: Mending joins");
+    }
+
+    @Test
+    void benefitsArePaddedWithMendingToTheTiersCount() {
+        java.util.function.Function<String, Set<Family>> of = s -> s.equals("lettuce") || s.equals("tomato") ? Set.of(Family.VIGOR) : Set.of();
+        assertEquals(List.of(Family.VIGOR, Family.MENDING), TierScorer.benefits("salad", Set.of("lettuce", "tomato"), of, false, 2));
+        assertEquals(List.of(Family.MENDING), TierScorer.benefits("x", Set.of("y"), of, false, 1), "no group at all: Mending");
+        assertEquals(List.of(), TierScorer.benefits("salad", Set.of("lettuce"), of, false, 0), "a raw food gives none");
+    }
+
+    @Test
     void thresholdsAreConfigurable() {
         assertEquals(Tier.RAW, Tier.fromScore(0, Tier.DEFAULT_THRESHOLDS));
         assertEquals(Tier.SIMPLE, Tier.fromScore(2, Tier.DEFAULT_THRESHOLDS));
