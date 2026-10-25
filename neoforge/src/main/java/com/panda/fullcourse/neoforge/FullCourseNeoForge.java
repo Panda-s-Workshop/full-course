@@ -7,6 +7,7 @@ import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.network.RecoveryPayload;
+import com.panda.fullcourse.network.RulesPayload;
 import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.platform.registry.DeferredRegister;
 import com.panda.fullcourse.registry.ModAttributes;
@@ -42,7 +43,8 @@ public final class FullCourseNeoForge {
         // the client handler is registered by the client entry class
         modBus.addListener((RegisterPayloadHandlersEvent e) -> e.registrar("1")
                 .playToClient(ProfilesPayload.TYPE, ProfilesPayload.STREAM_CODEC)
-                .playToClient(RecoveryPayload.TYPE, RecoveryPayload.STREAM_CODEC));
+                .playToClient(RecoveryPayload.TYPE, RecoveryPayload.STREAM_CODEC)
+                .playToClient(RulesPayload.TYPE, RulesPayload.STREAM_CODEC));
 
         var game = NeoForge.EVENT_BUS;
         game.addListener((PlayerTickEvent.Post e) -> {

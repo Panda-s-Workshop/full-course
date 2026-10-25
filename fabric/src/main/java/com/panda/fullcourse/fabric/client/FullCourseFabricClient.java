@@ -15,6 +15,7 @@ import com.panda.fullcourse.client.compat.cfb.CookingForBlockheadsClient;
 import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.network.RecoveryPayload;
+import com.panda.fullcourse.network.RulesPayload;
 import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModBlocks;
 import com.panda.fullcourse.registry.ModMenus;
@@ -48,6 +49,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
         ClientOptions.use(FabricClientConfig.load());
         ClientPlayNetworking.registerGlobalReceiver(ProfilesPayload.TYPE, (payload, context) -> ClientSync.received(payload));
         ClientPlayNetworking.registerGlobalReceiver(RecoveryPayload.TYPE, (payload, context) -> ClientSync.recovered());
+        ClientPlayNetworking.registerGlobalReceiver(RulesPayload.TYPE, (payload, context) -> ClientSync.received(payload));
         MenuScreens.register(ModMenus.COOKING_POT.get(), CookingPotScreen::new);
         MenuScreens.register(ModMenus.BRICK_OVEN.get(), BrickOvenScreen::new);
         BlockEntityRenderers.register(ModBlockEntities.CUTTING_BOARD.get(), CuttingBoardRenderer::new);

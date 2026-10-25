@@ -6,6 +6,7 @@ import com.panda.fullcourse.food.FoodState;
 import com.panda.fullcourse.food.Tasting;
 import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.network.ProfilesPayload;
+import com.panda.fullcourse.network.RulesPayload;
 import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.registry.ModSounds;
 import net.minecraft.client.Minecraft;
@@ -33,6 +34,10 @@ public final class ClientSync {
     private static int slotsSeen = -1;
 
     private ClientSync() {}
+
+    public static void received(RulesPayload payload) {
+        FullCourseConfig.useRegeneration(payload.regenerates());
+    }
 
     public static void received(ProfilesPayload payload) {
         payload.apply();

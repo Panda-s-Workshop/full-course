@@ -31,7 +31,9 @@ public final class FoodText {
         List<Component> out = new ArrayList<>();
         // with vanilla hunger food fills the bar instead of healing over time, and Recovery (Mending's work) is off
         boolean hunger = FullCourseConfig.keepVanillaHunger();
-        if (hunger) nutrition = 0;
+        // with naturalHealthRegeneration off food heals nothing and Recovery doesn't run, as vanilla's food doesn't heal
+        boolean regenerates = FullCourseConfig.regenerates();
+        if (hunger || !regenerates) nutrition = 0;
         if (p.remedy()) { // no tier, so no stars
             out.add(Component.translatable("tooltip.fullcourse.remedy").withStyle(ChatFormatting.LIGHT_PURPLE));
             if (nutrition > 0) out.add(heal(nutrition).withStyle(ChatFormatting.GRAY));
@@ -48,8 +50,8 @@ public final class FoodText {
             if (nutrition > 0) out.add(heal(nutrition).withStyle(ChatFormatting.GRAY));
         } else {
             for (Family family : p.families()) {
-                if (family == Family.MENDING && (hunger || FullCourseConfig.recoveryIntervalTicks() <= 0)) {
-                    // Mending speeds Recovery up, which vanilla hunger or an interval of 0 turns off
+                if (family == Family.MENDING && (hunger || !regenerates || FullCourseConfig.recoveryIntervalTicks() <= 0)) {
+                    // Mending speeds Recovery up, which vanilla hunger, the gamerule or an interval of 0 turns off
                     out.add(benefit(family, tier.level()).withStyle(ChatFormatting.DARK_GRAY)
                             .append(Component.translatable(hunger ? "tooltip.fullcourse.no_recovery" : "tooltip.fullcourse.recovery_off")
                                     .withStyle(ChatFormatting.DARK_GRAY)));

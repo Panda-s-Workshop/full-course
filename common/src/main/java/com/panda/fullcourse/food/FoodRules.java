@@ -7,6 +7,7 @@ import com.panda.fullcourse.logic.Meals;
 import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.logic.Recovery;
 import com.panda.fullcourse.network.RecoveryPayload;
+import com.panda.fullcourse.network.RulesPayload;
 import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.platform.registry.DeferredHolder;
 import com.panda.fullcourse.registry.ModAttributes;
@@ -43,6 +44,8 @@ public final class FoodRules {
     private static final int SLOT_CHECK_TICKS = 100;
     /** Each player's current Saturation effect and its ticks so far: it heals on the first and then every second. */
     private static final Map<ServerPlayer, SaturationRun> SATURATION = new WeakHashMap<>();
+    /** What each player was last told of the gamerule tooltips depend on; none yet after a login. */
+    private static final Map<ServerPlayer, Boolean> RULES_SENT = new WeakHashMap<>();
 
     private record SaturationRun(MobEffectInstance effect, int ticks) {}
 
@@ -152,6 +155,7 @@ public final class FoodRules {
             if (!ended.isEmpty()) player.sendSystemMessage(FoodText.mealEnded(ended), true);
         }
         if (now % SLOT_CHECK_TICKS == 0) s = unlockSlots(player, s);
+        if (now % 20 == 0) sendRules(player);
         if (!FullCourseConfig.keepVanillaHunger()) {
             // naturalHealthRegeneration off (UHC packs): food heals nothing, as in vanilla
             boolean regenerates = player.level().getGameRules().get(GameRules.NATURAL_HEALTH_REGENERATION);
@@ -188,6 +192,14 @@ public final class FoodRules {
     private static double recoveryRate(ServerPlayer player) {
         AttributeInstance rate = player.getAttribute(ModAttributes.RECOVERY_RATE.holder());
         return rate == null ? 1 : rate.getValue();
+    }
+
+    /** Sends the player the gamerule tooltips depend on when it isn't what they were last sent (at login, none was). */
+    private static void sendRules(ServerPlayer player) {
+        boolean regenerates = player.level().getGameRules().get(GameRules.NATURAL_HEALTH_REGENERATION);
+        if (Boolean.valueOf(regenerates).equals(RULES_SENT.get(player))) return;
+        RULES_SENT.put(player, regenerates);
+        Services.PLATFORM.sendToPlayer(player, new RulesPayload(regenerates));
     }
 
     /**

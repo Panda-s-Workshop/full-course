@@ -17,6 +17,7 @@ import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.neoforge.client.compat.AppleSkinCompat;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.network.RecoveryPayload;
+import com.panda.fullcourse.network.RulesPayload;
 import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModBlocks;
 import com.panda.fullcourse.registry.ModMenus;
@@ -59,6 +60,7 @@ public final class FullCourseClient {
         modBus.addListener((RegisterClientPayloadHandlersEvent e) -> {
             e.register(ProfilesPayload.TYPE, (payload, context) -> ClientSync.received(payload));
             e.register(RecoveryPayload.TYPE, (payload, context) -> ClientSync.recovered());
+            e.register(RulesPayload.TYPE, (payload, context) -> ClientSync.received(payload));
         });
         modBus.addListener((RegisterMenuScreensEvent e) -> {
             e.register(ModMenus.COOKING_POT.get(), CookingPotScreen::new);

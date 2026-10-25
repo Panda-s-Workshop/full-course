@@ -167,6 +167,7 @@ public final class MealList {
     }
 
     private static int recoveryInterval(LocalPlayer player) {
+        if (!FullCourseConfig.regenerates()) return 0;
         AttributeInstance attribute = player.getAttribute(ModAttributes.RECOVERY_RATE.holder());
         return Recovery.interval(FullCourseConfig.recoveryIntervalTicks(), attribute == null ? 1 : attribute.getValue());
     }

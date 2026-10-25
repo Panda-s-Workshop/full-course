@@ -117,6 +117,18 @@ public final class FullCourseConfig {
         return Snapshot.of(source);
     }
 
+    /** On a client, the server's {@code naturalHealthRegeneration} gamerule ({@link com.panda.fullcourse.network.RulesPayload}). */
+    private static boolean regenerates = true;
+
+    /** Food heals and Recovery runs: the server's gamerule as last sent; true where none was. */
+    public static boolean regenerates() {
+        return regenerates;
+    }
+
+    public static void useRegeneration(boolean on) {
+        regenerates = on;
+    }
+
     /** On the client: the server's values arrived. In single player they are the same values. */
     public static void useServer(Snapshot values) {
         fromServer = values;
@@ -141,6 +153,7 @@ public final class FullCourseConfig {
     public static void clearServer() {
         fromServer = null;
         source = local;
+        regenerates = true;
     }
 
     public static boolean keepVanillaHunger() {
