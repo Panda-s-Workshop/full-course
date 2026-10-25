@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 class ProfileTest {
     @Test
     void aProfileSyncsWhole() {
-        Profile p = new Profile(Tier.GOURMET, 9, 3, 4, 5, List.of(Family.EMBER, Family.BRAWN, Family.FORTITUDE), false, true);
+        Profile p = new Profile(Tier.GOURMET, 9, 3, 4, 5, 5, List.of(Family.EMBER, Family.BRAWN, Family.FORTITUDE), false, true);
         ByteBuf buf = Unpooled.buffer();
         Profile.STREAM_CODEC.encode(buf, p);
         assertEquals(p, Profile.STREAM_CODEC.decode(buf));
@@ -24,7 +24,7 @@ class ProfileTest {
     @Test
     void theClientReadsEveryFamilySentEachOnce() {
         ByteBuf buf = Unpooled.buffer();
-        for (int v : new int[] {Tier.HEARTY.stars(), 5, 2, 2, 3}) ByteBufCodecs.VAR_INT.encode(buf, v);
+        for (int v : new int[] {Tier.HEARTY.stars(), 5, 2, 2, 2, 3}) ByteBufCodecs.VAR_INT.encode(buf, v);
         int[] families = {Family.VIGOR.ordinal(), Family.VIGOR.ordinal(), 99, Family.SWIFT.ordinal(), Family.BRAWN.ordinal(),
                 Family.TIDE.ordinal(), Family.FORTUNE.ordinal(), Family.EMBER.ordinal(), Family.LIGHTFOOT.ordinal(),
                 Family.FORTITUDE.ordinal(), Family.DILIGENCE.ordinal(), Family.NIGHT_EYE.ordinal()};
@@ -42,6 +42,6 @@ class ProfileTest {
     @Test
     void aProfileListsEachFamilyOnce() {
         assertEquals(List.of(Family.VIGOR, Family.BRAWN),
-                new Profile(Tier.PREPARED, 3, 1, 1, 2, List.of(Family.VIGOR, Family.BRAWN, Family.VIGOR), false, false).families());
+                new Profile(Tier.PREPARED, 3, 1, 1, 1, 2, List.of(Family.VIGOR, Family.BRAWN, Family.VIGOR), false, false).families());
     }
 }

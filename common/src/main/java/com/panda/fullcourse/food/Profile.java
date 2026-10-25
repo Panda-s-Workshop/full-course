@@ -14,11 +14,13 @@ import net.minecraft.network.codec.StreamCodec;
  *
  * @param steps the depth of its cheapest recipe chain
  * @param stations the distinct stations in that chain (the score counts the crock twice; this counts it once)
+ * @param stationPoints what the stations add to the score: one each, the crock two
  * @param ingredients the distinct raw ingredients that chain starts from
  * @param ingredient some recipe makes it into another food: a raw food's tooltip says so only then
  */
-public record Profile(Tier tier, int score, int steps, int stations, int ingredients, List<Family> families, boolean remedy, boolean ingredient) {
-    public static final Profile NONE = new Profile(Tier.RAW, 0, 0, 0, 0, List.of(), false, false);
+public record Profile(Tier tier, int score, int steps, int stations, int stationPoints, int ingredients, List<Family> families, boolean remedy,
+                      boolean ingredient) {
+    public static final Profile NONE = new Profile(Tier.RAW, 0, 0, 0, 0, 0, List.of(), false, false);
 
     public static final StreamCodec<ByteBuf, Profile> STREAM_CODEC = new StreamCodec<>() {
         @Override
@@ -27,6 +29,7 @@ public record Profile(Tier tier, int score, int steps, int stations, int ingredi
             int score = ByteBufCodecs.VAR_INT.decode(buf);
             int steps = ByteBufCodecs.VAR_INT.decode(buf);
             int stations = ByteBufCodecs.VAR_INT.decode(buf);
+            int stationPoints = ByteBufCodecs.VAR_INT.decode(buf);
             int ingredients = ByteBufCodecs.VAR_INT.decode(buf);
             int n = ByteBufCodecs.VAR_INT.decode(buf);
             List<Family> families = new ArrayList<>();
@@ -36,7 +39,7 @@ public record Profile(Tier tier, int score, int steps, int stations, int ingredi
             }
             boolean remedy = ByteBufCodecs.BOOL.decode(buf);
             boolean ingredient = ByteBufCodecs.BOOL.decode(buf);
-            return new Profile(tier, score, steps, stations, ingredients, families, remedy, ingredient);
+            return new Profile(tier, score, steps, stations, stationPoints, ingredients, families, remedy, ingredient);
         }
 
         @Override
@@ -45,6 +48,7 @@ public record Profile(Tier tier, int score, int steps, int stations, int ingredi
             ByteBufCodecs.VAR_INT.encode(buf, p.score());
             ByteBufCodecs.VAR_INT.encode(buf, p.steps());
             ByteBufCodecs.VAR_INT.encode(buf, p.stations());
+            ByteBufCodecs.VAR_INT.encode(buf, p.stationPoints());
             ByteBufCodecs.VAR_INT.encode(buf, p.ingredients());
             ByteBufCodecs.VAR_INT.encode(buf, p.families().size());
             for (Family f : p.families()) ByteBufCodecs.VAR_INT.encode(buf, f.ordinal());

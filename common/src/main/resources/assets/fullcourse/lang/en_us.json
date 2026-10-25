@@ -316,6 +316,8 @@
   "tooltip.fullcourse.chain.ingredients": "%s ingredients",
   "tooltip.fullcourse.chain.ingredients.one": "%s ingredient",
   "tooltip.fullcourse.chain.stations": "%s stations",
+  "tooltip.fullcourse.chain.stations.crock": "%s stations, crock ×2",
+  "tooltip.fullcourse.chain.stations.crock.one": "the crock, ×2",
   "tooltip.fullcourse.chain.stations.one": "%s station",
   "tooltip.fullcourse.chain.steps": "%s steps",
   "tooltip.fullcourse.chain.steps.one": "%s step",

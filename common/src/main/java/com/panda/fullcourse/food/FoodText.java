@@ -67,13 +67,30 @@ public final class FoodText {
             out.add(lasts.withStyle(ChatFormatting.GRAY));
         }
         if (shift) {
-            out.add(Component.translatable("tooltip.fullcourse.chain", count("steps", p.steps()), count("stations", p.stations()),
-                    count("ingredients", p.ingredients())).withStyle(ChatFormatting.GRAY));
+            out.add(chain(p).withStyle(ChatFormatting.GRAY));
             out.add(score(p).withStyle(ChatFormatting.GRAY));
         } else if (p.steps() > 0) {
             out.add(Component.translatable("tooltip.fullcourse.shift").withStyle(ChatFormatting.GRAY));
         }
         return out;
+    }
+
+    /** "2 steps · 4 stations, crock ×2 · 4 ingredients": the recipe chain's counts, the crock's weight named. */
+    static MutableComponent chain(Profile p) {
+        Component stations = p.stationPoints() > p.stations()
+                ? Component.translatable("tooltip.fullcourse.chain.stations.crock" + (p.stations() == 1 ? ".one" : ""), p.stations())
+                : count("stations", p.stations());
+        return Component.translatable("tooltip.fullcourse.chain", count("steps", p.steps()), stations, count("ingredients", p.ingredients()));
+    }
+
+    /**
+     * "8 = 2 + 5 + 1": the score as its parts (steps, stations, a point per three ingredients, and a placed dish's
+     * bonus), or just the score when they don't make it.
+     */
+    private static String sum(Profile p) {
+        int assembled = p.score() - p.steps() - p.stationPoints() - p.ingredients() / 3;
+        if (p.steps() == 0 || assembled < 0 || p.stationPoints() < p.stations()) return Integer.toString(p.score());
+        return p.score() + " = " + p.steps() + " + " + p.stationPoints() + " + " + p.ingredients() / 3 + (assembled > 0 ? " + " + assembled : "");
     }
 
     /** "1 step", "3 steps": one of the recipe chain's counts. */
@@ -152,9 +169,9 @@ public final class FoodText {
         int tier = p.tier().ordinal(); // thresholds[i] is the lowest score of tier i + 1
         int lowest = tier == 0 ? 0 : thresholds[tier - 1];
         if (tier >= thresholds.length || tier >= Tier.FEAST.ordinal()) {
-            return Component.translatable("tooltip.fullcourse.score_top", p.score(), name, lowest);
+            return Component.translatable("tooltip.fullcourse.score_top", sum(p), name, lowest);
         }
-        return Component.translatable("tooltip.fullcourse.score", p.score(), name, lowest, thresholds[tier] - 1);
+        return Component.translatable("tooltip.fullcourse.score", sum(p), name, lowest, thresholds[tier] - 1);
     }
 
     /** "30", "2.5": one decimal at most, none for a whole number (rounded first: 0.1 × 3 × 100 is 30.000000000000004). */

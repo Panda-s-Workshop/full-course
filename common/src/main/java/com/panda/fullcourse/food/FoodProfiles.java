@@ -286,8 +286,9 @@ public final class FoodProfiles {
                 families = TierScorer.benefits(dish, score.leaves(), FoodProfiles::groupsOf, dish.builtInRegistryHolder().is(FoodTags.SOUPS),
                         tier.benefits());
             }
-            out.put(item, new Profile(tier, score.score(), score.depth(), score.stations().size(), score.leaves().size(), families, remedy,
-                    usedIn.contains(dish)));
+            int stationPoints = score.stations().values().stream().mapToInt(Integer::intValue).sum();
+            out.put(item, new Profile(tier, score.score(), score.depth(), score.stations().size(), stationPoints, score.leaves().size(), families,
+                    remedy, usedIn.contains(dish)));
         }
         return Collections.unmodifiableMap(out);
     }
