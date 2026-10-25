@@ -12,13 +12,18 @@ import com.panda.fullcourse.platform.Services;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
@@ -32,6 +37,11 @@ import net.minecraft.world.item.ItemStack;
 public final class FoodTooltips {
     /** Treats Shift as held, for tests: the keyboard can't be pressed from one. */
     public static boolean shiftDown;
+    /**
+     * The widest line the mod adds, in GUI pixels. Vanilla doesn't wrap item tooltips (so neither does Fabric), and a
+     * 427 px screen (GUI scale 3 at 720p, or 2 at 854 x 480) has to hold the tooltip beside the cursor.
+     */
+    public static final int MAX_WIDTH = 300;
 
     private FoodTooltips() {}
 
@@ -46,11 +56,11 @@ public final class FoodTooltips {
         Identifier id = BuiltInRegistries.ITEM.getKey(stack.getItem());
         if (id.getNamespace().equals(FullCourse.MODID)) {
             String key = "tooltip.fullcourse." + id.getPath();
-            if (Language.getInstance().has(key + ".use")) lines.add(1, Component.translatable(key + ".use").withStyle(ChatFormatting.GRAY));
+            if (Language.getInstance().has(key + ".use")) lines.addAll(1, wrap(List.of(Component.translatable(key + ".use").withStyle(ChatFormatting.GRAY))));
             if (Language.getInstance().has(key + ".craft")) made.add(Component.translatable(key + ".craft").withStyle(ChatFormatting.DARK_AQUA));
         } else if (Language.getInstance().has("tooltip.fullcourse." + id.toLanguageKey() + ".use")) {
             // what the mod changes about another's item (cake: one slice per helping)
-            lines.add(1, Component.translatable("tooltip.fullcourse." + id.toLanguageKey() + ".use").withStyle(ChatFormatting.GRAY));
+            lines.addAll(1, wrap(List.of(Component.translatable("tooltip.fullcourse." + id.toLanguageKey() + ".use").withStyle(ChatFormatting.GRAY))));
         }
         if (food) {
             boolean tasted = mc.player != null
@@ -59,12 +69,39 @@ public final class FoodTooltips {
             // a feast heals per serving, not as an item
             int nutrition = component != null ? component.nutrition()
                     : stack.getItem() instanceof BlockItem b && b.getBlock() instanceof FeastBlock feast ? feast.serving() : 0;
-            lines.addAll(1, FoodText.lines(p, nutrition, shift, tasted));
+            lines.addAll(1, wrap(FoodText.lines(p, nutrition, shift, tasted)));
         } else if (!made.isEmpty() && !shift) {
             lines.add(1, Component.translatable("tooltip.fullcourse.shift_recipe").withStyle(ChatFormatting.DARK_GRAY));
         }
-        if (shift) lines.addAll(made);
+        if (shift) lines.addAll(wrap(made));
         if (!FullCourseConfig.keepVanillaHunger()) markNeedsHunger(lines);
+    }
+
+    /**
+     * {@code in} with each line wider than {@link #MAX_WIDTH} split at spaces, its continuations indented two spaces
+     * past the line's own indent so they read as one entry.
+     */
+    public static List<Component> wrap(List<? extends Component> in) {
+        Font font = Minecraft.getInstance().font;
+        List<Component> out = new ArrayList<>();
+        for (Component line : in) {
+            if (font.width(line) <= MAX_WIDTH) {
+                out.add(line);
+                continue;
+            }
+            String text = line.getString();
+            String indent = " ".repeat(text.length() - text.stripLeading().length() + 2);
+            List<FormattedText> parts = font.getSplitter().splitLines(line, MAX_WIDTH - font.width(indent), Style.EMPTY);
+            for (int i = 0; i < parts.size(); i++) {
+                MutableComponent part = Component.literal(i == 0 ? "" : indent);
+                parts.get(i).visit((style, piece) -> {
+                    part.append(Component.literal(piece).withStyle(style));
+                    return Optional.empty();
+                }, Style.EMPTY);
+                out.add(part);
+            }
+        }
+        return out;
     }
 
     /** Greys out each line naming an effect in {@code #fullcourse:needs_hunger}, and says it does nothing here. */
