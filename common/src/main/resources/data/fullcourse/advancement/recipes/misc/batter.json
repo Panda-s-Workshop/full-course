@@ -12,7 +12,7 @@
       "conditions": {
         "items": [
           {
-            "items": "fullcourse:flour"
+            "items": "#c:eggs"
           }
         ]
       }
@@ -22,7 +22,7 @@
       "conditions": {
         "items": [
           {
-            "items": "minecraft:bowl"
+            "items": "fullcourse:flour"
           }
         ]
       }
@@ -32,7 +32,7 @@
       "conditions": {
         "items": [
           {
-            "items": "minecraft:egg"
+            "items": "minecraft:bowl"
           }
         ]
       }

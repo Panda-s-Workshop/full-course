@@ -12,7 +12,7 @@
       "conditions": {
         "items": [
           {
-            "items": "fullcourse:butter"
+            "items": "#c:foods/dough"
           }
         ]
       }
@@ -22,7 +22,7 @@
       "conditions": {
         "items": [
           {
-            "items": "fullcourse:dough"
+            "items": "fullcourse:butter"
           }
         ]
       }

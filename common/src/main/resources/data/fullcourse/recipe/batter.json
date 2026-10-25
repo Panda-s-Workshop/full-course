@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     "fullcourse:flour",
-    "minecraft:egg",
+    "#c:eggs",
     "minecraft:milk_bucket",
     "minecraft:bowl"
   ],

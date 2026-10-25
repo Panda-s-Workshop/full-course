@@ -12,7 +12,7 @@
       "conditions": {
         "items": [
           {
-            "items": "fullcourse:fried_egg"
+            "items": "#c:foods/cooked_egg"
           }
         ]
       }

@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     "minecraft:bread",
-    "fullcourse:fried_egg"
+    "#c:foods/cooked_egg"
   ],
   "result": {
     "id": "fullcourse:egg_sandwich"

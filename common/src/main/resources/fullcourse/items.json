@@ -75,7 +75,7 @@
         "station": "craft",
         "from": [
           "fullcourse:flour",
-          "minecraft:egg",
+          "#c:eggs",
           "minecraft:milk_bucket",
           "minecraft:bowl"
         ]
@@ -231,7 +231,7 @@
       {
         "station": "craft",
         "from": [
-          "fullcourse:dough",
+          "#c:foods/dough",
           "fullcourse:butter"
         ]
       }
@@ -280,7 +280,7 @@
       {
         "station": "fire",
         "from": [
-          "minecraft:egg"
+          "#c:eggs"
         ]
       }
     ]
@@ -498,7 +498,7 @@
         "station": "craft",
         "from": [
           "minecraft:bread",
-          "fullcourse:fried_egg"
+          "#c:foods/cooked_egg"
         ]
       }
     ]
@@ -944,7 +944,7 @@
         "station": "oven",
         "from": [
           "fullcourse:charred_chorus",
-          "minecraft:egg",
+          "#c:eggs",
           "fullcourse:sweet_cream",
           "fullcourse:syrup"
         ]
@@ -1004,7 +1004,7 @@
         "station": "oven",
         "from": [
           "minecraft:cooked_chicken",
-          "fullcourse:dough",
+          "fullcourse:pastry",
           "fullcourse:chopped_vegetables",
           "fullcourse:broth"
         ]
