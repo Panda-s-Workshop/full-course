@@ -18,6 +18,21 @@ the last hit. Food becomes a choice that makes you stronger, and the more work a
 ingredients), the stronger and longer its benefits. Every food from every mod gets a tier from its recipe chain
 (see Compatibility for recipes it can't read).
 
+## Playing
+
+- **Meals.** Food heals over time, and a cooked dish also fills a meal slot in the row where the food bar was. Its
+  benefits (more hearts, damage, armor, speed, mining speed and more) last while its ring runs down. You start with
+  two slots; a new dish over a full row replaces the meal with the least time left.
+- **Stars.** A food's tier, one to five stars on its tooltip, comes from the work in its recipe chain: steps,
+  stations and ingredients. More stars give more benefits, higher levels and longer meals. Hold Shift on a food to
+  see its chain.
+- **The kitchen.** The Cutting Board (food on it, then a knife), the Cooking Pot (heat under it, such as a lit
+  campfire), the Brick Oven (bakes with fuel) and the Fermenting Crock (seal it and wait) make the better dishes.
+  Feasts are placed and shared: one helping per player every five minutes.
+- **More slots.** Taste different dishes to open up to three more slots. The Tasting Journal lists what you have
+  tasted and what the next slot asks for.
+- **Health.** Health comes back on its own 8 seconds after the last hit (Recovery). Mending meals make it faster.
+
 ## Commands
 
 - `/fullcourse tier [item]`: a food's tier, score and benefits, for the item named or the one in your hand.
@@ -50,7 +65,7 @@ neither Recovery nor food. Healing potions, golden apples and other effects stil
 | `keepMealsOnDeath` | `false` | Keep held meals through death. |
 | `durationMultiplier` | `1.0` | Multiplies every meal's duration (0.05–20). |
 | `tierThresholds` | `1,3,5,8,12` | Lowest recipe-chain score of tiers 1 to 5: exactly five, ascending, 1–999. Anything else falls back to the defaults. |
-| `slotMilestones` | `8,15,20` | Different dishes to taste for meal slot 3 (two stars or more), 4 and 5 (three stars or more; slot 5 also needs a feast). Exactly three. Raise them in a pack with many food mods. |
+| `slotMilestones` | `8,15,20` | Different dishes to taste for meal slot 3 (two stars or more), 4 and 5 (three stars or more; slot 5 also needs a feast). Exactly three, each 1–9999, and slot 5's not below slot 4's; anything else falls back to the defaults. Raise them in a pack with many food mods. |
 
 Each player also has three display settings of their own, which the server never sees: `config/fullcourse-client.toml`
 on NeoForge, `config/fullcourse-client.properties` on Fabric. Restart the game after editing.
@@ -98,6 +113,18 @@ puts a replaced file back to the scored values.
 - `remedy`: true for foods like the golden apple, which keep their own effects and heal but give no meal.
 - `serving_of`: the dish this is a serving or slice of (a feast block, a pie); it rates exactly as that dish.
 
+Full Course's own dishes are rated by files at these paths too (`data/fullcourse/fullcourse/food_profiles/<dish>.json`,
+and cake's in `data/minecraft/`), which set their families and leave the tier to the recipes. A pack file at one of
+those paths replaces the whole file: a file with only `tier` leaves the dish's families to its recipes, so copy the
+families to keep them. A food in `fullcourse:soups` gets Mending only when its families come from its recipes;
+families set in a file are used as written.
+
+**What the scorer can't see.** Fluids a machine pours in (Create's filling, for instance) aren't ingredients; only
+items are. Another mod's tool that a crafting recipe uses and gives back (a rolling pin, a knife) counts as an
+ingredient unless it is in `fullcourse:containers`, and a non-edible intermediate (a flour, a paste) ends the chain as
+a raw ingredient unless it is in `fullcourse:culinary`: tag them there. The recipe lines a tooltip shows with Shift
+are Full Course's own recipes as shipped; a data pack's changed recipes rate correctly but don't change those lines.
+
 **Item tags** (namespace `fullcourse`):
 
 | Tag | What it means |
@@ -110,6 +137,7 @@ puts a replaced file back to the scored values.
 | `soups` | Always give Mending. |
 | `groups/<family>` | The ingredients that give each benefit family to foods rated from their recipes. Full Course's own dishes, Grilled Fillet, Flatbread and cake have their families set in their food profiles, so these tags don't change them. |
 | `journal_foods` | The "any simple dish" the Tasting Journal's recipe takes. |
+| `repairs_flint_knife` | What mends a Flint Knife on an anvil (flint). |
 
 **Block tags:** `fullcourse:heat_sources` heat a Cooking Pot set on top; it holds vanilla's `#minecraft:campfires` and
 `#minecraft:fire`, so other mods' campfires count. A block with a `lit` or `burning` state heats
