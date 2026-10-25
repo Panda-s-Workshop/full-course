@@ -39,6 +39,21 @@ public record Meals<D>(List<Meal<D>> active) {
         return new Meals<>(List.of());
     }
 
+    /** How eating a dish would place it: refresh the same dish, fill a free slot, or replace the meal with least time. */
+    public enum Fill { REFRESH, FILL, REPLACE }
+
+    /** The slot (an index into {@link #active()}, or its size for a new slot) a dish would take, and how. */
+    public record Target(int slot, Fill fill) {}
+
+    /** Where eating {@code dish} with {@code slots} slots would put it, as {@link #eat} does. */
+    public Target target(D dish, int slots) {
+        for (int i = 0; i < active.size(); i++) {
+            if (active.get(i).dish().equals(dish)) return new Target(i, Fill.REFRESH);
+        }
+        if (active.size() < slots) return new Target(active.size(), Fill.FILL);
+        return new Target(leastTime(active.subList(0, Math.min(active.size(), Math.max(1, slots)))), Fill.REPLACE);
+    }
+
     /** Eats a meal with {@code slots} slots available. */
     public Meals<D> eat(Meal<D> meal, int slots) {
         List<Meal<D>> next = new ArrayList<>(active);

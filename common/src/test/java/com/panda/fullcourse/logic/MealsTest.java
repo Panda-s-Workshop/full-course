@@ -64,4 +64,28 @@ class MealsTest {
         assertEquals(0.5F, m.fraction(200));
         assertEquals(0F, m.fraction(400));
     }
+
+    @Test
+    void targetSaysWhereADishWouldGo() {
+        Meals<String> m = Meals.<String>empty().eat(meal("a", 1, 500, Family.SWIFT), 3).eat(meal("b", 1, 300, Family.TIDE), 3);
+        assertEquals(new Meals.Target(1, Meals.Fill.REFRESH), m.target("b", 3));
+        assertEquals(new Meals.Target(2, Meals.Fill.FILL), m.target("c", 3));
+        assertEquals(new Meals.Target(1, Meals.Fill.REPLACE), m.target("c", 2));
+        assertEquals(new Meals.Target(0, Meals.Fill.FILL), Meals.<String>empty().target("a", 2));
+    }
+
+    @Test
+    void targetAgreesWithEat() {
+        var rng = new java.util.Random(7);
+        for (int run = 0; run < 500; run++) {
+            int slots = 1 + rng.nextInt(5);
+            Meals<String> m = Meals.empty();
+            for (int k = rng.nextInt(7); k > 0; k--) m = m.eat(meal("d" + rng.nextInt(6), 1, 100 + rng.nextInt(900), Family.VIGOR), slots);
+            String dish = "d" + rng.nextInt(7);
+            var eaten = meal(dish, 1, 2000 + run, Family.VIGOR);
+            Meals.Target t = m.target(dish, slots);
+            Meals<String> after = m.eat(eaten, slots);
+            assertSame(eaten, after.active().get(t.slot()), "run " + run + ": " + m.active() + " + " + dish + " at " + slots + " slots");
+        }
+    }
 }
