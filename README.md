@@ -34,7 +34,7 @@ slots always match the server.
 Restart the server (or the game, in single player) after editing either file. NeoForge's in-game config screen marks
 these keys the same way: they take effect on the next world load.
 
-The `naturalHealthRegeneration` gamerule works as in vanilla: turned off (as UHC packs do), nothing heals on its own,
+The `natural_health_regeneration` gamerule works as in vanilla: turned off (as UHC packs do), nothing heals on its own,
 neither Recovery nor food. Healing potions, golden apples and other effects still work.
 
 | Key | Default | What it does |
@@ -46,7 +46,7 @@ neither Recovery nor food. Healing potions, golden apples and other effects stil
 | `maxMealSlots` | `5` | The most meal slots a player can have (1–16). The Tasting Journal opens three past the starting slots; `/fullcourse unlock` can go up to this. |
 | `keepMealsOnDeath` | `false` | Keep held meals through death. |
 | `durationMultiplier` | `1.0` | Multiplies every meal's duration (0.05–20). |
-| `tierThresholds` | `1,3,5,8,12` | Lowest recipe-chain score of tiers 1 to 5: exactly five, ascending, 0–999. Anything else falls back to the defaults. |
+| `tierThresholds` | `1,3,5,8,12` | Lowest recipe-chain score of tiers 1 to 5: exactly five, ascending, 1–999. Anything else falls back to the defaults. |
 | `slotMilestones` | `8,15,20` | Different dishes to taste for meal slot 3 (two stars or more), 4 and 5 (three stars or more; slot 5 also needs a feast). Exactly three. Raise them in a pack with many food mods. |
 
 Each player also has three display settings of their own, which the server never sees: `config/fullcourse-client.toml`
