@@ -57,6 +57,8 @@ public final class MealHud {
     }
     /** A meal's ring blinks for its last tenth, but never less than this many ticks. */
     static final int ENDING_TICKS = 200;
+    /** The whole ring's colour on a blink's off beat: the drained track too, so a nearly spent meal still flashes. */
+    static final int BLINK_COLOR = 0xFFFFFFFF;
     /** The marker over a meal the held food would replace. */
     static final int REPLACE_COLOR = 0xFFE8383A;
     /** The ring's pixels, clockwise from the top middle. */
@@ -122,9 +124,8 @@ public final class MealHud {
             boolean blinkOff = left < ending && (now / 5) % 2 == 0;
             frame(g, x, top, Tier.FRAME_GREY, 0x88000000);
             int lit = Math.round(RING.length * meal.fraction(now));
-            int color = blinkOff ? 0xFFFFFFFF : meal.tier().color(), track = meal.tier().trackColor();
             for (int p = 0; p < RING.length; p++) {
-                g.fill(x + RING[p][0], top + RING[p][1], x + RING[p][0] + 1, top + RING[p][1] + 1, p < RING.length - lit ? track : color);
+                g.fill(x + RING[p][0], top + RING[p][1], x + RING[p][0] + 1, top + RING[p][1] + 1, ringColor(meal.tier(), p >= RING.length - lit, blinkOff));
             }
             BuiltInRegistries.ITEM.get(meal.dish()).ifPresent(item -> g.item(new ItemStack(item.value()), x + 1, top + 1));
             if (targeted && target.fill() == Meals.Fill.REPLACE) {
@@ -135,6 +136,11 @@ public final class MealHud {
             }
         }
         return true;
+    }
+
+    /** One ring pixel: the tier's colour where time is left, its track where it's gone, all of it white on a blink. */
+    static int ringColor(Tier tier, boolean lit, boolean blinkOff) {
+        return blinkOff ? BLINK_COLOR : lit ? tier.color() : tier.trackColor();
     }
 
     /**
@@ -174,11 +180,30 @@ public final class MealHud {
         g.fill(x + FRAME - 1, y + 1, x + FRAME, y + FRAME - 1, border);
     }
 
+    /** A free slot's plate seen from above: {@code o} its rim, {@code .} its well. */
+    private static final String[] PLATE = {
+            "      oooo      ",
+            "    oooooooo    ",
+            "   oooooooooo   ",
+            "  oooo....oooo  ",
+            "  ooo......ooo  ",
+            "  ooo......ooo  ",
+            "  ooo......ooo  ",
+            "  ooo......ooo  ",
+            "  oooo....oooo  ",
+            "   oooooooooo   ",
+            "    oooooooo    ",
+            "      oooo      "};
+
     /** A free slot: a light frame with a faint plate in it. */
     static void freeFrame(GuiGraphicsExtractor g, int x, int y) {
         frame(g, x, y, 0xFF9A9A9A, 0x66000000);
-        g.fill(x + 4, y + 9, x + 14, y + 11, 0x50FFFFFF);
-        g.fill(x + 5, y + 8, x + 13, y + 12, 0x50FFFFFF);
+        for (int row = 0; row < PLATE.length; row++) {
+            for (int col = 0; col < 16; col++) {
+                char c = PLATE[row].charAt(col);
+                if (c != ' ') g.fill(x + 1 + col, y + 3 + row, x + 2 + col, y + 4 + row, c == 'o' ? 0x58FFFFFF : 0x22FFFFFF);
+            }
+        }
     }
 
     /** A dim, see-through frame with a small padlock: a slot the Tasting Journal will unlock. */
