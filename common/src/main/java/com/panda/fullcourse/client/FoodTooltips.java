@@ -79,10 +79,14 @@ public final class FoodTooltips {
 
     /**
      * {@code in} with each line wider than {@link #MAX_WIDTH} split at spaces, its continuations indented two spaces
-     * past the line's own indent so they read as one entry.
+     * past the line's own indent so they read as one entry. Only where the loader doesn't split lines itself (splitting
+     * twice leaves single words), and only on the render thread: the recipe book's search builds tooltips on a worker,
+     * where measuring a glyph not yet drawn would upload it from the wrong thread.
      */
     public static List<Component> wrap(List<? extends Component> in) {
-        Font font = Minecraft.getInstance().font;
+        Minecraft mc = Minecraft.getInstance();
+        if (Services.PLATFORM.wrapsTooltips() || !mc.isSameThread()) return List.copyOf(in);
+        Font font = mc.font;
         List<Component> out = new ArrayList<>();
         for (Component line : in) {
             if (font.width(line) <= MAX_WIDTH) {

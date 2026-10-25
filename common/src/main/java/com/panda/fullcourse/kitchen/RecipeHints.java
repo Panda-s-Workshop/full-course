@@ -35,8 +35,13 @@ public final class RecipeHints {
 
     /** The item's recipe lines, empty for items that aren't the mod's or have no recipe. */
     public static List<Component> lines(Item item) {
+        return hints().getOrDefault(item, List.of());
+    }
+
+    /** Loaded once, under a lock: the recipe book's search asks for tooltips from worker threads too. */
+    private static synchronized Map<Item, List<Component>> hints() {
         if (hints == null) hints = load();
-        return hints.getOrDefault(item, List.of());
+        return hints;
     }
 
     /**
@@ -45,7 +50,7 @@ public final class RecipeHints {
      * {@link #MAX_SOURCES} lines. A tag counts as the mod's own item in it (any dough: Dough).
      */
     public static List<Component> sources(Item item) {
-        if (hints == null) hints = load();
+        hints();
         List<Component> out = new ArrayList<>();
         Set<Item> seen = new LinkedHashSet<>(List.of(item));
         Deque<Item> queue = new ArrayDeque<>(made(item));
@@ -84,7 +89,7 @@ public final class RecipeHints {
 
     /** Made by one of the mod's recipes, or one of its crops found growing wild. */
     private static boolean traced(Item item) {
-        return hints.containsKey(item) || wild(item);
+        return hints().containsKey(item) || wild(item);
     }
 
     /** The mod's own raw ingredient with a line on where to find it (Onion: "Grows wild in plains..."). */

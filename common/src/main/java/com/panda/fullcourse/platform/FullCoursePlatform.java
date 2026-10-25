@@ -11,6 +11,9 @@ public interface FullCoursePlatform {
     /** "neoforge" or "fabric". */
     String loaderName();
 
+    /** Whether the loader splits item tooltip lines too wide for the screen itself (NeoForge does, vanilla doesn't). */
+    boolean wrapsTooltips();
+
     /** Whether a mod with this id is installed. */
     boolean isModLoaded(String modId);
 

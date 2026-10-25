@@ -17,6 +17,11 @@ public final class NeoForgePlatform implements FullCoursePlatform {
     }
 
     @Override
+    public boolean wrapsTooltips() {
+        return true;
+    }
+
+    @Override
     public boolean isModLoaded(String modId) {
         return ModList.get().isLoaded(modId);
     }

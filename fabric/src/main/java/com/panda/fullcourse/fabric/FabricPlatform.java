@@ -29,6 +29,11 @@ public final class FabricPlatform implements FullCoursePlatform {
     }
 
     @Override
+    public boolean wrapsTooltips() {
+        return false;
+    }
+
+    @Override
     public boolean isModLoaded(String modId) {
         return FabricLoader.getInstance().isModLoaded(modId);
     }
