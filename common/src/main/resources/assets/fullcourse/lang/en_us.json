@@ -130,6 +130,7 @@
   "gui.fullcourse.pot.cold": "Needs one of these under it, burning:",
   "gui.fullcourse.pot.cold.cfb": "Cooking for Blockheads ovens heat only while they cook something",
   "gui.fullcourse.pot.conducts": "Heat rises through one %s between them",
+  "gui.fullcourse.pot.empty": "Add ingredients to see what they make. Shift over a dish shows its recipe",
   "gui.fullcourse.pot.from": "%s — %s",
   "gui.fullcourse.pot.heated": "Heated",
   "gui.fullcourse.pot.makes": "Makes %s",
@@ -343,5 +344,5 @@
   "tooltip.fullcourse.shift": "Shift: recipe chain",
   "tooltip.fullcourse.shift_recipe": "Shift: recipe",
   "tooltip.fullcourse.tasted": "Tasted",
-  "tooltip.fullcourse.tasting_journal.use": "Every dish you have tasted, and the next meal slot"
+  "tooltip.fullcourse.tasting_journal.use": "Every dish, which you have tasted, and the next meal slot. Shift over a dish shows its recipe"
 }

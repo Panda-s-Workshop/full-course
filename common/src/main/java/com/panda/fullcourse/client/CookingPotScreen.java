@@ -85,9 +85,15 @@ public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
         return HeatText.needsHeat();
     }
 
-    /** The arrow's tooltip: {@link #arrowLines()}, and with a recipe viewer, that a click shows the pot's recipes. */
+    /**
+     * The arrow's tooltip: {@link #arrowLines()}, or over an empty grid where to find recipes, and with a recipe viewer,
+     * that a click shows the pot's recipes.
+     */
     public List<Component> arrowTooltip() {
         List<Component> lines = new ArrayList<>(arrowLines());
+        if (lines.isEmpty() && grid().stream().allMatch(ItemStack::isEmpty)) {
+            lines.add(Component.translatable("gui.fullcourse.pot.empty").withStyle(ChatFormatting.GRAY));
+        }
         if (arrowOpensViewer) lines.add(Component.translatable("gui.fullcourse.pot.click_recipes").withStyle(ChatFormatting.GRAY));
         return lines;
     }
