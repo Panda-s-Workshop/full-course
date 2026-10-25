@@ -26,6 +26,29 @@ class FoodStateTest {
         assertEquals(Map.of(), FoodState.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow().helpings());
     }
 
+    /**
+     * The state syncs whole each second a heal runs (the nourish count is in it): a full journal of 100 dishes, five
+     * meals and two helpings stay a few kilobytes, the cost DECISIONS 64 accepts.
+     */
+    @Test
+    void aFullStateSyncsInAFewKilobytes() {
+        java.util.Set<Identifier> tasted = new java.util.LinkedHashSet<>();
+        for (int i = 0; i < 100; i++) tasted.add(Identifier.fromNamespaceAndPath("somemod", "a_long_dish_name_number_" + i));
+        java.util.List<Meals.Meal<Identifier>> meals = new java.util.ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            meals.add(new Meals.Meal<>(Identifier.fromNamespaceAndPath("fullcourse", "dish_" + i), com.panda.fullcourse.logic.Tier.GOURMET,
+                    java.util.List.of(com.panda.fullcourse.logic.Family.BRAWN, com.panda.fullcourse.logic.Family.VIGOR, com.panda.fullcourse.logic.Family.MENDING),
+                    3, 1000L, 40000L));
+        }
+        FoodState s = new FoodState(new Meals<>(meals), 8, tasted, 3, Map.of(BANQUET, 1200L, CAKE, 3000L));
+        io.netty.buffer.ByteBuf buf = io.netty.buffer.Unpooled.buffer();
+        FoodState.STREAM_CODEC.encode(buf, s);
+        int bytes = buf.readableBytes();
+        System.out.println("a full food state syncs in " + bytes + " bytes");
+        org.junit.jupiter.api.Assertions.assertTrue(bytes < 6000, bytes + " bytes");
+        assertEquals(s, FoodState.STREAM_CODEC.decode(buf));
+    }
+
     @Test
     void helpingsOutsideTheWindowAreDropped() {
         FoodState s = FoodState.EMPTY.withHelping(CAKE, 100, 6000).withHelping(BANQUET, 6099, 6000);
