@@ -74,7 +74,7 @@ class TierScorerTest {
         r("chopped_onion", "board", "onion");
         r("vegetable_stew", "fullcourse:cooking", "chopped_vegetables", "chopped_onion", "baked_potato", "broth", "bowl");
         r("shepherds_pie", "oven", "minced_meat", "chopped_onion", "baked_potato", "butter");
-        r("roast_banquet", "oven", "cooked_chicken", "dough", "chopped_vegetables", "broth");
+        r("roast_banquet", "oven", "cooked_chicken", "pastry", "chopped_vegetables", "broth");
         placed.add("roast_banquet");
     }
 
@@ -205,7 +205,7 @@ class TierScorerTest {
         assertEquals(Tier.HEARTY, tier("vegetable_stew"));
         assertEquals(8, score("shepherds_pie"));
         assertEquals(Tier.GOURMET, tier("shepherds_pie"));
-        assertEquals(12, score("roast_banquet"), "9 + placed bonus 3");
+        assertEquals(15, score("roast_banquet"), "depth 4 + 7 for stations (crock 2) + 1 for leaves + placed bonus 3");
         assertEquals(Tier.FEAST, tier("roast_banquet"));
     }
 
