@@ -12,6 +12,10 @@
     {
       "id": "#cookingforblockheads:ovens",
       "required": false
+    },
+    {
+      "id": "#farmersdelight:heat_sources",
+      "required": false
     }
   ]
 }
