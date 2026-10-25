@@ -89,6 +89,7 @@ public final class RuleChecks {
         CHECKS.put("recovery_respects_gamerule", RuleChecks::recoveryRespectsGamerule);
         CHECKS.put("recovery_off_on_peaceful", RuleChecks::recoveryOffOnPeaceful);
         CHECKS.put("recovery_holds_under_tick_freeze", RuleChecks::recoveryHoldsUnderTickFreeze);
+        CHECKS.put("candle_cake_refusal_drops_nothing", RuleChecks::candleCakeRefusalDropsNothing);
         CHECKS.put("mending_shortens_recovery", RuleChecks::mendingShortensRecovery);
         CHECKS.put("recovery_rate_attribute", RuleChecks::recoveryRateAttribute);
         CHECKS.put("steak_heals_eight_over_eight_seconds", RuleChecks::steakHeals);
@@ -578,6 +579,25 @@ public final class RuleChecks {
             check(state(c).meals().active().size() == 1, "one cake meal: %s", dishes(c));
         } finally {
             c.level().setBlock(pos, before, 3);
+        }
+    }
+
+    /** A refused helping from a candle cake leaves the candle on it: no candle for every click. */
+    private static void candleCakeRefusalDropsNothing(Ctx c) {
+        BlockPos pos = c.spot();
+        BlockState before = c.level().getBlockState(pos);
+        FoodRules.onEatDish(c.player(), Items.CAKE, FoodRules.CAKE_SLICE_NUTRITION, c.level().getGameTime());
+        c.level().setBlock(pos, Blocks.CANDLE_CAKE.defaultBlockState(), 3);
+        try {
+            BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, false);
+            for (int i = 0; i < 3; i++) c.level().getBlockState(pos).useWithoutItem(c.level(), c.player(), hit);
+            long candles = c.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(pos).inflate(2))
+                    .stream().filter(e -> e.getItem().is(Items.CANDLE)).mapToInt(e -> e.getItem().getCount()).sum();
+            check(candles == 0, "a refused candle cake dropped %s candles", candles);
+            check(c.level().getBlockState(pos).is(Blocks.CANDLE_CAKE), "the refused candle cake should stay whole: %s", c.level().getBlockState(pos));
+        } finally {
+            c.level().setBlock(pos, before, 3);
+            c.level().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new net.minecraft.world.phys.AABB(pos).inflate(2)).forEach(e -> e.discard());
         }
     }
 

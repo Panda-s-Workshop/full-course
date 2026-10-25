@@ -28,7 +28,8 @@ abstract class CakeBlockMixin {
         Component refused = FeastBlock.refusal(server, Items.CAKE);
         if (refused == null) return;
         server.sendOverlayMessage(refused);
-        cir.setReturnValue(InteractionResult.SUCCESS);
+        // FAIL, not SUCCESS: a candle cake drops its candle whenever eating consumed the click
+        cir.setReturnValue(InteractionResult.FAIL);
     }
 
     @Inject(method = "eat", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/food/FoodData;eat(IF)V"))

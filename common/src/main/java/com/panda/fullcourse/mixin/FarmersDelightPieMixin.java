@@ -28,6 +28,6 @@ abstract class FarmersDelightPieMixin {
         Component refused = FeastBlock.refusal(server, ((Block) (Object) this).asItem());
         if (refused == null) return;
         server.sendOverlayMessage(refused);
-        cir.setReturnValue(InteractionResult.SUCCESS);
+        cir.setReturnValue(InteractionResult.FAIL);
     }
 }
