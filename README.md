@@ -53,7 +53,8 @@ on NeoForge, `config/fullcourse-client.properties` on Fabric. Restart the game a
 Full Course rates every food in the game from its recipes, including foods from other mods, so it needs no list of
 supported mods. Some mods get more than that:
 
-- **Farmer's Delight Refabricated** (Fabric): its dishes get tiers from their cooking-pot and cutting-board recipes,
+- **Farmer's Delight Refabricated** (Fabric): its dishes get tiers from their cooking-pot and cutting-board recipes
+  (a cut such as minced beef or bacon is still a raw ingredient, but the cut counts toward every dish made from it),
   its knives work on the Cutting Board, and Full Course's ingredients carry the shared `c:` tags.
 - **JEI**: a recipe category for each kitchen station. Hover the Cooking Pot's arrow for what the grid makes, or
   click it for all pot recipes.

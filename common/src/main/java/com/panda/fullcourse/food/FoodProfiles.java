@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.FullCourseConfig;
+import com.panda.fullcourse.compat.FarmersDelightCuts;
 import com.panda.fullcourse.logic.Family;
 import com.panda.fullcourse.logic.Tier;
 import com.panda.fullcourse.logic.TierScorer;
@@ -110,7 +111,8 @@ public final class FoodProfiles {
     private record ProfileOverride(Optional<Integer> tier, Optional<List<Family>> families, Optional<Boolean> remedy, Optional<Item> servingOf) {}
 
     private static Map<Item, Profile> compute(MinecraftServer mcServer) {
-        Map<Item, List<TierScorer.Recipe<Item>>> byOutput = recipeGraph(mcServer);
+        Map<Item, List<TierScorer.Recipe<Item>>> rawCuts = new HashMap<>();
+        Map<Item, List<TierScorer.Recipe<Item>>> byOutput = recipeGraph(mcServer, rawCuts);
         Map<Item, ProfileOverride> overrides = overrides(mcServer);
         // a dish served from a block (a feast, a pie cut into slices) is a placed meal, whether or not it's tagged one
         Set<Item> servedFrom = new HashSet<>();
@@ -142,6 +144,11 @@ public final class FoodProfiles {
             }
 
             @Override
+            public List<TierScorer.Recipe<Item>> prep(Item item) {
+                return rawCuts.getOrDefault(item, List.of());
+            }
+
+            @Override
             public boolean placed(Item item) {
                 return item.builtInRegistryHolder().is(FoodTags.PLACED_MEALS) || servedFrom.contains(item);
             }
@@ -161,7 +168,8 @@ public final class FoodProfiles {
             Optional<List<Family>> setFamilies = o != null && o.families().isPresent() ? o.families()
                     : dishOverride != null ? dishOverride.families() : Optional.empty();
             // a remedy has no tier: its own effects and the heal, no meal, so no stars to imply one
-            Tier tier = remedy ? Tier.RAW : setTier.map(Tier::ofStars).orElseGet(() -> Tier.fromScore(score.score(), thresholds));
+            Tier tier = remedy || (setTier.isEmpty() && rawCuts.containsKey(dish)) ? Tier.RAW
+                    : setTier.map(Tier::ofStars).orElseGet(() -> Tier.fromScore(score.score(), thresholds));
             List<Family> families;
             if (remedy) {
                 families = List.of();
@@ -207,20 +215,32 @@ public final class FoodProfiles {
         return item.components().has(DataComponents.FOOD);
     }
 
-    /** Every recipe of every type, as output item → recipes; recipes that can't be placed or have no result are skipped. */
-    private static Map<Item, List<TierScorer.Recipe<Item>>> recipeGraph(MinecraftServer mcServer) {
+    /**
+     * Every recipe of every type, as output item → recipes; recipes that can't be placed or have no result are skipped,
+     * except Farmer's Delight's cuts ({@link FarmersDelightCuts}). A cut that makes a raw ingredient of its own mod
+     * (minced beef, bacon, rice) goes to {@code rawCuts} instead: the only way to get that item, so it counts toward
+     * every dish made from it. A cut back to something obtained raw anyway (ham into porkchops) doesn't.
+     */
+    private static Map<Item, List<TierScorer.Recipe<Item>>> recipeGraph(MinecraftServer mcServer, Map<Item, List<TierScorer.Recipe<Item>>> rawCuts) {
         ContextMap context = SlotDisplayContext.fromLevel(mcServer.overworld());
         Map<Item, List<TierScorer.Recipe<Item>>> byOutput = new HashMap<>();
         for (RecipeHolder<?> holder : mcServer.getRecipeManager().getRecipes()) {
             Recipe<?> recipe = holder.value();
             List<Ingredient> ingredients;
-            try {
-                if (recipe.placementInfo().isImpossibleToPlace()) continue;
-                ingredients = recipe.placementInfo().ingredients();
-            } catch (RuntimeException e) {
-                continue; // a mod's recipe that can't describe itself
+            ItemStack result;
+            Optional<FarmersDelightCuts.Cut> cut = FarmersDelightCuts.read(recipe);
+            if (cut.isPresent()) {
+                ingredients = List.of(cut.get().input());
+                result = cut.get().result();
+            } else {
+                try {
+                    if (recipe.placementInfo().isImpossibleToPlace()) continue;
+                    ingredients = recipe.placementInfo().ingredients();
+                } catch (RuntimeException e) {
+                    continue; // a mod's recipe that can't describe itself
+                }
+                result = result(recipe, context);
             }
-            ItemStack result = result(recipe, context);
             if (result.isEmpty()) continue;
             List<Set<Item>> slots = new ArrayList<>();
             Set<Ingredient> seen = new LinkedHashSet<>();
@@ -233,8 +253,11 @@ public final class FoodProfiles {
             if (slots.isEmpty()) continue;
             String station = station(recipe.getType());
             int weight = STATION_WEIGHTS.getOrDefault(station, 1);
-            byOutput.computeIfAbsent(result.getItem(), k -> new ArrayList<>())
-                    .add(new TierScorer.Recipe<>(station, weight, List.copyOf(slots), result.getCount()));
+            TierScorer.Recipe<Item> step = new TierScorer.Recipe<>(station, weight, List.copyOf(slots), result.getCount());
+            Item made = result.getItem();
+            boolean rawCut = cut.isPresent() && made.builtInRegistryHolder().is(FoodTags.RAW_INGREDIENTS)
+                    && BuiltInRegistries.ITEM.getKey(made).getNamespace().equals(holder.id().identifier().getNamespace());
+            (rawCut ? rawCuts : byOutput).computeIfAbsent(made, k -> new ArrayList<>()).add(step);
         }
         return byOutput;
     }

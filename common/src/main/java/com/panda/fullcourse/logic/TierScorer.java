@@ -49,6 +49,14 @@ public final class TierScorer<T> {
 
         /** Placed meals get {@link #PLACED_BONUS}. */
         boolean placed(T item);
+
+        /**
+         * How a raw item is prepared when that is the only way to get it (a cut): its depth and stations count toward
+         * what's made from it, and the item itself stays the leaf.
+         */
+        default List<Recipe<T>> prep(T item) {
+            return List.of();
+        }
     }
 
     /**
@@ -90,6 +98,7 @@ public final class TierScorer<T> {
         Score<T> known = memo.get(item);
         if (known != null) return known;
         if (onStack.contains(item)) return null;
+        if (graph.raw(item) && !graph.prep(item).isEmpty()) return prepared(item);
         List<Recipe<T>> recipes = graph.raw(item) ? List.of() : graph.recipesFor(item);
         if (recipes.isEmpty()) {
             Score<T> leaf = Score.leaf(item);
@@ -114,6 +123,21 @@ public final class TierScorer<T> {
         if (bestScore == null && !cycled) bestScore = Score.leaf(item); // only unpacking recipes: a raw item
         if (bestScore != null) memo.put(item, bestScore);
         return bestScore;
+    }
+
+    /** A raw item through its cheapest preparation, still its own leaf; a leaf if every preparation cycles. */
+    private Score<T> prepared(T item) {
+        onStack.add(item);
+        Score<T> best = null;
+        for (Recipe<T> recipe : graph.prep(item)) {
+            Score<T> s = viaRecipe(recipe);
+            if (s != null && (best == null || s.score() < best.score())) best = s;
+        }
+        onStack.remove(item);
+        Score<T> out = best == null ? Score.leaf(item)
+                : new Score<>(best.depth() + best.stationWeight(), best.depth(), best.stations(), Set.of(item)); // one leaf: no leaf bonus
+        memo.put(item, out);
+        return out;
     }
 
     private boolean isUnpacking(Recipe<T> recipe) {

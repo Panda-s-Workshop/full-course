@@ -18,6 +18,7 @@ class TierScorerTest {
 
     private final Map<String, List<TierScorer.Recipe<String>>> recipes = new HashMap<>();
     private final Set<String> placed = new java.util.HashSet<>();
+    private final Map<String, List<TierScorer.Recipe<String>>> preps = new HashMap<>();
 
     private void r(String out, String station, String... ins) {
         r(out, station, 1, ins);
@@ -37,6 +38,7 @@ class TierScorerTest {
             @Override public boolean container(String item) { return CONTAINERS.contains(item); }
             @Override public boolean raw(String item) { return RAW.contains(item); }
             @Override public boolean placed(String item) { return placed.contains(item); }
+            @Override public List<TierScorer.Recipe<String>> prep(String item) { return preps.getOrDefault(item, List.of()); }
         });
     }
 
@@ -72,6 +74,32 @@ class TierScorerTest {
         r("shepherds_pie", "oven", "minced_meat", "chopped_onion", "baked_potato", "butter");
         r("roast_banquet", "oven", "cooked_chicken", "dough", "chopped_vegetables", "broth");
         placed.add("roast_banquet");
+    }
+
+    /** A raw item made only by a cut: the cut counts toward the dish, and the raw item stays its leaf. */
+    @Test
+    void aCutCountsTowardTheDishAndTheCutStaysTheLeaf() {
+        vanilla();
+        r("patty", "fire", "minced_beef");
+        TierScorer.Score<String> before = scorer().score("patty");
+        preps.put("minced_beef", List.of(new TierScorer.Recipe<>("cutting", 1, List.of(Set.of("beef")), 2)));
+        Set<String> raw = new java.util.HashSet<>(RAW);
+        raw.add("minced_beef");
+        TierScorer<String> withCut = new TierScorer<>(new TierScorer.Graph<>() {
+            @Override public List<TierScorer.Recipe<String>> recipesFor(String item) { return recipes.getOrDefault(item, List.of()); }
+            @Override public boolean culinary(String item) { return !NOT_CULINARY.contains(item); }
+            @Override public boolean container(String item) { return CONTAINERS.contains(item); }
+            @Override public boolean raw(String item) { return raw.contains(item); }
+            @Override public boolean placed(String item) { return placed.contains(item); }
+            @Override public List<TierScorer.Recipe<String>> prep(String item) { return preps.getOrDefault(item, List.of()); }
+        });
+        TierScorer.Score<String> patty = withCut.score("patty");
+        assertEquals(1, before.depth());
+        assertEquals(2, patty.depth(), "cut, then cooked");
+        assertEquals(Set.of("fire", "cutting"), patty.stations().keySet());
+        assertEquals(Set.of("minced_beef"), patty.leaves(), "the cut stays the leaf, so its own groups count");
+        assertEquals(before.score() + 2, patty.score());
+        assertEquals(new TierScorer.Score<>(2, 1, Map.of("cutting", 1), Set.of("minced_beef")), withCut.score("minced_beef"));
     }
 
     private int score(String item) {
