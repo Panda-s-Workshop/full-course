@@ -75,8 +75,18 @@ public final class FoodProfiles {
             server = compute(mcServer);
             computedFor = recipes;
             FullCourse.LOGGER.info("Full Course rated {} foods", server.size());
+            if (server.values().stream().noneMatch(p -> p.tier() == Tier.FEAST)) {
+                // the fifth meal slot asks for a feast: with none, it can't open
+                FullCourse.LOGGER.warn("Full Course: no food rates Feast with tierThresholds {}, so the fifth meal slot can't open; "
+                        + "lower the Feast threshold or set a feast's tier with a food profile", java.util.Arrays.toString(FullCourseConfig.tierThresholds()));
+            }
         }
         return server;
+    }
+
+    /** Whether some food rates Feast: the fifth meal slot needs one (the warning above, and a check). */
+    public static boolean anyFeast(MinecraftServer mcServer) {
+        return all(mcServer).values().stream().anyMatch(p -> p.tier() == Tier.FEAST);
     }
 
     /** The dish {@code item} is a serving of on the server, or the item itself. */

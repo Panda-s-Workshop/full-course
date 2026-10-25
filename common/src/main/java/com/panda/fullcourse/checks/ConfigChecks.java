@@ -170,11 +170,13 @@ final class ConfigChecks {
                 FoodProfiles.reset();
                 Tier tier = profile(c, Items.COOKED_BEEF).tier();
                 check(tier == Tier.RAW, "cooked beef is %s with thresholds from 100, expected Raw", tier);
+                check(!FoodProfiles.anyFeast(c.server()), "no food rates Feast from 104: the log warns of it");
             });
         } finally {
             FoodProfiles.reset();
         }
         Tier tier = profile(c, Items.COOKED_BEEF).tier();
         check(tier == Tier.SIMPLE, "cooked beef is %s again with the default thresholds, expected Simple", tier);
+        check(FoodProfiles.anyFeast(c.server()), "the feasts rate Feast with the default thresholds");
     }
 }
