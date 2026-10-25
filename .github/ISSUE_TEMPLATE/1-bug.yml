@@ -81,7 +81,7 @@ body:
     id: mods
     attributes:
       label: Other mods
-      description: Your mod list, the modpack's name and version, or "none". Mods that add enchantments matter most.
+      description: Your mod list, the modpack's name and version, or "none". Mods that add food, crops or cooking matter most.
     validations:
       required: true
 

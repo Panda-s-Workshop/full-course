@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
-import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.gui.handlers.IGuiClickableArea;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -28,11 +27,9 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.runtime.IRecipesGui;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
 /**
@@ -83,7 +80,7 @@ public final class FullCourseJeiPlugin implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        // the pot's arrow opens the pot page, and its "show recipes" tooltip carries the arrow's own lines
+        // the pot's arrow opens the pot page; the screen's own tooltip, placed below the arrow, says so
         registration.addGuiContainerHandler(CookingPotScreen.class, new IGuiContainerHandler<CookingPotScreen>() {
             @Override
             public Collection<IGuiClickableArea> getGuiClickableAreas(CookingPotScreen screen, double mouseX, double mouseY) {
@@ -95,9 +92,8 @@ public final class FullCourseJeiPlugin implements IModPlugin {
                     }
 
                     @Override
-                    public void getTooltip(ITooltipBuilder tooltip) {
-                        tooltip.addAll(screen.arrowLines());
-                        tooltip.add(Component.translatable("gui.fullcourse.jei.show_recipes").withStyle(ChatFormatting.GRAY));
+                    public boolean isTooltipEnabled() {
+                        return false;
                     }
 
                     @Override
@@ -107,7 +103,7 @@ public final class FullCourseJeiPlugin implements IModPlugin {
                 });
             }
         });
-        CookingPotScreen.arrowTooltipFromViewer = true;
+        CookingPotScreen.arrowOpensViewer = true;
         // JEI's panels stay out of the meal list beside the inventory
         registration.addGuiContainerHandler(InventoryScreen.class, new IGuiContainerHandler<InventoryScreen>() {
             @Override

@@ -31,8 +31,10 @@ public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
     /** Vanilla's dark red for text on a container panel. */
     private static final int STATUS_COLOR = 0xFFA0302A;
     public static final int FLAME_X = 49, FLAME_Y = 56, ARROW_X = 89, ARROW_Y = 26;
-    /** Set when a recipe viewer makes the arrow a button with its own tooltip, which then carries {@link #arrowLines()}. */
-    public static boolean arrowTooltipFromViewer;
+    /** Set when a recipe viewer makes the arrow a button that opens the pot's recipes; the arrow's tooltip then says so. */
+    public static boolean arrowOpensViewer;
+    /** Tooltips wrap at this width, so the longest still fits a small screen. */
+    private static final int WRAP = 200;
 
     public CookingPotScreen(CookingPotMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 176, 166);
@@ -65,21 +67,30 @@ public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
     protected void extractTooltip(GuiGraphicsExtractor g, int mouseX, int mouseY) {
         super.extractTooltip(g, mouseX, mouseY);
         if (isHovering(FLAME_X, FLAME_Y, 14, 14, mouseX, mouseY)) {
-            if (menu.heated()) {
-                g.setTooltipForNextFrame(font, Component.translatable("gui.fullcourse.pot.heated").withStyle(ChatFormatting.GOLD), mouseX, mouseY);
-            } else {
-                List<Component> lines = new ArrayList<>();
-                lines.add(Component.translatable("gui.fullcourse.pot.cold"));
-                lines.addAll(KitchenHeat.notes());
-                g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
-            }
-        } else if (!arrowTooltipFromViewer && isHovering(ARROW_X, ARROW_Y, 24, 16, mouseX, mouseY)) {
+            g.setTooltipForNextFrame(font, flameLines().stream().flatMap(c -> font.split(c, WRAP).stream()).toList(), mouseX, mouseY);
+        } else if (isHovering(ARROW_X, ARROW_Y, 24, 16, mouseX, mouseY)) {
             // below the arrow and wrapped to the room on its right, so the tooltip never covers the grid it talks about
             int room = Math.max(120, width - (leftPos + ARROW_X) - 12);
-            List<FormattedCharSequence> lines = arrowLines().stream().flatMap(c -> font.split(c, room).stream()).toList();
+            List<FormattedCharSequence> lines = arrowTooltip().stream().flatMap(c -> font.split(c, room).stream()).toList();
             var arrow = new ScreenRectangle(leftPos + ARROW_X, topPos + ARROW_Y, 24, 16);
             if (!lines.isEmpty()) g.setTooltipForNextFrame(font, lines, new BelowOrAboveWidgetTooltipPositioner(arrow), mouseX, mouseY, false);
         }
+    }
+
+    /** What the flame says: that the pot is heated, or what heats it. */
+    public List<Component> flameLines() {
+        if (menu.heated()) return List.of(Component.translatable("gui.fullcourse.pot.heated").withStyle(ChatFormatting.GOLD));
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable("gui.fullcourse.pot.cold"));
+        lines.addAll(KitchenHeat.notes());
+        return lines;
+    }
+
+    /** The arrow's tooltip: {@link #arrowLines()}, and with a recipe viewer, that a click shows the pot's recipes. */
+    public List<Component> arrowTooltip() {
+        List<Component> lines = new ArrayList<>(arrowLines());
+        if (arrowOpensViewer) lines.add(Component.translatable("gui.fullcourse.pot.click_recipes").withStyle(ChatFormatting.GRAY));
+        return lines;
     }
 
     /** What the arrow says: how far the dish is, and what the grid makes or still needs ({@link PotPreview}). */

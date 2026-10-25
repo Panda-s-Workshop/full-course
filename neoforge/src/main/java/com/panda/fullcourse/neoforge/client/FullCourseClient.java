@@ -66,7 +66,7 @@ public final class FullCourseClient {
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> ClientSync.disconnected());
         // before recipe viewers read them (JEI listens at the lowest priority); only an event that carries the kitchen's types
         NeoForge.EVENT_BUS.addListener(EventPriority.HIGH, false, (RecipesReceivedEvent e) -> {
-            if (ModRecipes.kitchenTypes().stream().anyMatch(e.getRecipeTypes()::contains)) {
+            if (e.getRecipeTypes().containsAll(ModRecipes.kitchenTypes())) {
                 KitchenRecipes.received(type -> e.getRecipeMap().byType((RecipeType) type));
             }
         });

@@ -2,13 +2,13 @@ body:
   - type: markdown
     attributes:
       value: |
-        Suggest rooms, creatures, enchantments and other improvements, and upvote the ideas you'd like most: votes help decide what comes next.
+        Suggest dishes, kitchen stations, meal benefits, mods to work with and other improvements, and upvote the ideas you'd like most: votes help decide what comes next.
 
   - type: textarea
     id: idea
     attributes:
       label: The idea
-      placeholder: A map room whose table shows where the nearest gate halls are.
+      placeholder: A soup that gives Night Vision, cooked from glow berries and mushrooms in the Cooking Pot.
     validations:
       required: true
 

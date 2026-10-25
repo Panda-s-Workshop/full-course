@@ -169,7 +169,7 @@ public final class FoodProfiles {
                 families = setFamilies.get();
             } else {
                 families = TierScorer.families(dish, score.leaves(), FoodProfiles::groupsOf, tier.benefits());
-                // a food whose ingredients belong to no group still counts: a good meal helps you heal (pillar 4)
+                // a food whose ingredients belong to no group still counts: a good meal helps you heal
                 if (families.isEmpty() && tier.benefits() > 0) families = List.of(Family.MENDING);
                 // a soup always mends: Mending takes the weakest-counted place if the count left it out
                 if (tier.benefits() > 0 && !families.contains(Family.MENDING) && dish.builtInRegistryHolder().is(FoodTags.SOUPS)) {
