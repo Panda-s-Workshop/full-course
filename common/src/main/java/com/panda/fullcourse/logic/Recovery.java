@@ -21,12 +21,13 @@ public final class Recovery {
     }
 
     /**
-     * Whether Recovery heals on this tick: once the delay after the last damage is over, then every {@code interval}.
+     * Whether Recovery heals on this tick: once the delay after the last damage is over, then every {@code interval};
+     * never on the tick of a hit, so a delay of 0 doesn't hand back half a heart of every hit at once.
      *
      * @param sinceDamage ticks since the player last took damage
      */
     public static boolean healsNow(long sinceDamage, int delayTicks, int interval) {
-        if (interval <= 0) return false;
+        if (interval <= 0 || sinceDamage <= 0) return false;
         long since = sinceDamage - delayTicks;
         return since >= 0 && since % interval == 0;
     }

@@ -22,6 +22,14 @@ class RecoveryTest {
     }
 
     @Test
+    void noDelayStillWaitsOneIntervalAfterAHit() {
+        assertFalse(Recovery.healsNow(0, 0, 80), "not on the tick of the hit");
+        assertFalse(Recovery.healsNow(79, 0, 80));
+        assertTrue(Recovery.healsNow(80, 0, 80));
+        assertTrue(Recovery.healsNow(160, 0, 80));
+    }
+
+    @Test
     void aRateOfZeroNeverHeals() {
         assertEquals(0, Recovery.interval(80, 0.0));
         for (long t = 0; t < 2000; t++) assertFalse(Recovery.healsNow(t, 160, 0));
