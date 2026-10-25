@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
@@ -104,6 +105,12 @@ public final class FoodText {
                 duration(p.tier().durationTicks(FullCourseConfig.durationMultiplier())));
         if (replaced != null) line = Component.translatable("message.fullcourse.meal_replaces", line, replaced);
         return line.withStyle(Style.EMPTY.withColor(p.tier().color() & 0xFFFFFF));
+    }
+
+    /** The action-bar line when meals run out: "Rabbit Stew wore off", "Steak, Bread wore off". */
+    public static Component mealEnded(List<Component> dishes) {
+        return Component.translatable("message.fullcourse.meal_ended", ComponentUtils.formatList(dishes, Component.literal(", ")))
+                .withStyle(ChatFormatting.GRAY);
     }
 
     /** The numbers in a family's effect text, from the same table the attribute modifiers use. */

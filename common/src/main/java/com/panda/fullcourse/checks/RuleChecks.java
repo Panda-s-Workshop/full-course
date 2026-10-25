@@ -654,6 +654,8 @@ public final class RuleChecks {
         Component message = FoodText.mealMessage(Items.RABBIT_STEW.getName(new ItemStack(Items.RABBIT_STEW)), profile(c, Items.RABBIT_STEW),
                 Map.of(Family.VIGOR, 3), Items.COOKED_BEEF.getName(new ItemStack(Items.COOKED_BEEF)));
         check(message.getString().equals("Rabbit Stew: Vigor II, Mending II · 10:00 · replaces Steak"), "a full row names the meal replaced: %s", message.getString());
+        String ended = FoodText.mealEnded(List.of(Items.RABBIT_STEW.getName(new ItemStack(Items.RABBIT_STEW)))).getString();
+        check(ended.equals("Rabbit Stew wore off"), "the line when a meal runs out: %s", ended);
         // Vigor III held elsewhere outranks this Vigor II: grey; Mending II adds something: the tier's colour
         Map<String, Integer> colours = new java.util.HashMap<>();
         message.visit((style, text) -> {

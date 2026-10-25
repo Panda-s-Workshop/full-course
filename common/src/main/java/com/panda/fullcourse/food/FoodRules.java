@@ -11,6 +11,7 @@ import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.platform.registry.DeferredHolder;
 import com.panda.fullcourse.registry.ModAttributes;
 import com.panda.fullcourse.registry.ModSounds;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import net.minecraft.ChatFormatting;
@@ -137,7 +138,13 @@ public final class FoodRules {
         if (s.meals().active().stream().anyMatch(m -> !BuiltInRegistries.ITEM.containsKey(m.dish()))) {
             s = s.withMeals(new Meals<>(s.meals().active().stream().filter(m -> BuiltInRegistries.ITEM.containsKey(m.dish())).toList()));
         }
-        if (s.meals().active().size() < before.meals().active().size()) cue(player, ModSounds.MEAL_END);
+        if (s.meals().active().size() < before.meals().active().size()) {
+            cue(player, ModSounds.MEAL_END);
+            List<Meals.Meal<Identifier>> kept = s.meals().active();
+            List<Component> ended = before.meals().active().stream().filter(m -> !kept.contains(m))
+                    .filter(m -> BuiltInRegistries.ITEM.containsKey(m.dish())).map(m -> itemName(m.dish())).toList();
+            if (!ended.isEmpty()) player.sendSystemMessage(FoodText.mealEnded(ended), true);
+        }
         if (now % SLOT_CHECK_TICKS == 0) s = unlockSlots(player, s);
         if (!FullCourseConfig.keepVanillaHunger()) {
             // naturalHealthRegeneration off (UHC packs): food heals nothing, as in vanilla
