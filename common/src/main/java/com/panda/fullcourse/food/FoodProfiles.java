@@ -253,7 +253,7 @@ public final class FoodProfiles {
             Optional<List<Family>> setFamilies = o != null && o.families().isPresent() ? o.families()
                     : dishOverride != null ? dishOverride.families() : Optional.empty();
             // a remedy has no tier: its own effects and the heal, no meal, so no stars to imply one
-            Tier tier = remedy || (setTier.isEmpty() && rawCuts.containsKey(dish)) ? Tier.RAW
+            Tier tier = remedy || (setTier.isEmpty() && (rawCuts.containsKey(dish) || dish.builtInRegistryHolder().is(FoodTags.NO_MEAL))) ? Tier.RAW
                     : setTier.map(Tier::ofStars).orElseGet(() -> Tier.fromScore(score.score(), thresholds));
             if (setTier.isEmpty() && cutThenCooked(score) && tier.stars() > Tier.SIMPLE.stars()) tier = Tier.SIMPLE;
             // Feast is a placed, shared dish's tier (one helping each): anything else stops at Gourmet unless a file says so

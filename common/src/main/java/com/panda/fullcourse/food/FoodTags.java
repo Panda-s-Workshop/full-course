@@ -19,6 +19,8 @@ public final class FoodTags {
     public static final TagKey<Item> RAW_INGREDIENTS = tag("raw_ingredients");
     /** Their vanilla effects only, plus the heal: no meal slot. */
     public static final TagKey<Item> REMEDIES = tag("remedies");
+    /** Edible steps on the way to a dish (dough, raw pasta): no meal, still counted in what's made from them. */
+    public static final TagKey<Item> NO_MEAL = tag("no_meal");
     /** Placed meals: +3 score. */
     public static final TagKey<Item> PLACED_MEALS = tag("placed_meals");
     /** Soups always give Mending. */

@@ -137,6 +137,7 @@ are Full Course's own recipes as shipped; a data pack's changed recipes rate cor
 | `culinary` | Not edible, but followed down its recipes as an ingredient (flour, sugar). Anything edible already is. |
 | `containers` | Bowls, bottles, buckets: ignored as ingredients. |
 | `remedies` | Their own effects and the heal only, no meal. |
+| `no_meal` | Edible steps on the way to a dish (another mod's dough, raw pasta, pie crust): they heal but give no meal, and still count in what's made from them. A file's `tier` wins over it. |
 | `placed_meals` | Placed and eaten as a block (feasts, cake): their score gets +3. A dish named only by a `serving_of` override (another mod's feast block) gets +1. Only these reach five stars from their score; anything else stops at four unless a file sets its tier. |
 | `soups` | Always give Mending. |
 | `groups/<family>` | The ingredients that give each benefit family to foods rated from their recipes. Full Course's own dishes, Grilled Fillet, Flatbread and cake have their families set in their food profiles, so these tags don't change them. |
