@@ -15,7 +15,12 @@ import com.panda.fullcourse.logic.Meals;
 import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.logic.Tier;
 import com.panda.fullcourse.platform.Services;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
@@ -30,6 +35,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.LevelResource;
 
 /**
  * {@code /fullcourse tier [item]}: what a food scores and gives, as its tooltip with Shift held, for the item named or
@@ -38,8 +44,11 @@ import net.minecraft.world.item.ItemStack;
  * themselves; asking about someone else needs operator rights.
  * {@code /fullcourse unlock <players> <slots>} (operators): raises the players' meal slots to that many, up to the
  * config's maximum. It never takes slots away, since the journal would give earned ones back.
+ * {@code /fullcourse dump} (operators): writes every food's rating to {@code fullcourse-profiles.csv} in the world folder.
  */
 public final class FullCourseCommand {
+    public static final String DUMP_FILE = "fullcourse-profiles.csv";
+
     private FullCourseCommand() {}
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
@@ -53,6 +62,9 @@ public final class FullCourseCommand {
                         .then(Commands.argument("player", EntityArgument.player())
                                 .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                                 .executes(c -> meals(c, EntityArgument.getPlayer(c, "player")))))
+                .then(Commands.literal("dump")
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .executes(FullCourseCommand::dump))
                 .then(Commands.literal("unlock")
                         .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.argument("players", EntityArgument.players())
@@ -105,6 +117,22 @@ public final class FullCourseCommand {
         String time = FoodText.duration((int) Math.min(Integer.MAX_VALUE, meal.remaining(now)));
         return Component.translatable("command.fullcourse.meals.meal", name, "★".repeat(meal.tier().stars()), time,
                 Component.translatable("enchantment.level." + meal.level()), families).withStyle(Style.EMPTY.withColor(meal.tier().color() & 0xFFFFFF));
+    }
+
+    /** Writes {@link FoodProfiles#dump} to the world folder. Returns the number of foods written. */
+    private static int dump(CommandContext<CommandSourceStack> c) {
+        CommandSourceStack source = c.getSource();
+        List<String> lines = FoodProfiles.dump(source.getServer());
+        Path file = source.getServer().getWorldPath(LevelResource.ROOT).resolve(DUMP_FILE);
+        try {
+            Files.write(file, lines, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            source.sendFailure(Component.translatable("command.fullcourse.dump.failed", DUMP_FILE, e.getMessage()));
+            return 0;
+        }
+        int n = lines.size() - 1;
+        source.sendSuccess(() -> Component.translatable("command.fullcourse.dump.done", n, DUMP_FILE), false);
+        return n;
     }
 
     /** Raises each player to {@code slots} meal slots. Returns how many players gained a slot. */

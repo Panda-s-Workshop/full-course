@@ -41,6 +41,8 @@
   "block.fullcourse.roast_banquet": "Roast Banquet",
   "block.fullcourse.wild_ember_peppers": "Wild Ember Peppers",
   "block.fullcourse.wild_onions": "Wild Onions",
+  "command.fullcourse.dump.done": "Wrote %s foods to %s in the world folder",
+  "command.fullcourse.dump.failed": "Couldn't write %s: %s",
   "command.fullcourse.meals.header": "%s: %s of %s meal slots, %s dishes tasted",
   "command.fullcourse.meals.meal": "%s %s · %s · %s · %s",
   "command.fullcourse.meals.none": "No meals",

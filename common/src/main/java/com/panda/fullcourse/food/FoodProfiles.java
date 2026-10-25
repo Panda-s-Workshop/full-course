@@ -69,6 +69,25 @@ public final class FoodProfiles {
         return all(mcServer).getOrDefault(item, Profile.NONE);
     }
 
+    /**
+     * Every rated food as CSV, a header line first, sorted by item id: what {@code /fullcourse dump} writes so a pack
+     * maker can audit a large pack's ratings in a spreadsheet.
+     */
+    public static List<String> dump(MinecraftServer mcServer) {
+        List<String> out = new ArrayList<>();
+        out.add("item,stars,tier,score,steps,stations,ingredients,families,remedy");
+        all(mcServer).entrySet().stream()
+                .sorted(Map.Entry.comparingByKey(java.util.Comparator.comparing(i -> BuiltInRegistries.ITEM.getKey(i).toString())))
+                .forEach(e -> {
+                    Profile p = e.getValue();
+                    out.add(String.join(",", BuiltInRegistries.ITEM.getKey(e.getKey()).toString(), String.valueOf(p.tier().stars()),
+                            p.tier().name().toLowerCase(java.util.Locale.ROOT), String.valueOf(p.score()), String.valueOf(p.steps()),
+                            String.valueOf(p.stations()), String.valueOf(p.ingredients()),
+                            p.families().stream().map(Family::key).collect(java.util.stream.Collectors.joining(" ")), String.valueOf(p.remedy())));
+                });
+        return out;
+    }
+
     public static synchronized Map<Item, Profile> all(MinecraftServer mcServer) {
         RecipeManager recipes = mcServer.getRecipeManager();
         if (recipes != computedFor) {

@@ -40,6 +40,8 @@ ingredients), the stronger and longer its benefits. Every food from every mod ge
   Naming another player needs operator rights.
 - `/fullcourse unlock <players> <slots>` (operators): raises the players' meal slots to that many, up to the config's
   maximum. It never takes slots away.
+- `/fullcourse dump` (operators): writes every food's tier, score, recipe chain and families to
+  `fullcourse-profiles.csv` in the world folder, one line per food, to check a large pack's ratings in a spreadsheet.
 
 ## Configuration
 

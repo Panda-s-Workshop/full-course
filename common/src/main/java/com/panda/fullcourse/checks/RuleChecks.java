@@ -114,6 +114,7 @@ public final class RuleChecks {
         CHECKS.put("cake_slice_gives_meal", RuleChecks::cakeSliceGivesMeal);
         CHECKS.put("cake_one_helping", RuleChecks::cakeOneHelping);
         CHECKS.put("tooltip_lines", RuleChecks::tooltipLines);
+        CHECKS.put("dump_lists_every_food", RuleChecks::dumpListsEveryFood);
         KitchenChecks.register(CHECKS);
         ConfigChecks.register(CHECKS);
     }
@@ -486,6 +487,18 @@ public final class RuleChecks {
         families(c, Items.MUSHROOM_STEW, List.of(Family.MENDING));
         families(c, Items.PUMPKIN_PIE, List.of(Family.VIGOR, Family.FORTUNE));
         families(c, Items.CAKE, List.of(Family.FORTUNE, Family.DILIGENCE)); // cake's profile override
+    }
+
+    /** {@code /fullcourse dump}'s lines: a header, then one line per rated food with its tier and families. */
+    private static void dumpListsEveryFood(Ctx c) {
+        MinecraftServer server = c.player().level().getServer();
+        List<String> lines = FoodProfiles.dump(server);
+        check(lines.size() == FoodProfiles.all(server).size() + 1, "%s lines for %s foods", lines.size(), FoodProfiles.all(server).size());
+        check(lines.getFirst().startsWith("item,stars,tier,score"), "the header: %s", lines.getFirst());
+        Profile stew = profile(c, Items.RABBIT_STEW);
+        String expected = "minecraft:rabbit_stew,3,hearty," + stew.score() + "," + stew.steps() + "," + stew.stations() + "," + stew.ingredients()
+                + ",vigor mending,false";
+        check(lines.contains(expected), "no line %s", expected);
     }
 
     private static void families(Ctx c, Item item, List<Family> expected) {
