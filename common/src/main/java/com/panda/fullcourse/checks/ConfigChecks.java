@@ -145,6 +145,16 @@ final class ConfigChecks {
             eat(c, Items.COOKED_BEEF, c.t());
             FoodRules.onDeath(c.player());
             check(dishes(c).equals(List.of(id(Items.COOKED_BEEF))), "meals kept on death: %s", dishes(c));
+            // the respawned player keeps a Vigor meal and comes back at its full max health, not the 20 it starts with
+            eat(c, Items.RABBIT_STEW, c.t());
+            var respawned = new net.minecraft.server.level.ServerPlayer(c.server(), c.level(),
+                    new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "fc_respawn"), net.minecraft.server.level.ClientInformation.createDefault());
+            respawned.restoreFrom(c.player(), false);
+            // NeoForge copies the state in restoreFrom; Fabric copies it later in the respawn, which a test player skips
+            if (FoodRules.state(respawned).meals().active().isEmpty()) Services.PLATFORM.setFoodState(respawned, FoodRules.state(c.player()));
+            FoodRules.tick(respawned, c.t() + 1);
+            check(respawned.getMaxHealth() == 24F, "max health after respawn %s, expected 24", respawned.getMaxHealth());
+            check(Math.abs(respawned.getHealth() - 24F) < 0.01F, "health after respawn %s, expected 24", respawned.getHealth());
         });
     }
 
