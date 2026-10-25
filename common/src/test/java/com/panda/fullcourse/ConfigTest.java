@@ -58,7 +58,7 @@ class ConfigTest {
         Properties p = new Properties();
         p.setProperty("keepVanillaHunger", " TRUE ");
         p.setProperty("recoveryDelaySeconds", "9999");
-        p.setProperty("recoveryIntervalTicks", "0");
+        p.setProperty("recoveryIntervalTicks", "-5");
         p.setProperty("startingMealSlots", "3");
         p.setProperty("maxMealSlots", "seven");
         p.setProperty("keepMealsOnDeath", "yes");
@@ -67,7 +67,7 @@ class ConfigTest {
         var c = new PropertiesConfig(p);
         assertTrue(c.keepVanillaHunger());
         assertEquals(600, c.recoveryDelaySeconds());
-        assertEquals(1, c.recoveryIntervalTicks());
+        assertEquals(0, c.recoveryIntervalTicks(), "clamped to 0, which turns Recovery off");
         assertEquals(3, c.startingMealSlots());
         assertEquals(FullCourseConfig.DEFAULTS.maxMealSlots(), c.maxMealSlots());
         assertFalse(c.keepMealsOnDeath(), "a word other than true or false keeps the default");

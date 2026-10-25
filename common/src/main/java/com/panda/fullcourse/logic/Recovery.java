@@ -15,9 +15,12 @@ public final class Recovery {
         return interval(baseTicks, 1 + 0.5 * Math.max(0, mendingLevel));
     }
 
-    /** The interval at a recovery rate ({@code fullcourse:recovery_rate}): the base divided by the rate, 0 for none. */
+    /**
+     * The interval at a recovery rate ({@code fullcourse:recovery_rate}): the base divided by the rate; 0 (no Recovery)
+     * for a rate of 0 or a base of 0, which the config uses to turn Recovery off.
+     */
     public static int interval(int baseTicks, double rate) {
-        return rate <= 0 ? 0 : (int) Math.max(1, Math.round(baseTicks / rate));
+        return rate <= 0 || baseTicks <= 0 ? 0 : (int) Math.max(1, Math.round(baseTicks / rate));
     }
 
     /**

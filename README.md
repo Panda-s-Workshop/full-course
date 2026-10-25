@@ -59,7 +59,7 @@ neither Recovery nor food. Healing potions, golden apples and other effects stil
 |---|---|---|
 | `keepVanillaHunger` | `false` | Keep the vanilla food bar and regeneration. Meals still give their benefits, except Mending: with Recovery off it has nothing to speed up (tooltips say so). |
 | `recoveryDelaySeconds` | `8` | Seconds without taking damage before health starts coming back (0–600). |
-| `recoveryIntervalTicks` | `80` | Ticks between heals of 1 HP, before meal benefits shorten it (1–12000). |
+| `recoveryIntervalTicks` | `80` | Ticks between heals of 1 HP, before meal benefits shorten it (0–12000; 0 turns Recovery off, and food still heals). |
 | `startingMealSlots` | `2` | Meal slots a new player has (1–16). |
 | `maxMealSlots` | `5` | The most meal slots a player can have (1–16). The Tasting Journal opens three past the starting slots; `/fullcourse unlock` can go up to this. |
 | `keepMealsOnDeath` | `false` | Keep held meals through death. |

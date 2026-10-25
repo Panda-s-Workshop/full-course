@@ -30,6 +30,12 @@ class RecoveryTest {
     }
 
     @Test
+    void anIntervalOfZeroTurnsRecoveryOff() {
+        assertEquals(0, Recovery.interval(0, 1.0));
+        assertEquals(0, Recovery.interval(0, 4));
+    }
+
+    @Test
     void aRateOfZeroNeverHeals() {
         assertEquals(0, Recovery.interval(80, 0.0));
         for (long t = 0; t < 2000; t++) assertFalse(Recovery.healsNow(t, 160, 0));

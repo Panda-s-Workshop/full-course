@@ -48,9 +48,11 @@ public final class FoodText {
             if (nutrition > 0) out.add(heal(nutrition).withStyle(ChatFormatting.GRAY));
         } else {
             for (Family family : p.families()) {
-                if (hunger && family == Family.MENDING) {
+                if (family == Family.MENDING && (hunger || FullCourseConfig.recoveryIntervalTicks() <= 0)) {
+                    // Mending speeds Recovery up, which vanilla hunger or an interval of 0 turns off
                     out.add(benefit(family, tier.level()).withStyle(ChatFormatting.DARK_GRAY)
-                            .append(Component.translatable("tooltip.fullcourse.no_recovery").withStyle(ChatFormatting.DARK_GRAY)));
+                            .append(Component.translatable(hunger ? "tooltip.fullcourse.no_recovery" : "tooltip.fullcourse.recovery_off")
+                                    .withStyle(ChatFormatting.DARK_GRAY)));
                 } else {
                     out.add(benefit(family, tier.level()).withStyle(ChatFormatting.BLUE));
                 }

@@ -14,7 +14,7 @@ public final class PropertiesConfig implements FullCourseConfig.Source {
              Full Course (read once at startup: restart after editing)
              keepVanillaHunger: keep vanilla hunger and regeneration; Full Course only adds meal benefits (true/false)
              recoveryDelaySeconds: seconds without taking damage before Recovery starts healing (0-600)
-             recoveryIntervalTicks: ticks between Recovery heals of 1 HP, before Mending (1-12000)
+             recoveryIntervalTicks: ticks between Recovery heals of 1 HP, before Mending (0-12000; 0 turns Recovery off)
              startingMealSlots: meal slots a new player has (1-16)
              maxMealSlots: the most meal slots a player can have (1-16); the journal opens three past the starting slots
              keepMealsOnDeath: keep held meals through death (true/false)
@@ -36,7 +36,7 @@ public final class PropertiesConfig implements FullCourseConfig.Source {
         FullCourseConfig.Source d = FullCourseConfig.DEFAULTS;
         keepVanillaHunger = bool(p.getProperty("keepVanillaHunger"), d.keepVanillaHunger());
         recoveryDelaySeconds = clamp(p.getProperty("recoveryDelaySeconds"), d.recoveryDelaySeconds(), 0, 600);
-        recoveryIntervalTicks = clamp(p.getProperty("recoveryIntervalTicks"), d.recoveryIntervalTicks(), 1, 12000);
+        recoveryIntervalTicks = clamp(p.getProperty("recoveryIntervalTicks"), d.recoveryIntervalTicks(), 0, 12000);
         startingMealSlots = clamp(p.getProperty("startingMealSlots"), d.startingMealSlots(), 1, 16);
         maxMealSlots = clamp(p.getProperty("maxMealSlots"), d.maxMealSlots(), 1, 16);
         keepMealsOnDeath = bool(p.getProperty("keepMealsOnDeath"), d.keepMealsOnDeath());

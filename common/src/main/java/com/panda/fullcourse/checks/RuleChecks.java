@@ -1,6 +1,7 @@
 package com.panda.fullcourse.checks;
 
 import com.mojang.authlib.GameProfile;
+import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.Benefits;
 import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodRules;
@@ -654,6 +655,12 @@ public final class RuleChecks {
         Component message = FoodText.mealMessage(Items.RABBIT_STEW.getName(new ItemStack(Items.RABBIT_STEW)), profile(c, Items.RABBIT_STEW),
                 Map.of(Family.VIGOR, 3), Items.COOKED_BEEF.getName(new ItemStack(Items.COOKED_BEEF)));
         check(message.getString().equals("Rabbit Stew: Vigor II, Mending II · 10:00 · replaces Steak"), "a full row names the meal replaced: %s", message.getString());
+        var off = FullCourseConfig.snapshot();
+        FullCourseConfig.with(new FullCourseConfig.Snapshot(false, off.recoveryDelaySeconds(), 0, off.startingMealSlots(), off.maxMealSlots(),
+                off.keepMealsOnDeath(), off.durationMultiplier(), off.tierThresholds(), off.slotMilestones()), () -> {
+            List<String> mends = text(c, Items.RABBIT_STEW, false, false);
+            check(mends.get(2).equals("Mending II: +100% Recovery · Recovery is off here"), "Mending with Recovery off: %s", mends.get(2));
+        });
         String ended = FoodText.mealEnded(List.of(Items.RABBIT_STEW.getName(new ItemStack(Items.RABBIT_STEW)))).getString();
         check(ended.equals("Rabbit Stew wore off"), "the line when a meal runs out: %s", ended);
         // Vigor III held elsewhere outranks this Vigor II: grey; Mending II adds something: the tier's colour

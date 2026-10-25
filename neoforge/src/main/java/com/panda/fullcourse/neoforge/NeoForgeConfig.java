@@ -20,10 +20,10 @@ public final class NeoForgeConfig implements FullCourseConfig.Source {
             .worldRestart()
             .defineInRange("recoveryDelaySeconds", D.recoveryDelaySeconds(), 0, 600);
     private static final ModConfigSpec.IntValue RECOVERY_INTERVAL = B
-            .comment("Ticks between Recovery heals of 1 HP, before Mending.")
+            .comment("Ticks between Recovery heals of 1 HP, before Mending. 0 turns Recovery off.")
             .translation("fullcourse.configuration.recoveryIntervalTicks")
             .worldRestart()
-            .defineInRange("recoveryIntervalTicks", D.recoveryIntervalTicks(), 1, 12000);
+            .defineInRange("recoveryIntervalTicks", D.recoveryIntervalTicks(), 0, 12000);
     private static final ModConfigSpec.IntValue STARTING_SLOTS = B
             .comment("Meal slots a new player has.")
             .translation("fullcourse.configuration.startingMealSlots")
