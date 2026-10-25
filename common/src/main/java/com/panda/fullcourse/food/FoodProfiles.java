@@ -199,9 +199,9 @@ public final class FoodProfiles {
                 families = TierScorer.families(dish, score.leaves(), FoodProfiles::groupsOf, tier.benefits());
                 // a food whose ingredients belong to no group still counts: a good meal helps you heal
                 if (families.isEmpty() && tier.benefits() > 0) families = List.of(Family.MENDING);
-                // a soup always mends: Mending takes the weakest-counted place if the count left it out
+                // a soup always mends: Mending joins if the tier has room, else takes the weakest-counted place
                 if (tier.benefits() > 0 && !families.contains(Family.MENDING) && dish.builtInRegistryHolder().is(FoodTags.SOUPS)) {
-                    List<Family> withMending = new ArrayList<>(families.subList(0, families.size() - 1));
+                    List<Family> withMending = new ArrayList<>(families.size() < tier.benefits() ? families : families.subList(0, families.size() - 1));
                     withMending.add(Family.MENDING);
                     families = List.copyOf(withMending);
                 }
