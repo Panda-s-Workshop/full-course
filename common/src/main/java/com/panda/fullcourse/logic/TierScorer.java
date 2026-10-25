@@ -21,6 +21,8 @@ import java.util.Set;
 public final class TierScorer<T> {
     /** Score added to placed meals (feasts, cake): assembling one is a step of its own. */
     public static final int PLACED_BONUS = 3;
+    /** Score added to a dish served from another mod's block: it's assembled, but its servings aren't a feast's. */
+    public static final int SERVED_BONUS = 1;
     /** A single-ingredient recipe that yields this many or more from a non-culinary item is unpacking (hay → wheat). */
     public static final int UNPACK_COUNT = 4;
 
@@ -49,6 +51,11 @@ public final class TierScorer<T> {
 
         /** Placed meals get {@link #PLACED_BONUS}. */
         boolean placed(T item);
+
+        /** Other dishes served from a block get {@link #SERVED_BONUS}. */
+        default boolean served(T item) {
+            return false;
+        }
 
         /**
          * How a raw item is prepared when that is the only way to get it (a cut): its depth and stations count toward
@@ -85,12 +92,13 @@ public final class TierScorer<T> {
         this.graph = graph;
     }
 
-    /** The item's score with the placed-meal bonus. */
+    /** The item's score with the placed-meal or served-dish bonus. */
     public Score<T> score(T item) {
         Score<T> base = best(item);
         if (base == null) base = Score.leaf(item);
-        if (!graph.placed(item)) return base;
-        return new Score<>(base.score() + PLACED_BONUS, base.depth(), base.stations(), base.leaves());
+        int bonus = graph.placed(item) ? PLACED_BONUS : graph.served(item) ? SERVED_BONUS : 0;
+        if (bonus == 0) return base;
+        return new Score<>(base.score() + bonus, base.depth(), base.stations(), base.leaves());
     }
 
     /** The cheapest chain to the item, or null when every recipe for it runs into a cycle. */

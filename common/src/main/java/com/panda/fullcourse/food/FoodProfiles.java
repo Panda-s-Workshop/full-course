@@ -115,7 +115,8 @@ public final class FoodProfiles {
         Map<Item, List<TierScorer.Recipe<Item>>> rawCuts = new HashMap<>();
         Map<Item, List<TierScorer.Recipe<Item>>> byOutput = recipeGraph(mcServer, rawCuts);
         Map<Item, ProfileOverride> overrides = overrides(mcServer);
-        // a dish served from a block (a feast, a pie cut into slices) is a placed meal, whether or not it's tagged one
+        // a dish served from a block (a feast, a pie cut into slices) is assembled: a step, though only the tagged placed
+        // meals (our feasts, cake) are feasts
         Set<Item> servedFrom = new HashSet<>();
         for (ProfileOverride o : overrides.values()) o.servingOf().filter(dish -> !isFood(dish)).ifPresent(servedFrom::add);
         // putting the slices back together (four slices make a pie) is no way to make the dish
@@ -151,7 +152,12 @@ public final class FoodProfiles {
 
             @Override
             public boolean placed(Item item) {
-                return item.builtInRegistryHolder().is(FoodTags.PLACED_MEALS) || servedFrom.contains(item);
+                return item.builtInRegistryHolder().is(FoodTags.PLACED_MEALS);
+            }
+
+            @Override
+            public boolean served(Item item) {
+                return servedFrom.contains(item);
             }
         });
         int[] thresholds = FullCourseConfig.tierThresholds();

@@ -18,6 +18,7 @@ class TierScorerTest {
 
     private final Map<String, List<TierScorer.Recipe<String>>> recipes = new HashMap<>();
     private final Set<String> placed = new java.util.HashSet<>();
+    private final Set<String> served = new java.util.HashSet<>();
     private final Map<String, List<TierScorer.Recipe<String>>> preps = new HashMap<>();
 
     private void r(String out, String station, String... ins) {
@@ -38,6 +39,7 @@ class TierScorerTest {
             @Override public boolean container(String item) { return CONTAINERS.contains(item); }
             @Override public boolean raw(String item) { return RAW.contains(item); }
             @Override public boolean placed(String item) { return placed.contains(item); }
+            @Override public boolean served(String item) { return served.contains(item); }
             @Override public List<TierScorer.Recipe<String>> prep(String item) { return preps.getOrDefault(item, List.of()); }
         });
     }
@@ -108,6 +110,16 @@ class TierScorerTest {
 
     private Tier tier(String item) {
         return Tier.fromScore(score(item), Tier.DEFAULT_THRESHOLDS);
+    }
+
+    @Test
+    void anotherModsServedDishGetsOneNotThree() {
+        r("bread", "crafting", "wheat");
+        r("pie_block", "crafting", "bread", "beef");
+        served.add("pie_block");
+        assertEquals(4, score("pie_block"), "2 steps + 1 station + served bonus 1");
+        placed.add("pie_block");
+        assertEquals(6, score("pie_block"), "a placed meal's bonus is 3, and replaces the served one");
     }
 
     @Test

@@ -99,7 +99,7 @@ puts a replaced file back to the scored values.
 | `culinary` | Not edible, but followed down its recipes as an ingredient (flour, sugar). Anything edible already is. |
 | `containers` | Bowls, bottles, buckets: ignored as ingredients. |
 | `remedies` | Their own effects and the heal only, no meal. |
-| `placed_meals` | Placed and eaten as a block (feasts, cake): their score gets +3. |
+| `placed_meals` | Placed and eaten as a block (feasts, cake): their score gets +3. A dish named only by a `serving_of` override (another mod's feast block) gets +1. |
 | `soups` | Always give Mending. |
 | `groups/<family>` | The ingredients that give each benefit family. |
 | `journal_foods` | The "any simple dish" the Tasting Journal's recipe takes. |
