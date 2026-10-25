@@ -53,6 +53,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
         BlockEntityRenderers.register(ModBlockEntities.CUTTING_BOARD.get(), CuttingBoardRenderer::new);
         BlockColorRegistry.register(List.of(new PotSoupTint()), ModBlocks.COOKING_POT.get());
         // the meal row replaces the food bar, sits above the mount's hearts when riding, and lifts the air bubbles over it
+        // (and over the held-food marker above it)
         HudElementRegistry.replaceElement(VanillaHudElements.FOOD_BAR, vanilla -> (g, delta) -> {
             if (!MealHud.active()) vanilla.extractRenderState(g, delta);
         });
@@ -67,7 +68,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
                 return;
             }
             g.pose().pushMatrix();
-            g.pose().translate(0, -(MealHud.lift() - 10));
+            g.pose().translate(0, -(MealHud.lift() - 10 + MealHud.MARKER_ROOM));
             vanilla.extractRenderState(g, delta);
             g.pose().popMatrix();
         });
@@ -79,7 +80,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
                 return;
             }
             g.pose().pushMatrix();
-            g.pose().translate(0, -(MealHud.lift() - 10 + 10 * MealHud.vehicleHeartRows(player)));
+            g.pose().translate(0, -(MealHud.lift() - 10 + MealHud.MARKER_ROOM + 10 * MealHud.vehicleHeartRows(player)));
             vanilla.extractRenderState(g, delta);
             g.pose().popMatrix();
         });
@@ -87,7 +88,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
         // keep vanilla's spacing and the message clears the row too; NeoForge already stacks it above the HUD
         HudElementRegistry.replaceElement(VanillaHudElements.OVERLAY_MESSAGE, vanilla -> (g, delta) -> {
             var player = Minecraft.getInstance().player;
-            int lift = player == null || !MealHud.active() ? 0 : Math.max(0, MealHud.lift() - 10 + 10 * MealHud.vehicleHeartRows(player));
+            int lift = player == null || !MealHud.active() ? 0 : Math.max(0, MealHud.lift() - 10 + MealHud.MARKER_ROOM + 10 * MealHud.vehicleHeartRows(player));
             if (lift == 0) {
                 vanilla.extractRenderState(g, delta);
                 return;
