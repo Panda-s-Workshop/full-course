@@ -53,6 +53,7 @@ public final class FoodProfiles {
     /** The keys an override file may have. */
     private static final List<String> OVERRIDE_KEYS = List.of("tier", "families", "remedy", "serving_of");
     private static List<String> overrideWarnings = List.of();
+    private static Map<String, Integer> unreadRecipes = Map.of();
     /** The crock counts double: patience is effort. */
     private static final Map<String, Integer> STATION_WEIGHTS = Map.of("fullcourse:fermenting", 2);
 
@@ -327,30 +328,58 @@ public final class FoodProfiles {
     /**
      * Every recipe of every type, as output item → recipes. A recipe that can't be placed is read from its own fields
      * instead (Farmer's Delight's cuts, {@link FarmersDelightCuts}; machine records, {@link RecipeFields}), or counted
-     * and logged as unread. A cut that makes a raw ingredient of its own mod
+     * and logged as unread, with the foods left raw for it where they're known. A cut that makes a raw ingredient of its own mod
      * (minced beef, bacon, rice) goes to {@code rawCuts} instead: the only way to get that item, so it counts toward
      * every dish made from it. A cut back to something obtained raw anyway (ham into porkchops) doesn't.
      */
     private static Map<Item, List<TierScorer.Recipe<Item>>> recipeGraph(MinecraftServer mcServer, Map<Item, List<TierScorer.Recipe<Item>>> rawCuts) {
         ContextMap context = SlotDisplayContext.fromLevel(mcServer.overworld());
         Map<Item, List<TierScorer.Recipe<Item>>> byOutput = new HashMap<>();
-        Map<String, Integer> unread = new java.util.TreeMap<>();
+        Unread unread = new Unread(new java.util.TreeMap<>(), new LinkedHashSet<>());
         for (RecipeHolder<?> holder : mcServer.getRecipeManager().getRecipes()) {
             try {
                 add(holder, context, byOutput, rawCuts, unread);
             } catch (RuntimeException e) {
-                unread.merge(station(holder.value().getType()), 1, Integer::sum); // one mod's broken recipe isn't everyone's table
+                unread.add(holder, ItemStack.EMPTY); // one mod's broken recipe isn't everyone's table
             }
         }
-        if (!unread.isEmpty()) {
+        unreadRecipes = Map.copyOf(unread.types());
+        if (!unread.types().isEmpty()) {
+            List<String> raw = unread.foods().stream().filter(f -> !byOutput.containsKey(f) && !rawCuts.containsKey(f))
+                    .map(f -> BuiltInRegistries.ITEM.getKey(f).toString()).sorted().toList();
             FullCourse.LOGGER.info("Full Course couldn't read the ingredients of {} recipes ({}); a food made only by them rates as raw "
-                    + "unless a food_profiles override rates it", unread.values().stream().mapToInt(Integer::intValue).sum(), unread);
+                    + "unless a food_profiles override rates it{}", unread.types().values().stream().mapToInt(Integer::intValue).sum(),
+                    unread.types(), raw.isEmpty() ? "" : ". Made only by them: " + String.join(", ", raw));
         }
         return byOutput;
     }
 
+    /** The recipes the last rating couldn't read, counted by type as logged: for pack makers' checks. */
+    public static Map<String, Integer> unreadRecipes() {
+        return unreadRecipes;
+    }
+
+    /**
+     * Recipes that couldn't be read, by type, and the foods they make where that's known. A crafting recipe is counted
+     * under its mod, since another mod's special crafting is typed as vanilla's.
+     */
+    private record Unread(Map<String, Integer> types, Set<Item> foods) {
+        void add(RecipeHolder<?> holder, ItemStack result) {
+            String type = station(holder.value().getType());
+            if (!type.contains(":")) type += " from " + holder.id().identifier().getNamespace();
+            types.merge(type, 1, Integer::sum);
+            if (!result.isEmpty() && isFood(result.getItem())) foods.add(result.getItem());
+        }
+    }
+
+    /** Vanilla's own recipe of a vanilla type: its unreadable ones (special crafting, smithing) make no food. */
+    private static boolean vanilla(RecipeHolder<?> holder) {
+        Identifier type = BuiltInRegistries.RECIPE_TYPE.getKey(holder.value().getType());
+        return holder.id().identifier().getNamespace().equals("minecraft") && (type == null || type.getNamespace().equals("minecraft"));
+    }
+
     private static void add(RecipeHolder<?> holder, ContextMap context, Map<Item, List<TierScorer.Recipe<Item>>> byOutput,
-                            Map<Item, List<TierScorer.Recipe<Item>>> rawCuts, Map<String, Integer> unread) {
+                            Map<Item, List<TierScorer.Recipe<Item>>> rawCuts, Unread unread) {
         Recipe<?> recipe = holder.value();
         List<Ingredient> ingredients;
         ItemStack result;
@@ -361,13 +390,17 @@ public final class FoodProfiles {
         } else if (!recipe.placementInfo().isImpossibleToPlace()) {
             ingredients = recipe.placementInfo().ingredients();
             result = result(recipe, context);
+            // a recipe that shows no result may still hold one in its fields
+            if (result.isEmpty()) result = RecipeFields.read(recipe).map(RecipeFields.Read::result).orElse(ItemStack.EMPTY);
+            if (result.isEmpty()) {
+                if (!vanilla(holder)) unread.add(holder, ItemStack.EMPTY);
+                return;
+            }
         } else {
             Optional<RecipeFields.Read> fields = RecipeFields.read(recipe);
-            if (fields.isEmpty()) {
-                String type = station(recipe.getType());
-                // vanilla's own unplaceable recipes (special crafting, smithing) make no food; other mods' may (Create
-                // marks every machine recipe special)
-                if (type.contains(":") && !type.startsWith("minecraft:")) unread.merge(type, 1, Integer::sum);
+            if (fields.isEmpty() || fields.get().unread()) {
+                // other mods' unplaceable recipes may make food (Create marks every machine recipe special)
+                if (!vanilla(holder)) unread.add(holder, fields.map(RecipeFields.Read::result).orElseGet(() -> result(recipe, context)));
                 return;
             }
             ingredients = fields.get().ingredients();
@@ -382,13 +415,14 @@ public final class FoodProfiles {
             ingredient.items().forEach(h -> alternatives.add(h.value()));
             if (!alternatives.isEmpty()) slots.add(alternatives);
         }
-        if (slots.isEmpty()) return;
+        // fluids alone (Create's chocolate from melted chocolate) make it in one step at that station
+        if (slots.isEmpty() && !ingredients.isEmpty()) return;
         String station = station(recipe.getType());
         int weight = STATION_WEIGHTS.getOrDefault(station, 1);
         TierScorer.Recipe<Item> step = new TierScorer.Recipe<>(station, weight, List.copyOf(slots), result.getCount());
         Item made = result.getItem();
         // a cut of food (beef, a rice panicle), not of a wild plant's bush back into its crop
-        boolean culinaryInput = slots.getFirst().stream().anyMatch(i -> isFood(i) || i.builtInRegistryHolder().is(FoodTags.CULINARY));
+        boolean culinaryInput = !slots.isEmpty() && slots.getFirst().stream().anyMatch(i -> isFood(i) || i.builtInRegistryHolder().is(FoodTags.CULINARY));
         boolean rawCut = cut.isPresent() && culinaryInput && made.builtInRegistryHolder().is(FoodTags.RAW_INGREDIENTS)
                 && BuiltInRegistries.ITEM.getKey(made).getNamespace().equals(holder.id().identifier().getNamespace());
         (rawCut ? rawCuts : byOutput).computeIfAbsent(made, k -> new ArrayList<>()).add(step);

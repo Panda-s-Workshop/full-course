@@ -84,7 +84,8 @@ on NeoForge, `config/fullcourse-client.properties` on Fabric. Restart the game a
 Full Course rates every food in the game from its recipes, including foods from other mods, so it needs no list of
 supported mods. Machine recipes that don't list their ingredients the usual way (Create's, for instance) are read from
 their own fields where they can be. Recipes it still can't read are counted in one line of the log at server start,
-by recipe type; a food made only that way rates as a raw ingredient until a pack rates it (see below). Some mods get
+by recipe type (a crafting recipe by its mod), followed by the foods made only that way where they're known. Such a
+food rates as a raw ingredient until a pack rates it (see below). Some mods get
 more than that:
 
 - **Farmer's Delight Refabricated** (Fabric): its dishes get tiers from their cooking-pot and cutting-board recipes
@@ -127,7 +128,7 @@ and a food whose ingredients fall in fewer groups than its tier gives is made up
 are used as written, up to the tier's count.
 
 **What the scorer can't see.** Fluids a machine pours in (Create's filling, for instance) aren't ingredients; only
-items are. Another mod's tool that a crafting recipe uses and gives back (a rolling pin, a knife) counts as an
+items are. A food made from fluids alone (Create's chocolate bar) is one step at that machine. Another mod's tool that a crafting recipe uses and gives back (a rolling pin, a knife) counts as an
 ingredient unless it is in `fullcourse:containers`, and a non-edible intermediate (a flour, a paste) ends the chain as
 a raw ingredient unless it is in `fullcourse:culinary`: tag them there. The recipe lines a tooltip shows with Shift
 are Full Course's own recipes as shipped; a data pack's changed recipes rate correctly but don't change those lines.

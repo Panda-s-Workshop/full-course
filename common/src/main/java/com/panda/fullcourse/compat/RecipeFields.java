@@ -17,11 +17,17 @@ import net.minecraft.world.item.crafting.Recipe;
  * anything in them that hands one over through {@code getIngredient()} or {@code ingredient()} (Create's sized
  * ingredients). Its result is the first {@link ItemStackTemplate} or {@link ItemStack}, or anything that makes one through
  * {@code create()} (Create's processing outputs), preferring a component named {@code result} or {@code results} (a
- * sequenced assembly's transitional item isn't its result). Anything else about it (fluids, chances, heat) is ignored.
- * Read reflectively, so nothing here needs the other mod.
+ * sequenced assembly's transitional item isn't its result). A component named for fluids, or holding them, marks a
+ * recipe that takes fluids (Create's chocolate bar, pressed from melted chocolate alone). Anything else about it
+ * (chances, heat) is ignored. Read reflectively, so nothing here needs the other mod.
  */
 public final class RecipeFields {
-    public record Read(List<Ingredient> ingredients, ItemStack result) {}
+    public record Read(List<Ingredient> ingredients, ItemStack result, boolean fluids) {
+        /** A result, but nothing it's made from that can be read: no ingredient and no fluid. */
+        public boolean unread() {
+            return ingredients.isEmpty() && !fluids;
+        }
+    }
 
     private RecipeFields() {}
 
@@ -36,13 +42,21 @@ public final class RecipeFields {
         List<Ingredient> ingredients = new ArrayList<>();
         ItemStack named = ItemStack.EMPTY;
         ItemStack other = ItemStack.EMPTY;
+        boolean fluids = false;
         try {
             for (RecordComponent component : type.getRecordComponents()) {
                 Method accessor = component.getAccessor();
                 accessor.setAccessible(true);
                 Object value = accessor.invoke(recipe);
                 boolean result = component.getName().startsWith("result");
-                for (Object o : value instanceof List<?> list ? list : Collections.singletonList(value)) {
+                List<?> values = value instanceof List<?> list ? list : Collections.singletonList(value);
+                // a fluid made isn't one taken
+                if (!result && component.getName().toLowerCase(java.util.Locale.ROOT).contains("fluid") && value != null && !values.isEmpty()) fluids = true;
+                for (Object o : values) {
+                    if (o != null && o.getClass().getSimpleName().contains("Fluid")) {
+                        fluids |= !result;
+                        continue;
+                    }
                     Ingredient ingredient = ingredient(o);
                     if (ingredient != null) {
                         ingredients.add(ingredient);
@@ -58,7 +72,7 @@ public final class RecipeFields {
             return Optional.empty(); // a record that won't be read from outside its mod
         }
         ItemStack result = named.isEmpty() ? other : named;
-        return ingredients.isEmpty() || result.isEmpty() ? Optional.empty() : Optional.of(new Read(List.copyOf(ingredients), result));
+        return result.isEmpty() ? Optional.empty() : Optional.of(new Read(List.copyOf(ingredients), result, fluids));
     }
 
     private static Ingredient ingredient(Object value) {

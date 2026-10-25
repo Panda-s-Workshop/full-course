@@ -91,6 +91,12 @@ final class KitchenChecks {
     /** Shaped like Create's mixing recipe: outputs first, fluids, then sized ingredients. */
     public record Mixing(int time, List<Output> results, List<String> fluidIngredients, List<Sized> ingredients) {}
 
+    /** Shaped like Create's compacting of a fluid alone: no item goes in. */
+    public record Compacting(List<String> fluidIngredients, List<Output> results) {}
+
+    /** A machine record whose input isn't an ingredient (a block): its result is known, what it's made from isn't. */
+    public record Planting(String block, List<Output> results) {}
+
     /** Shaped like Create's sequenced assembly: a transitional item before the results. */
     public record Assembly(Ingredient ingredient, ItemStackTemplate transitionalItem, List<Output> results) {}
 
@@ -141,6 +147,12 @@ final class KitchenChecks {
                 List.of(new Output(Items.CAKE, 1))));
         check(assembly.isPresent() && assembly.get().result().is(Items.CAKE),
                 "an assembly's result is its results, not its transitional item: %s", assembly);
+        var compacting = RecipeFields.fields(new Compacting(List.of("chocolate"), List.of(new Output(Items.COOKIE, 1))));
+        check(compacting.isPresent() && compacting.get().ingredients().isEmpty() && compacting.get().fluids() && !compacting.get().unread(),
+                "a recipe of fluids alone is read, with no ingredients: %s", compacting);
+        var planting = RecipeFields.fields(new Planting("minecraft:farmland", List.of(new Output(Items.CARROT, 1))));
+        check(planting.isPresent() && planting.get().unread() && planting.get().result().is(Items.CARROT),
+                "a record of no ingredient and no fluid is unread, its result known: %s", planting);
     }
 
     /**
