@@ -13,7 +13,7 @@ import net.minecraft.network.codec.StreamCodec;
  * whether it's a remedy (vanilla effects only, no meal slot). Computed on the server, synced to clients.
  *
  * @param steps the depth of its cheapest recipe chain
- * @param stations the summed weight of the distinct stations in that chain
+ * @param stations the distinct stations in that chain (the score counts the crock twice; this counts it once)
  * @param ingredients the distinct raw ingredients that chain starts from
  */
 public record Profile(Tier tier, int score, int steps, int stations, int ingredients, List<Family> families, boolean remedy) {

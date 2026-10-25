@@ -171,6 +171,7 @@ public final class FoodProfiles {
             // a remedy has no tier: its own effects and the heal, no meal, so no stars to imply one
             Tier tier = remedy || (setTier.isEmpty() && rawCuts.containsKey(dish)) ? Tier.RAW
                     : setTier.map(Tier::ofStars).orElseGet(() -> Tier.fromScore(score.score(), thresholds));
+            if (setTier.isEmpty() && cutThenCooked(score) && tier.stars() > Tier.SIMPLE.stars()) tier = Tier.SIMPLE;
             List<Family> families;
             if (remedy) {
                 families = List.of();
@@ -187,9 +188,18 @@ public final class FoodProfiles {
                     families = List.copyOf(withMending);
                 }
             }
-            out.put(item, new Profile(tier, score.score(), score.depth(), score.stationWeight(), score.leaves().size(), families, remedy));
+            out.put(item, new Profile(tier, score.score(), score.depth(), score.stations().size(), score.leaves().size(), families, remedy));
         }
         return Collections.unmodifiableMap(out);
+    }
+
+    /**
+     * Only cut and cooked (a fish fillet grilled, minced beef fried into a patty): an edible intermediate, rated with
+     * plain cooked food at one star, though its two steps would score two.
+     */
+    private static boolean cutThenCooked(TierScorer.Score<Item> score) {
+        return score.stations().containsKey("fire") && score.stations().size() == 2
+                && score.stations().keySet().stream().anyMatch(s -> s.endsWith(":cutting"));
     }
 
     /** Every ingredient of {@code recipe} is a serving of {@code dish}. */
