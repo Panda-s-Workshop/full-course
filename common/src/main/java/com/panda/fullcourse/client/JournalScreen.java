@@ -44,7 +44,7 @@ public class JournalScreen extends Screen {
     private static final Identifier SCROLLER_OFF = Identifier.withDefaultNamespace("container/creative_inventory/scroller_disabled");
     /** The layout drawn into textures/gui/journal.png: panel, bar, grid and scrollbar track. */
     public static final int W = 212, H = 194, GRID_X = 8, GRID_Y = 46, COLS = 10, ROWS = 7, BAR_X = 8, BAR_Y = 30, BAR_W = 196,
-            BAR_H = 4, SCROLL_X = 195, SCROLL_Y = 46, SCROLL_H = ROWS * 18 - 2;
+            BAR_H = 4, SCROLL_X = 191, SCROLL_Y = 46, SCROLL_H = ROWS * 18 - 2;
     private static final int LABEL = 0xFF404040, FADE = 0xB08B8B8B, WELL = 0xFF3C3C3C, PIP_EDGE = 0xFF202020, SEARCH_W = 92;
 
     /** Every dish the journal lists, and those the search lets through (what the grid shows). */
