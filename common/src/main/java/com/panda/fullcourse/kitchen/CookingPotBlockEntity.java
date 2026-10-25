@@ -3,6 +3,7 @@ package com.panda.fullcourse.kitchen;
 import com.panda.fullcourse.food.FoodTags;
 import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModRecipes;
+import com.panda.fullcourse.registry.ModSounds;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,7 +19,6 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
@@ -216,8 +216,8 @@ public class CookingPotBlockEntity extends BaseContainerBlockEntity implements W
         ItemStack out = items.get(OUTPUT);
         if (out.isEmpty()) items.set(OUTPUT, made);
         else out.grow(made.getCount());
-        level.playSound(null, pos, SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, SoundSource.BLOCKS, 0.8F, 1.0F);
-        level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.25F, 1.6F);
+        level.playSound(null, pos, ModSounds.POT_DONE.get(), SoundSource.BLOCKS, 1F, 1F);
+        level.playSound(null, pos, ModSounds.POT_DONE_HISS.get(), SoundSource.BLOCKS, 1F, 1F);
     }
 
     /**

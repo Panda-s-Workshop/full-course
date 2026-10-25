@@ -20,5 +20,167 @@
         "pitch": 0.75
       }
     ]
+  },
+  "slot.unlock": {
+    "subtitle": "subtitles.fullcourse.slot.unlock",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.chime",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 1.2
+      }
+    ]
+  },
+  "slot.unlock_fanfare": {
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.levelup",
+        "type": "event",
+        "volume": 0.35,
+        "pitch": 1.5
+      }
+    ]
+  },
+  "board.chop": {
+    "subtitle": "subtitles.fullcourse.board.chop",
+    "sounds": [
+      {
+        "name": "minecraft:item.axe.strip",
+        "type": "event",
+        "volume": 0.6,
+        "pitch": 1.5
+      }
+    ]
+  },
+  "pot.bubble": {
+    "subtitle": "subtitles.fullcourse.pot.bubble",
+    "sounds": [
+      {
+        "name": "minecraft:block.bubble_column.bubble_pop",
+        "type": "event",
+        "volume": 0.4,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "pot.done": {
+    "subtitle": "subtitles.fullcourse.pot.done",
+    "sounds": [
+      {
+        "name": "minecraft:block.bubble_column.upwards_ambient",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "pot.done_hiss": {
+    "sounds": [
+      {
+        "name": "minecraft:block.fire.extinguish",
+        "type": "event",
+        "volume": 0.25,
+        "pitch": 1.6
+      }
+    ]
+  },
+  "oven.crackle": {
+    "subtitle": "subtitles.fullcourse.oven.crackle",
+    "sounds": [
+      {
+        "name": "minecraft:block.furnace.fire_crackle",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "oven.done": {
+    "subtitle": "subtitles.fullcourse.oven.done",
+    "sounds": [
+      {
+        "name": "minecraft:block.furnace.fire_crackle",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.8
+      }
+    ]
+  },
+  "oven.done_crackle": {
+    "sounds": [
+      {
+        "name": "minecraft:block.campfire.crackle",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 1.2
+      }
+    ]
+  },
+  "crock.fill": {
+    "subtitle": "subtitles.fullcourse.crock.fill",
+    "sounds": [
+      {
+        "name": "minecraft:block.decorated_pot.insert",
+        "type": "event",
+        "volume": 0.7,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "crock.refuse": {
+    "subtitle": "subtitles.fullcourse.crock.refuse",
+    "sounds": [
+      {
+        "name": "minecraft:block.decorated_pot.insert_fail",
+        "type": "event",
+        "volume": 0.7,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "crock.seal": {
+    "subtitle": "subtitles.fullcourse.crock.seal",
+    "sounds": [
+      {
+        "name": "minecraft:block.barrel.close",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 1.2
+      }
+    ]
+  },
+  "crock.open": {
+    "subtitle": "subtitles.fullcourse.crock.open",
+    "sounds": [
+      {
+        "name": "minecraft:block.barrel.open",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 1.3
+      }
+    ]
+  },
+  "crock.bubble": {
+    "subtitle": "subtitles.fullcourse.crock.bubble",
+    "sounds": [
+      {
+        "name": "minecraft:block.bubble_column.bubble_pop",
+        "type": "event",
+        "volume": 0.3,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "feast.serve": {
+    "subtitle": "subtitles.fullcourse.feast.serve",
+    "sounds": [
+      {
+        "name": "minecraft:entity.generic.eat",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 1.0
+      }
+    ]
   }
 }

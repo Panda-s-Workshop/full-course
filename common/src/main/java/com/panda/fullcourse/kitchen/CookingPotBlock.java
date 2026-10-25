@@ -1,12 +1,12 @@
 package com.panda.fullcourse.kitchen;
 
 import com.panda.fullcourse.registry.ModBlockEntities;
+import com.panda.fullcourse.registry.ModSounds;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
@@ -115,7 +115,7 @@ public class CookingPotBlock extends Block implements EntityBlock {
                 level.addParticle(ParticleTypes.WHITE_SMOKE, x + (random.nextDouble() - 0.5) * 0.4, y + 0.1, z + (random.nextDouble() - 0.5) * 0.4, 0, 0.02, 0);
             }
             if (random.nextInt(8) == 0) {
-                level.playLocalSound(x, y, z, SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.BLOCKS, 0.4F, 0.8F + random.nextFloat() * 0.4F, false);
+                level.playLocalSound(x, y, z, ModSounds.POT_BUBBLE.get(), SoundSource.BLOCKS, 1F, 0.8F + random.nextFloat() * 0.4F, false);
             }
         } else if (random.nextInt(4) == 0 && CookingPotBlockEntity.heated(level, pos)) {
             level.addParticle(ParticleTypes.WHITE_SMOKE, x + (random.nextDouble() - 0.5) * 0.4, y + 0.1, z + (random.nextDouble() - 0.5) * 0.4, 0, 0.01, 0);

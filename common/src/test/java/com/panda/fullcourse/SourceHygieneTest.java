@@ -53,6 +53,29 @@ class SourceHygieneTest {
         assertTrue(missing.isEmpty(), "lang keys used in code but missing from en_us.json: " + missing);
     }
 
+    /** Each sound event has a sounds.json entry pointing at a vanilla event, and each subtitle it names has English. */
+    @Test
+    void everySoundEventHasAnEntryAndItsSubtitleHasEnglish() throws IOException {
+        String registry = Files.readString(SRC.resolve(Path.of("com", "panda", "fullcourse", "registry", "ModSounds.java")));
+        com.google.gson.JsonObject sounds = com.google.gson.JsonParser.parseString(
+                Files.readString(Path.of("src", "main", "resources", "assets", "fullcourse", "sounds.json"))).getAsJsonObject();
+        com.google.gson.JsonObject lang = com.google.gson.JsonParser.parseString(Files.readString(LANG)).getAsJsonObject();
+        Matcher m = Pattern.compile("sound\\(\"([a-z0-9_.]+)\"\\)").matcher(registry);
+        Set<String> events = new TreeSet<>();
+        while (m.find()) events.add(m.group(1));
+        assertFalse(events.isEmpty(), "no sound events found in ModSounds");
+        assertEquals(events, new TreeSet<>(sounds.keySet()), "ModSounds and sounds.json name different events");
+        for (String event : events) {
+            var entry = sounds.getAsJsonObject(event);
+            for (var sound : entry.getAsJsonArray("sounds")) {
+                var o = sound.getAsJsonObject();
+                assertEquals("event", o.get("type").getAsString(), event + " should point at a vanilla event");
+                assertTrue(o.get("name").getAsString().startsWith("minecraft:"), event + " should point at a vanilla event");
+            }
+            if (entry.has("subtitle")) assertTrue(lang.has(entry.get("subtitle").getAsString()), event + "'s subtitle has no English");
+        }
+    }
+
     @Test
     void everyGeneratedJsonParsesAndHasNoTabs() throws IOException {
         Path res = Path.of("src", "main", "resources");

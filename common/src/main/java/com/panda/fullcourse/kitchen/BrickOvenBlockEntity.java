@@ -3,6 +3,7 @@ package com.panda.fullcourse.kitchen;
 import com.panda.fullcourse.food.FoodTags;
 import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModRecipes;
+import com.panda.fullcourse.registry.ModSounds;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,7 +14,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
@@ -219,8 +219,8 @@ public class BrickOvenBlockEntity extends BaseContainerBlockEntity implements Wo
         ItemStack out = items.get(OUTPUT);
         if (out.isEmpty()) items.set(OUTPUT, made);
         else out.grow(made.getCount());
-        level.playSound(null, pos, SoundEvents.FURNACE_FIRE_CRACKLE, SoundSource.BLOCKS, 1.0F, 0.8F);
-        level.playSound(null, pos, SoundEvents.CAMPFIRE_CRACKLE, SoundSource.BLOCKS, 0.8F, 1.2F);
+        level.playSound(null, pos, ModSounds.OVEN_DONE.get(), SoundSource.BLOCKS, 1F, 1F);
+        level.playSound(null, pos, ModSounds.OVEN_DONE_CRACKLE.get(), SoundSource.BLOCKS, 1F, 1F);
     }
 
     /** An empty from a stack that isn't used up: into a free (or matching) ingredient slot, where it's spare, else the empties slot. */

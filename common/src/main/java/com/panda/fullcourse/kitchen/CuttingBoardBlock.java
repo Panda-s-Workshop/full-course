@@ -1,6 +1,7 @@
 package com.panda.fullcourse.kitchen;
 
 import com.panda.fullcourse.food.FoodAdvancements;
+import com.panda.fullcourse.registry.ModSounds;
 import java.util.Map;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -125,7 +126,7 @@ public class CuttingBoardBlock extends Block implements EntityBlock {
         Block.popResourceFromFace(level, pos, Direction.UP, result.create());
         knife.hurtAndBreak(1, player, hand);
         if (player instanceof ServerPlayer sp) FoodAdvancements.award(sp, "cutting_board");
-        level.playSound(null, pos, SoundEvents.AXE_STRIP.value(), SoundSource.BLOCKS, 0.6F, 1.5F + level.getRandom().nextFloat() * 0.2F);
+        level.playSound(null, pos, ModSounds.BOARD_CHOP.get(), SoundSource.BLOCKS, 1F, 1F + level.getRandom().nextFloat() * 0.13F);
         return true;
     }
 }

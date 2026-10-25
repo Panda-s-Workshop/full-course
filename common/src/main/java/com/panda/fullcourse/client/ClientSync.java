@@ -7,13 +7,13 @@ import com.panda.fullcourse.food.Tasting;
 import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.platform.Services;
+import com.panda.fullcourse.registry.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
 
 /**
  * The client's copy of the server's food table and config, and the first-join hint: a toast that says
@@ -70,8 +70,8 @@ public final class ClientSync {
                 : Component.translatable(next.needsFeast() ? "toast.fullcourse.slot.next_feast" : "toast.fullcourse.slot.next",
                         next.need(), "★".repeat(next.stars()));
         mc.gui.toastManager().addToast(new SlotToast(title, body));
-        mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.AMETHYST_BLOCK_CHIME, 1.2F, 1.0F));
-        mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.PLAYER_LEVELUP, 1.5F, 0.35F));
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(ModSounds.SLOT_UNLOCK.get(), 1F, 1F));
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(ModSounds.SLOT_UNLOCK_FANFARE.get(), 1F, 1F));
     }
 
     /** The slot toast is on screen (for checks). */

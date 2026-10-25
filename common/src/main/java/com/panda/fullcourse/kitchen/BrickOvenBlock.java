@@ -1,10 +1,10 @@
 package com.panda.fullcourse.kitchen;
 
 import com.panda.fullcourse.registry.ModBlockEntities;
+import com.panda.fullcourse.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
@@ -104,7 +104,7 @@ public class BrickOvenBlock extends Block implements EntityBlock {
         if (!state.getValue(LIT)) return;
         double x = pos.getX() + 0.5, y = pos.getY(), z = pos.getZ() + 0.5;
         if (random.nextDouble() < 0.1) {
-            level.playLocalSound(x, y, z, SoundEvents.FURNACE_FIRE_CRACKLE, SoundSource.BLOCKS, 1.0F, 1.0F, false);
+            level.playLocalSound(x, y, z, ModSounds.OVEN_CRACKLE.get(), SoundSource.BLOCKS, 1F, 1F, false);
         }
         Direction facing = state.getValue(FACING);
         double side = (random.nextDouble() - 0.5) * 0.4;

@@ -4,6 +4,7 @@ import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.food.FoodText;
 import com.panda.fullcourse.logic.Meals;
+import com.panda.fullcourse.registry.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -11,7 +12,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
@@ -126,7 +126,7 @@ public class FeastBlock extends Block {
         }
         if (FullCourseConfig.keepVanillaHunger()) server.getFoodData().eat(serving, 0.8F);
         FoodRules.onEatDish(server, asItem(), serving);
-        level.playSound(null, pos, SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS, 0.8F, 0.9F + level.getRandom().nextFloat() * 0.2F);
+        level.playSound(null, pos, ModSounds.FEAST_SERVE.get(), SoundSource.PLAYERS, 1F, 0.9F + level.getRandom().nextFloat() * 0.2F);
         level.gameEvent(player, GameEvent.EAT, pos);
         if (left > 1 || platter) {
             level.setBlockAndUpdate(pos, state.setValue(SERVINGS, left - 1));

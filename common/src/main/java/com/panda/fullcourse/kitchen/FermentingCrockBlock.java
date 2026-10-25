@@ -2,6 +2,7 @@ package com.panda.fullcourse.kitchen;
 
 import com.panda.fullcourse.food.FoodText;
 import com.panda.fullcourse.registry.ModBlockEntities;
+import com.panda.fullcourse.registry.ModSounds;
 import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -78,17 +79,17 @@ public class FermentingCrockBlock extends Block implements EntityBlock {
         }
         if (!(level instanceof ServerLevel server)) return InteractionResult.SUCCESS;
         if (!FermentingCrockBlockEntity.ferments(server, stack)) {
-            level.playSound(null, pos, SoundEvents.DECORATED_POT_INSERT_FAIL, SoundSource.BLOCKS, 0.7F, 1.0F);
+            level.playSound(null, pos, ModSounds.CROCK_REFUSE.get(), SoundSource.BLOCKS, 1F, 1F);
             player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.not_fermentable", stack.getHoverName()).withStyle(ChatFormatting.GRAY));
             return InteractionResult.SUCCESS;
         }
         ItemStack moving = player.hasInfiniteMaterials() ? stack.copy() : stack;
         if (crock.insert(moving) == 0) {
-            level.playSound(null, pos, SoundEvents.DECORATED_POT_INSERT_FAIL, SoundSource.BLOCKS, 0.7F, 1.0F);
+            level.playSound(null, pos, ModSounds.CROCK_REFUSE.get(), SoundSource.BLOCKS, 1F, 1F);
             player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.full").withStyle(ChatFormatting.GRAY));
             return InteractionResult.SUCCESS;
         }
-        level.playSound(null, pos, SoundEvents.DECORATED_POT_INSERT, SoundSource.BLOCKS, 0.7F, 0.9F + level.getRandom().nextFloat() * 0.2F);
+        level.playSound(null, pos, ModSounds.CROCK_FILL.get(), SoundSource.BLOCKS, 1F, 0.9F + level.getRandom().nextFloat() * 0.2F);
         crock.recipe(server).ifPresent(holder -> {
             FermentingRecipe r = holder.value();
             ItemStack made = r.result().create();
@@ -106,7 +107,7 @@ public class FermentingCrockBlock extends Block implements EntityBlock {
             if (crock.done(server)) {
                 List<ItemStack> out = crock.open(server);
                 for (ItemStack s : out) player.getInventory().placeItemBackInInventory(s, Prediction.SERVER_ONLY);
-                level.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.8F, 1.3F);
+                level.playSound(null, pos, ModSounds.CROCK_OPEN.get(), SoundSource.BLOCKS, 1F, 1F);
             } else {
                 int left = (int) Math.min(Integer.MAX_VALUE, crock.ticksLeft(server));
                 player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.fermenting",
@@ -127,7 +128,7 @@ public class FermentingCrockBlock extends Block implements EntityBlock {
             ItemStack made = r.result().create();
             player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.sealed", batches * made.getCount(), made.getHoverName(),
                     FoodText.duration(r.time())).withStyle(ChatFormatting.GRAY));
-            level.playSound(null, pos, SoundEvents.BARREL_CLOSE, SoundSource.BLOCKS, 0.8F, 1.2F);
+            level.playSound(null, pos, ModSounds.CROCK_SEAL.get(), SoundSource.BLOCKS, 1F, 1F);
         } else {
             player.sendOverlayMessage(Component.translatable("message.fullcourse.crock.no_recipe").withStyle(ChatFormatting.GRAY));
         }
@@ -142,7 +143,7 @@ public class FermentingCrockBlock extends Block implements EntityBlock {
         double x = pos.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.3, z = pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.3;
         level.addParticle(ParticleTypes.BUBBLE_POP, x, pos.getY() + 0.9, z, 0, 0.01, 0);
         if (stage == 3 && random.nextInt(3) == 0) {
-            level.playLocalSound(x, pos.getY() + 0.8, z, SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.BLOCKS, 0.3F, 0.6F, false);
+            level.playLocalSound(x, pos.getY() + 0.8, z, ModSounds.CROCK_BUBBLE.get(), SoundSource.BLOCKS, 1F, 1F, false);
         }
     }
 }
