@@ -115,7 +115,9 @@ puts a replaced file back to the scored values.
   `lightfoot`, `mending`. A name not in this list is logged and skipped; an empty list leaves the families to the
   recipes.
 - `remedy`: true for foods like the golden apple, which keep their own effects and heal but give no meal.
-- `serving_of`: the dish this is a serving or slice of (a feast block, a pie); it rates exactly as that dish.
+- `serving_of`: the dish this is a serving or slice of (a feast block, a pie); it rates exactly as that dish. A block
+  that says what it serves, as Farmer's Delight's feasts and pies and their add-ons' do, needs no file: each serving made
+  only from it rates as it, and the block's item shows that rating.
 
 A key not in this list, a file whose path names no item of an installed mod, and a `serving_of` that names no item are
 logged as warnings at each `/reload`; a file for a mod that isn't installed is skipped quietly.
@@ -142,7 +144,7 @@ are Full Course's own recipes as shipped; a data pack's changed recipes rate cor
 | `containers` | Bowls, bottles, buckets: ignored as ingredients. |
 | `remedies` | Their own effects and the heal only, no meal. |
 | `no_meal` | Edible steps on the way to a dish (another mod's dough, raw pasta, pie crust): they heal but give no meal, and still count in what's made from them. A file's `tier` wins over it. |
-| `placed_meals` | Placed and eaten as a block (feasts, cake): their score gets +3. A dish named only by a `serving_of` override (another mod's feast block) gets +1. Only these reach five stars from their score; anything else stops at four unless a file sets its tier. |
+| `placed_meals` | Placed and eaten as a block (feasts, cake): their score gets +3. A dish served from another mod's block (its feast, or a dish a `serving_of` names) gets +1. Only these reach five stars from their score; anything else stops at four unless a file sets its tier. |
 | `soups` | Always give Mending. |
 | `groups/<family>` | The ingredients that give each benefit family to foods rated from their recipes. Full Course's own dishes, Grilled Fillet, Flatbread and cake have their families set in their food profiles, so these tags don't change them. |
 | `journal_foods` | The "any simple dish" the Tasting Journal's recipe takes. |

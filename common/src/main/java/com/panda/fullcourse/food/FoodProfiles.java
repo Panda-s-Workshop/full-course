@@ -7,6 +7,7 @@ import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.compat.FarmersDelightCuts;
 import com.panda.fullcourse.compat.RecipeFields;
+import com.panda.fullcourse.compat.ServedFrom;
 import com.panda.fullcourse.logic.Family;
 import com.panda.fullcourse.logic.Tier;
 import com.panda.fullcourse.logic.TierScorer;
@@ -130,19 +131,25 @@ public final class FoodProfiles {
         return cuts.contains(item);
     }
 
-    /** Each serving's dish on the server (its {@code serving_of} override). */
+    /** Each serving's dish on the server: what its block serves, or its {@code serving_of} override. */
     public static Map<Item, Item> servings(MinecraftServer mcServer) {
         all(mcServer);
         return servingOf;
     }
 
     /**
-     * What eating {@code item} counts as, tasted and as a meal: the dish it is a serving of when that dish gives a meal
-     * itself (a slice and the whole cake are one dish), else the item.
+     * What eating {@code item} counts as, tasted and as a meal: the dish it is a serving of when that dish is eaten as it
+     * is and gives a meal itself (a slice and the whole cake are one dish), else the item. Another mod's feast block,
+     * only ever eaten as its servings, is no such dish.
      */
     public static Item tastedAs(MinecraftServer mcServer, Item item) {
         Item dish = dishOf(mcServer, item);
-        return dish != item && get(mcServer, dish).givesMeal() ? dish : item;
+        return dish != item && eatenAsIs(dish) && get(mcServer, dish).givesMeal() ? dish : item;
+    }
+
+    /** Eaten as it is: a food, or a meal placed and eaten from its block (our feasts, cake). */
+    public static boolean eatenAsIs(Item item) {
+        return isFood(item) || item.builtInRegistryHolder().is(FoodTags.PLACED_MEALS);
     }
 
     /** {@link #dishOf} on the client, from the table the server sent. */
@@ -150,10 +157,15 @@ public final class FoodProfiles {
         return clientServings.getOrDefault(item, item);
     }
 
+    /** A serving of {@code dish} on the client, if it's served from a block: what one of its helpings heals. */
+    public static Optional<Item> clientServingOf(Item dish) {
+        return clientServings.entrySet().stream().filter(e -> e.getValue() == dish).map(Map.Entry::getKey).findFirst();
+    }
+
     /** {@link #tastedAs} on the client, from the table the server sent. */
     public static Item clientTastedAs(Item item) {
         Item dish = clientServings.getOrDefault(item, item);
-        return dish != item && client(dish).givesMeal() ? dish : item;
+        return dish != item && eatenAsIs(dish) && client(dish).givesMeal() ? dish : item;
     }
 
     /** Forget the server table (the server stopped; an integrated server restarts in the same JVM). */
@@ -199,19 +211,26 @@ public final class FoodProfiles {
         Map<Item, List<TierScorer.Recipe<Item>>> rawCuts = new HashMap<>();
         Map<Item, List<TierScorer.Recipe<Item>>> byOutput = recipeGraph(mcServer, rawCuts);
         Map<Item, ProfileOverride> overrides = overrides(mcServer);
+        // each serving's dish: what its block serves (Farmer's Delight's feasts and pies, add-ons' too), then the files
         Map<Item, Item> servings = new HashMap<>();
+        ServedFrom.servings().forEach((serving, dish) -> {
+            // a serving made only from its dish (a slice cut from its pie, or no recipe at all); a medley's rolls are
+            // also made on their own, and keep their own rating
+            boolean own = byOutput.getOrDefault(serving, List.of()).stream().anyMatch(r -> r.ingredients().stream().noneMatch(slot -> slot.contains(dish)));
+            if (isFood(serving) && !own) servings.put(serving, dish);
+        });
         overrides.forEach((serving, o) -> o.servingOf().ifPresent(dish -> servings.put(serving, dish)));
         servingOf = Map.copyOf(servings);
         cuts = Set.copyOf(rawCuts.keySet());
         // a dish served from a block (a feast, a pie cut into slices) is assembled: a step, though only the tagged placed
         // meals (our feasts, cake) are feasts
         Set<Item> servedFrom = new HashSet<>();
-        for (ProfileOverride o : overrides.values()) o.servingOf().filter(dish -> !isFood(dish)).ifPresent(servedFrom::add);
+        for (Item dish : servings.values()) if (!isFood(dish)) servedFrom.add(dish);
         // putting the slices back together (four slices make a pie) is no way to make the dish
-        overrides.forEach((serving, o) -> o.servingOf().ifPresent(dish -> byOutput.computeIfPresent(dish, (k, recipes) -> {
-            List<TierScorer.Recipe<Item>> kept = recipes.stream().filter(r -> !onlyServingsOf(r, dish, overrides)).toList();
+        servings.forEach((serving, dish) -> byOutput.computeIfPresent(dish, (k, recipes) -> {
+            List<TierScorer.Recipe<Item>> kept = recipes.stream().filter(r -> !onlyServingsOf(r, dish, servings)).toList();
             return kept.isEmpty() ? null : kept;
-        })));
+        }));
         // everything some food recipe takes: a raw food that is one of them can still become a meal
         Set<Item> usedIn = new HashSet<>();
         for (List<TierScorer.Recipe<Item>> recipes : byOutput.values()) {
@@ -260,10 +279,11 @@ public final class FoodProfiles {
         Map<Item, Profile> out = new HashMap<>();
         for (Item item : BuiltInRegistries.ITEM) {
             boolean placed = item.builtInRegistryHolder().is(FoodTags.PLACED_MEALS);
-            if (!isFood(item) && !placed) continue;
+            // a block a dish is served from is rated too: its tooltip and pip say what its servings are worth
+            if (!isFood(item) && !placed && !servedFrom.contains(item)) continue;
             ProfileOverride o = overrides.get(item);
             // a serving is rated as its dish: the dish's chain, groups and own override, under this item's override
-            Item dish = o != null && o.servingOf().isPresent() ? o.servingOf().get() : item;
+            Item dish = servings.getOrDefault(item, item);
             ProfileOverride dishOverride = dish == item ? null : overrides.get(dish);
             TierScorer.Score<Item> score = scorer.score(dish);
             boolean remedy = o != null && o.remedy().isPresent() ? o.remedy().get() : item.builtInRegistryHolder().is(FoodTags.REMEDIES);
@@ -303,11 +323,10 @@ public final class FoodProfiles {
     }
 
     /** Every ingredient of {@code recipe} is a serving of {@code dish}. */
-    private static boolean onlyServingsOf(TierScorer.Recipe<Item> recipe, Item dish, Map<Item, ProfileOverride> overrides) {
+    private static boolean onlyServingsOf(TierScorer.Recipe<Item> recipe, Item dish, Map<Item, Item> servings) {
         for (Set<Item> slot : recipe.ingredients()) {
             for (Item i : slot) {
-                ProfileOverride o = overrides.get(i);
-                if (o == null || o.servingOf().filter(dish::equals).isEmpty()) return false;
+                if (!dish.equals(servings.get(i))) return false;
             }
         }
         return true;

@@ -71,20 +71,24 @@ public final class FoodTooltips {
             boolean tasted = mc.player != null
                     && Services.PLATFORM.foodState(mc.player).tasted().contains(BuiltInRegistries.ITEM.getKey(FoodProfiles.clientTastedAs(stack.getItem())));
             var component = stack.get(DataComponents.FOOD);
-            // a feast or cake heals per serving or slice, not as an item
+            // a feast or cake heals per serving or slice, not as an item; another mod's feast as one of its servings
             int nutrition = component != null ? component.nutrition()
                     : stack.getItem() instanceof BlockItem b && b.getBlock() instanceof FeastBlock feast ? feast.serving()
-                    : stack.is(net.minecraft.world.item.Items.CAKE) ? FoodRules.CAKE_SLICE_NUTRITION : 0;
+                    : stack.is(net.minecraft.world.item.Items.CAKE) ? FoodRules.CAKE_SLICE_NUTRITION
+                    : FoodProfiles.clientServingOf(stack.getItem()).map(s -> new ItemStack(s).get(DataComponents.FOOD))
+                            .map(net.minecraft.world.food.FoodProperties::nutrition).orElse(0);
             List<Component> foodLines = wrap(FoodText.lines(p, nutrition, shift, tasted));
             lines.addAll(1, foodLines);
             // above FoodText's "Shift: recipe chain" line, the last when Shift is up
             foodEnd = 1 + foodLines.size() - (!shift && p.steps() > 0 ? 1 : 0);
             // under the stars: while Queasy, a meal food eaten now is spent on its heal alone
-            if (p.givesMeal() && mc.player != null && mc.player.hasEffect(net.minecraft.world.effect.MobEffects.HUNGER)) {
+            // (not on another mod's feast block: only its servings are eaten)
+            boolean eaten = FoodProfiles.eatenAsIs(stack.getItem());
+            if (eaten && p.givesMeal() && mc.player != null && mc.player.hasEffect(net.minecraft.world.effect.MobEffects.HUNGER)) {
                 lines.add(Math.min(2, lines.size()), Component.translatable("tooltip.fullcourse.queasy").withStyle(ChatFormatting.GREEN));
             }
             // under the stars: an untasted dish that would move the next meal slot along, as the journal marks it
-            if (!tasted && mc.player != null
+            if (eaten && !tasted && mc.player != null
                     && JournalScreen.countsToward(JournalScreen.nextSlot(Services.PLATFORM.foodState(mc.player)), FoodProfiles.clientTastedAs(stack.getItem()))) {
                 lines.add(Math.min(2, lines.size()), Component.translatable("gui.fullcourse.journal.counts",
                         Services.PLATFORM.foodState(mc.player).slots() + 1).withStyle(ChatFormatting.GRAY));
