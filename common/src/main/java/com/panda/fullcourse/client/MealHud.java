@@ -24,13 +24,16 @@ import net.minecraft.world.item.ItemStack;
  * a dim track of the same colour so a meal about to end still shows its tier (the icon itself stays clear); a lighter frame with a plate for free slots and dim padlocks for slots the journal hasn't
  * unlocked yet. Holding a food that gives a meal marks the slot it would take with a small arrow above it: white over
  * the free slot it fills (shown there, dimmed) or its own slot to refresh, red over the meal it would replace (dimmed).
- * Loaders place it and hide the food bar; the player's {@code mealRowOffset} lifts it, and the loaders lift what stacks
- * above it by {@link #lift}.
+ * Five frames fit between the hearts and the hotbar's right edge; a server allowing more slots gets more rows, stacked
+ * upward. Loaders place it and hide the food bar; the player's {@code mealRowOffset} lifts it, and the loaders lift what
+ * stacks above it by {@link #lift}.
  */
 public final class MealHud {
     public static final Identifier LAYER = FullCourse.id("meals");
-    /** Height the row takes, including the gap above it, for the loaders' row stacking. */
+    /** Height a row takes, including the gap above it, for the loaders' row stacking. */
     public static final int HEIGHT = 20;
+    /** Frames per row: a sixth would reach over the hearts. */
+    static final int PER_ROW = 5;
     /** The top of the frames as last drawn (for checks). */
     private static int lastTop;
 
@@ -38,9 +41,14 @@ public final class MealHud {
         return lastTop;
     }
 
-    /** What the row adds above the food row's place: its height plus the player's {@code mealRowOffset}. */
+    /** What the rows add above the food row's place: their height plus the player's {@code mealRowOffset}. */
     public static int lift() {
-        return HEIGHT + ClientOptions.mealRowOffset();
+        return HEIGHT * rows() + ClientOptions.mealRowOffset();
+    }
+
+    /** Rows of frames for the server's most slots. */
+    static int rows() {
+        return (FullCourseConfig.maxMealSlots() + PER_ROW - 1) / PER_ROW;
     }
     static final int FRAME = 18;
     /** A meal's ring blinks for its last tenth, but never less than this many ticks. */
@@ -75,7 +83,7 @@ public final class MealHud {
     public static boolean extract(GuiGraphicsExtractor g, int bottom) {
         if (!active()) return false;
         bottom -= ClientOptions.mealRowOffset();
-        lastTop = bottom - FRAME;
+        lastTop = bottom - FRAME - (rows() - 1) * HEIGHT;
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         FoodState state = Services.PLATFORM.foodState(player);
@@ -83,11 +91,12 @@ public final class MealHud {
         int slots = state.slots();
         int max = FullCourseConfig.maxMealSlots();
         int right = g.guiWidth() / 2 + 91;
-        int top = bottom - FRAME;
+        int firstTop = bottom - FRAME;
         ItemStack held = heldMeal(player);
         Meals.Target target = held.isEmpty() ? null : state.meals().target(BuiltInRegistries.ITEM.getKey(held.getItem()), slots);
         for (int i = 0; i < max; i++) {
-            int x = right - (i + 1) * FRAME - i;
+            int col = i % PER_ROW;
+            int x = right - (col + 1) * FRAME - col, top = firstTop - (i / PER_ROW) * HEIGHT;
             if (i >= slots) {
                 lockedFrame(g, x, top);
                 continue;
