@@ -328,5 +328,6 @@
   "tooltip.fullcourse.score_top": "Score %s · top tier",
   "tooltip.fullcourse.shift": "Shift: recipe chain",
   "tooltip.fullcourse.shift_recipe": "Shift: recipe",
+  "tooltip.fullcourse.tasted": "Tasted",
   "tooltip.fullcourse.tasting_journal.use": "Every dish you have tasted, and the next meal slot"
 }

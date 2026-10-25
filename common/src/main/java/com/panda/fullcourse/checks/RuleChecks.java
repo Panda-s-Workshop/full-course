@@ -645,7 +645,7 @@ public final class RuleChecks {
         check(stew.get(3).equals("Lasts 10:00 · Heals 5 ❤ over 10 s"), "duration and heal %s", stew.get(3));
         check(stew.get(4).startsWith("Shift"), "shift hint %s", stew);
         List<String> shift = text(c, Items.RABBIT_STEW, true, true);
-        check(shift.get(0).endsWith("✔"), "check mark once tasted: %s", shift.get(0));
+        check(shift.get(0).endsWith("✔ Tasted"), "check mark once tasted, named: %s", shift.get(0));
         check(shift.contains("Score 5 · Gourmet at 8"), "score line %s", shift);
         // flatbread's chain scores Prepared, its data sets it to Simple: no threshold it has already passed
         List<String> flatbread = text(c, com.panda.fullcourse.registry.ModItems.item("flatbread"), true, false);

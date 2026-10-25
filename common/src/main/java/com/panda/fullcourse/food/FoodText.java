@@ -39,7 +39,7 @@ public final class FoodText {
         MutableComponent stars = Component.literal("★".repeat(tier.stars()) + "☆".repeat(5 - tier.stars()) + " ")
                 .withStyle(Style.EMPTY.withColor(tier.color() & 0xFFFFFF));
         stars.append(Component.translatable("tier.fullcourse." + tier.stars()));
-        if (tasted) stars.append(Component.literal(" ✔").withStyle(ChatFormatting.GREEN));
+        if (tasted) stars.append(Component.literal(" ✔ ").append(Component.translatable("tooltip.fullcourse.tasted")).withStyle(ChatFormatting.GREEN));
         out.add(stars);
         if (!p.givesMeal()) {
             out.add(Component.translatable("tooltip.fullcourse.raw").withStyle(ChatFormatting.GRAY));
