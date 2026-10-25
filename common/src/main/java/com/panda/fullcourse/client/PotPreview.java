@@ -85,7 +85,7 @@ public final class PotPreview {
         Map<String, Ingredient> ingredients = new LinkedHashMap<>();
         for (int i : nearestMissing) {
             Ingredient ingredient = nearest.ingredients().get(i);
-            Component name = name(ingredient);
+            Component name = RecipeHints.whole(name(ingredient));
             String key = name.getString();
             counts.merge(key, 1, Integer::sum);
             names.putIfAbsent(key, name);
@@ -117,9 +117,10 @@ public final class PotPreview {
     private static Component dish(CookingRecipe recipe, boolean servedIn) {
         ItemStack result = recipe.result().create();
         Tier tier = FoodProfiles.clientReady() ? FoodProfiles.client(result.getItem()).tier() : Tier.RAW;
-        MutableComponent out = result.getHoverName().copy().withColor(tier.color() & 0xFFFFFF);
-        if (tier.stars() > 0) out.append(Component.literal(" " + "★".repeat(tier.stars())));
-        if (servedIn) recipe.container().ifPresent(c -> out.append(Component.translatable("hint.fullcourse.served_in", name(c))));
+        MutableComponent name = result.getHoverName().copy();
+        if (tier.stars() > 0) name.append(Component.literal(" " + "★".repeat(tier.stars())));
+        MutableComponent out = Component.empty().withColor(tier.color() & 0xFFFFFF).append(RecipeHints.whole(name));
+        if (servedIn) recipe.container().ifPresent(c -> out.append(Component.translatable("hint.fullcourse.served_in", RecipeHints.whole(name(c)))));
         return out;
     }
 
@@ -132,7 +133,7 @@ public final class PotPreview {
         for (ItemStack stack : grid) {
             if (stack.isEmpty() || stack.is(FoodTags.CONTAINERS)) continue;
             boolean used = recipes.stream().anyMatch(r -> r.ingredients().stream().anyMatch(i -> i.test(stack)));
-            if (!used) return Component.translatable("gui.fullcourse.pot.unused", stack.getHoverName()).withStyle(ChatFormatting.GRAY);
+            if (!used) return Component.translatable("gui.fullcourse.pot.unused", RecipeHints.whole(stack.getHoverName())).withStyle(ChatFormatting.GRAY);
         }
         return Component.translatable("gui.fullcourse.pot.strays").withStyle(ChatFormatting.GRAY);
     }

@@ -73,7 +73,7 @@ public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
         } else if (isHovering(ARROW_X, ARROW_Y, 24, 16, mouseX, mouseY)) {
             // below the arrow and wrapped to the room on its right, so the tooltip never covers the grid it talks about
             int room = Math.max(120, width - (leftPos + ARROW_X) - 12);
-            List<FormattedCharSequence> lines = arrowTooltip().stream().flatMap(c -> font.split(c, room).stream()).toList();
+            List<FormattedCharSequence> lines = arrowTooltip().stream().flatMap(c -> TooltipWrap.hanging(font, c, room).stream()).toList();
             var arrow = new ScreenRectangle(leftPos + ARROW_X, topPos + ARROW_Y, 24, 16);
             if (!lines.isEmpty()) g.setTooltipForNextFrame(font, lines, new BelowOrAboveWidgetTooltipPositioner(arrow), mouseX, mouseY, false);
         }

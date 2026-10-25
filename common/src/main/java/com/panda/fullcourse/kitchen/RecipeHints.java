@@ -37,7 +37,18 @@ public final class RecipeHints {
     /** Each item's ingredients over all its recipes, as item ids and tags, alternatives included. */
     private static final Map<Item, Set<String>> takes = new LinkedHashMap<>();
 
+    /**
+     * Marks a name a wrapped line keeps whole (the client's tooltip wrap reads it): an insertion, which only chat uses,
+     * on shift-click.
+     */
+    public static final String WHOLE = "fullcourse:whole";
+
     private RecipeHints() {}
+
+    /** {@code name}, marked to stay on one line when its line wraps. */
+    public static MutableComponent whole(Component name) {
+        return name.copy().withStyle(s -> s.withInsertion(WHOLE));
+    }
 
     /** The item's recipe lines, empty for items that aren't the mod's or have no recipe. */
     public static List<Component> lines(Item item) {
@@ -151,7 +162,7 @@ public final class RecipeHints {
                     from.append(ingredient(ingredients.get(i)));
                 }
                 if (made.has("container")) from.append(Component.translatable("hint.fullcourse.served_in", name(made.get("container").getAsString())));
-                lines.add(Component.translatable("hint.fullcourse.made", Component.translatable("station.fullcourse." + made.get("station").getAsString()), from)
+                lines.add(Component.translatable("hint.fullcourse.made", whole(Component.translatable("station.fullcourse." + made.get("station").getAsString())), from)
                         .withStyle(ChatFormatting.DARK_AQUA));
             }
             Item item = ModItems.item(e.get("id").getAsString());
@@ -187,7 +198,7 @@ public final class RecipeHints {
     }
 
     private static Component name(String id) {
-        if (id.startsWith("#")) return Component.translatable("hint.fullcourse.tag." + id.substring(1).replace(':', '.').replace('/', '.'));
-        return Component.translatable(BuiltInRegistries.ITEM.getValue(Identifier.parse(id)).getDescriptionId());
+        if (id.startsWith("#")) return whole(Component.translatable("hint.fullcourse.tag." + id.substring(1).replace(':', '.').replace('/', '.')));
+        return whole(Component.translatable(BuiltInRegistries.ITEM.getValue(Identifier.parse(id)).getDescriptionId()));
     }
 }
