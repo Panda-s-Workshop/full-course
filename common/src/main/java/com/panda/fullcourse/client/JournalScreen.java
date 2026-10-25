@@ -188,18 +188,18 @@ public class JournalScreen extends Screen {
             int x = left + GRID_X + (i % COLS) * 18, y = top + GRID_Y + (i / COLS - scroll) * 18;
             boolean has = tasted.contains(BuiltInRegistries.ITEM.getKey(item));
             if (has) {
-                // a dark well under the tier's frame, so the light iron of two stars shows on the grey panel too
+                // the tier's ring between a dark edge and a dark well, so the light iron of two stars shows on the grey
+                // panel too
                 g.fill(x - 1, y - 1, x + 17, y + 17, WELL);
-                g.outline(x - 1, y - 1, 18, 18, FoodProfiles.client(item).tier().color());
+                g.outline(x - 1, y - 1, 18, 18, PIP_EDGE);
+                g.outline(x, y, 16, 16, FoodProfiles.client(item).tier().color());
             }
             g.item(new ItemStack(item), x, y);
             if (!has) {
                 g.fill(x, y, x + 16, y + 16, FADE);
-                // a pip in the progress bar's colour: tasting this one moves the next slot along
-                if (countsToward(next, item)) {
-                    g.fill(x + 11, y, x + 16, y + 5, PIP_EDGE);
-                    g.fill(x + 12, y + 1, x + 15, y + 4, barTier(next).color());
-                }
+                // a diamond in the progress bar's colour (a square would read as a tier pip): tasting this one moves the
+                // next slot along
+                if (countsToward(next, item)) diamond(g, x + 12, y + 3, barTier(next).color());
             }
             if (mouseX >= x - 1 && mouseX < x + 17 && mouseY >= y - 1 && mouseY < y + 17) {
                 hovered = item;
@@ -223,6 +223,15 @@ public class JournalScreen extends Screen {
                 lines.add(Math.min(1, lines.size()), Component.translatable("gui.fullcourse.journal.untasted").withStyle(ChatFormatting.DARK_GRAY));
             }
             g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
+        }
+    }
+
+    /** A 7-pixel-wide diamond centred on {@code cx, cy}: a dark edge round a fill of {@code color}. */
+    static void diamond(GuiGraphicsExtractor g, int cx, int cy, int color) {
+        for (int d = -3; d <= 3; d++) {
+            int half = 3 - Math.abs(d);
+            g.fill(cx - half, cy + d, cx + half + 1, cy + d + 1, PIP_EDGE);
+            if (half > 0) g.fill(cx - half + 1, cy + d, cx + half, cy + d + 1, color);
         }
     }
 
