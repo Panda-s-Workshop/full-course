@@ -86,6 +86,8 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
     }
 
     private static final int STARS_W = 50;
+    /** A widget tooltip's width, in lines no wider than this. */
+    private static final int TOOLTIP_WIDTH = 160;
 
     /**
      * The result's stars in its tier's colour, centred under the output slot whose item sits at x, from y down, if it
@@ -179,8 +181,10 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
         @Override
         public void createRecipeExtras(IRecipeExtrasBuilder extras, RecipeHolder<FermentingRecipe> holder, IFocusGroup focuses) {
             extras.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(44, 10);
-            // the crock goes by the overworld's clock too, so sleeping through the night counts toward this
-            time(extras, holder.value().time(), 44, 28).setTooltip(Component.translatable("gui.fullcourse.jei.crock_sleep"));
+            // the crock goes by the overworld's clock too, so sleeping through the night counts toward this; in lines,
+            // as JEI draws a widget's tooltip as given
+            time(extras, holder.value().time(), 44, 28).setTooltip(net.minecraft.client.Minecraft.getInstance().font.getSplitter()
+                    .splitLines(Component.translatable("gui.fullcourse.jei.crock_sleep"), TOOLTIP_WIDTH, net.minecraft.network.chat.Style.EMPTY));
             stars(extras, holder.value().result(), 79, 32);
         }
     }
