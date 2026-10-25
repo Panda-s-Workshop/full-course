@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 
 /**
  * The text a food shows: tier stars and name (a check mark once tasted), one line per benefit saying what
@@ -104,7 +105,9 @@ public final class FoodText {
         for (int i = 0; i < effects.size(); i++) {
             Benefits.Effect e = effects.get(i);
             double v = Math.abs(e.perLevel() * level);
-            args[i] = number(e.operation() == Operation.ADD_VALUE ? v : v * 100);
+            // water movement efficiency is a share of water's drag taken away (1 = none), so it reads as a percentage
+            boolean percent = e.operation() != Operation.ADD_VALUE || e.attribute().get() == Attributes.WATER_MOVEMENT_EFFICIENCY;
+            args[i] = number(percent ? v * 100 : v);
         }
         return args;
     }

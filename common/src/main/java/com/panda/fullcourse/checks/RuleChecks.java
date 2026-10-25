@@ -656,6 +656,9 @@ public final class RuleChecks {
         // 0.10 a level times 3 is 0.30000000000000004 in floating point
         String diligence = FoodText.benefit(Family.DILIGENCE, 3).getString();
         check(diligence.equals("Diligence III: +30% mining speed"), "whole percentages read without a decimal: %s", diligence);
+        // water movement efficiency is added as a value (0.15) but is a share of water's drag
+        String tide = FoodText.benefit(Family.TIDE, 4).getString();
+        check(tide.equals("Tide IV: +4 respiration, 60% less water drag"), "Tide's drag as a percentage: %s", tide);
         List<String> raw = text(c, Items.BEEF, false, false);
         check(raw.get(1).contains("Made into a dish, it gives a meal") && raw.get(2).equals("Heals 1.5 ❤ over 3 s"), "raw lines %s", raw);
         List<String> remedy = text(c, Items.GOLDEN_APPLE, false, false);

@@ -70,7 +70,7 @@
   "family.fullcourse.swift": "Swift",
   "family.fullcourse.swift.effect": "+%s%% speed",
   "family.fullcourse.tide": "Tide",
-  "family.fullcourse.tide.effect": "+%s respiration, +%s%% swim speed",
+  "family.fullcourse.tide.effect": "+%s respiration, %s%% less water drag",
   "family.fullcourse.vigor": "Vigor",
   "family.fullcourse.vigor.effect": "+%s max health",
   "fullcourse.configuration.durationMultiplier": "Meal duration multiplier",
