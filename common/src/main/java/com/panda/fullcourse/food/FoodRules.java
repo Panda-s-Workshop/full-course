@@ -132,7 +132,7 @@ public final class FoodRules {
         // under /tick freeze players keep ticking while the game time stands still; a /tick step runs the game,
         // its last tick included (the step count is spent before the tick runs)
         if (!player.level().tickRateManager().runsNormally()) return;
-        restoreHealth(player);
+        restoreHealth(player, now);
         FoodState before = state(player);
         // a server that lowered its slots trims the meals past them now, not at the next meal
         FoodState s = before.withMeals(before.meals().expire(now).trim(before.slots()));
@@ -186,13 +186,18 @@ public final class FoodRules {
         return rate == null ? 1 : rate.getValue();
     }
 
-    /** After a login or an End exit: the meal bonus back first, then the health the save or the old player had. */
-    private static void restoreHealth(ServerPlayer player) {
+    /**
+     * After a login or an End exit: the meal bonus back first, then the health the save or the old player had. The time
+     * of the last hit isn't saved, so a player who logs in hurt waits Recovery's delay as after a hit, instead of
+     * healing at once (the End exit carries the old player's time over).
+     */
+    private static void restoreHealth(ServerPlayer player, long now) {
         if (!(player instanceof HealthMemory memory) || memory.fullcourse$savedHealth() <= 0) return;
         float saved = memory.fullcourse$savedHealth();
         memory.fullcourse$setSavedHealth(0F);
         Benefits.apply(player, state(player).meals().strongest());
         if (saved > player.getHealth()) player.setHealth(Math.min(saved, player.getMaxHealth()));
+        if (player.isHurt() && player.lastDamageStamp == 0) player.lastDamageStamp = now;
     }
 
     /** The Saturation effect heals (amplifier + 1) HP on its first tick and every second after. */

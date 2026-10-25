@@ -102,6 +102,7 @@ public final class RuleChecks {
         CHECKS.put("meal_survives_milk", RuleChecks::mealSurvivesMilk);
         CHECKS.put("meals_lost_on_death", RuleChecks::mealsLostOnDeath);
         CHECKS.put("relog_keeps_vigor_hearts", RuleChecks::relogKeepsVigorHearts);
+        CHECKS.put("relog_keeps_recovery_delay", RuleChecks::relogKeepsRecoveryDelay);
         CHECKS.put("vanilla_tiers", RuleChecks::vanillaTiers);
         CHECKS.put("benefit_attribute_applied", RuleChecks::benefitApplied);
         CHECKS.put("benefit_removed_on_expiry", RuleChecks::benefitRemovedOnExpiry);
@@ -468,6 +469,23 @@ public final class RuleChecks {
         FoodRules.tick(loaded, c.t() + 1);
         check(loaded.getMaxHealth() == 24F, "max health after loading %s, expected 24", loaded.getMaxHealth());
         check(Math.abs(loaded.getHealth() - 24F) < 0.01F, "health after loading %s, expected 24", loaded.getHealth());
+    }
+
+    /** A player saved hurt comes back with Recovery's delay to wait out, as after a hit; one leaving the End keeps its hit time. */
+    private static void relogKeepsRecoveryDelay(Ctx c) {
+        hurtAt(c, c.t());
+        var registries = c.server().registryAccess();
+        TagValueOutput out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, registries);
+        c.player().saveWithoutId(out);
+        ServerPlayer loaded = new ServerPlayer(c.server(), c.level(), new GameProfile(UUID.randomUUID(), "fc_relog"), ClientInformation.createDefault());
+        loaded.load(TagValueInput.create(ProblemReporter.DISCARDING, registries, out.buildResult()));
+        long login = c.t() + 20_001; // long after the hit, off the 20-tick nourish beat
+        FoodRules.tick(loaded, login);
+        check(loaded.lastDamageStamp == login, "the login stamped %s, expected the login time %s", loaded.lastDamageStamp, login);
+        check(Math.abs(loaded.getHealth() - 10F) < 0.01F, "healed at login: %s HP", loaded.getHealth());
+        ServerPlayer exited = new ServerPlayer(c.server(), c.level(), new GameProfile(UUID.randomUUID(), "fc_end_exit"), ClientInformation.createDefault());
+        exited.restoreFrom(c.player(), true);
+        check(exited.lastDamageStamp == c.t(), "the End exit carried %s, expected the hit at %s", exited.lastDamageStamp, c.t());
     }
 
     // ---- 3.4 tiers of vanilla food ------------------------------------------------------------------------------

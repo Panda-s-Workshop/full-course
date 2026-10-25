@@ -17,7 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 abstract class ServerPlayerMixin {
     @Inject(method = "restoreFrom", at = @At("TAIL"))
     private void fullcourse$rememberHealth(ServerPlayer old, boolean keepEverything, CallbackInfo ci) {
-        if (keepEverything) ((HealthMemory) this).fullcourse$setSavedHealth(old.getHealth());
+        if (keepEverything) {
+            ((HealthMemory) this).fullcourse$setSavedHealth(old.getHealth());
+            ((ServerPlayer) (Object) this).lastDamageStamp = old.lastDamageStamp; // Recovery's delay runs on
+        }
         else if (FullCourseConfig.keepMealsOnDeath()) ((HealthMemory) this).fullcourse$setSavedHealth(Float.MAX_VALUE);
     }
 }
