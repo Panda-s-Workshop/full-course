@@ -16,7 +16,7 @@ public final class PropertiesConfig implements FullCourseConfig.Source {
              recoveryDelaySeconds: seconds without taking damage before Recovery starts healing (0-600)
              recoveryIntervalTicks: ticks between Recovery heals of 1 HP, before Mending (1-12000)
              startingMealSlots: meal slots a new player has (1-16)
-             maxMealSlots: the most meal slots the Tasting Journal can unlock (1-16)
+             maxMealSlots: the most meal slots a player can have (1-16); the journal opens three past the starting slots
              keepMealsOnDeath: keep held meals through death (true/false)
              durationMultiplier: multiplies every meal's duration (0.05-20)
              tierThresholds: lowest recipe-chain score of tiers 1 to 5, exactly five, ascending, comma-separated

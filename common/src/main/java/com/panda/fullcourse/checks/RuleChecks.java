@@ -599,7 +599,7 @@ public final class RuleChecks {
         String diligence = FoodText.benefit(Family.DILIGENCE, 3).getString();
         check(diligence.equals("Diligence III: +30% mining speed"), "whole percentages read without a decimal: %s", diligence);
         List<String> raw = text(c, Items.BEEF, false, false);
-        check(raw.get(1).contains("Cook it") && raw.get(2).equals("Heals 1.5 ❤ over 3 s"), "raw lines %s", raw);
+        check(raw.get(1).contains("Made into a dish, it gives a meal") && raw.get(2).equals("Heals 1.5 ❤ over 3 s"), "raw lines %s", raw);
         List<String> remedy = text(c, Items.GOLDEN_APPLE, false, false);
         check(remedy.size() == 2 && remedy.get(0).startsWith("Remedy") && remedy.get(1).equals("Heals 2 ❤ over 4 s"),
                 "a remedy shows its line and its heal, no stars: %s", remedy);

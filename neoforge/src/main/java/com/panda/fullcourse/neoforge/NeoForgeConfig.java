@@ -30,7 +30,7 @@ public final class NeoForgeConfig implements FullCourseConfig.Source {
             .worldRestart()
             .defineInRange("startingMealSlots", D.startingMealSlots(), 1, 16);
     private static final ModConfigSpec.IntValue MAX_SLOTS = B
-            .comment("The most meal slots the Tasting Journal can unlock.")
+            .comment("The most meal slots a player can have. The Tasting Journal opens three past the starting slots; /fullcourse unlock can go up to this.")
             .translation("fullcourse.configuration.maxMealSlots")
             .worldRestart()
             .defineInRange("maxMealSlots", D.maxMealSlots(), 1, 16);
