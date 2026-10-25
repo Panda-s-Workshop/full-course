@@ -5,6 +5,7 @@ import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.command.FullCourseCommand;
 import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodRules;
+import com.panda.fullcourse.kitchen.VillageOnions;
 import com.panda.fullcourse.network.ProfilesPayload;
 import com.panda.fullcourse.network.RecoveryPayload;
 import com.panda.fullcourse.network.RulesPayload;
@@ -21,6 +22,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.recipe.v1.sync.RecipeSynchronization;
@@ -32,6 +34,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
 
 /** The Fabric entry point: registers the common content and wires the common hooks to Fabric API's events. */
 public final class FullCourseFabric implements ModInitializer {
@@ -64,6 +68,12 @@ public final class FullCourseFabric implements ModInitializer {
                 GenerationStep.Decoration.VEGETAL_DECORATION, ResourceKey.create(Registries.PLACED_FEATURE, FullCourse.id("patch_wild_onions")));
         BiomeModifications.addFeature(BiomeSelectors.tag(TagKey.create(Registries.BIOME, FullCourse.id("has_wild_ember_peppers"))),
                 GenerationStep.Decoration.VEGETAL_DECORATION, ResourceKey.create(Registries.PLACED_FEATURE, FullCourse.id("patch_wild_ember_peppers")));
+        // onions in village house chests (NeoForge reads data/fullcourse/loot_modifiers/village_onions.json instead)
+        LootTableEvents.MODIFY.register((key, table, source, registries) -> {
+            if (source.isBuiltin() && VillageOnions.chests().contains(key.identifier())) {
+                table.withPool(LootPool.lootPool().add(NestedLootTable.inlineLootTable(VillageOnions.table(registries))));
+            }
+        });
         ServerTickEvents.END_SERVER_TICK.register(server -> server.getPlayerList().getPlayers().forEach(FoodRules::tick));
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
             if (entity instanceof ServerPlayer player) FoodRules.onDeath(player);

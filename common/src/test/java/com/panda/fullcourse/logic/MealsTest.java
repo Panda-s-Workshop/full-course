@@ -9,7 +9,28 @@ import org.junit.jupiter.api.Test;
 /** Meal slots: fill, refresh, replace the least time, strongest wins, expiry. */
 class MealsTest {
     private static Meals.Meal<String> meal(String dish, int level, long end, Family... families) {
-        return new Meals.Meal<>(dish, Tier.HEARTY, List.of(families), level, 0, end);
+        return meal(dish, Tier.HEARTY, level, end, families);
+    }
+
+    private static Meals.Meal<String> meal(String dish, Tier tier, int level, long end, Family... families) {
+        return new Meals.Meal<>(dish, tier, List.of(families), level, 0, end);
+    }
+
+    @Test
+    void aCheaperFoodLeavesARowOfBetterMeals() {
+        Meals<String> row = Meals.<String>empty().eat(meal("wellington", Tier.GOURMET, 3, 100, Family.BRAWN), 2)
+                .eat(meal("chowder", Tier.HEARTY, 2, 900, Family.TIDE), 2);
+        // a steak over a Gourmet and a Hearty meal: neither goes
+        assertEquals(new Meals.Target(-1, Meals.Fill.NONE), row.target("steak", Tier.SIMPLE, 2));
+        assertEquals(row.active(), row.eat(meal("steak", Tier.SIMPLE, 1, 2000, Family.BRAWN), 2).active());
+        // a Hearty dish replaces the Hearty meal, though the Gourmet one has less time left
+        assertEquals(new Meals.Target(1, Meals.Fill.REPLACE), row.target("stew", Tier.HEARTY, 2));
+        assertEquals(List.of("wellington", "stew"),
+                row.eat(meal("stew", Tier.HEARTY, 2, 2000, Family.VIGOR), 2).active().stream().map(Meals.Meal::dish).toList());
+        // a better dish takes the least time of all
+        assertEquals(new Meals.Target(0, Meals.Fill.REPLACE), row.target("banquet", Tier.FEAST, 2));
+        // its own slot is refreshed whatever the row holds
+        assertEquals(new Meals.Target(1, Meals.Fill.REFRESH), row.target("chowder", Tier.SIMPLE, 2));
     }
 
     @Test
@@ -76,10 +97,10 @@ class MealsTest {
     @Test
     void targetSaysWhereADishWouldGo() {
         Meals<String> m = Meals.<String>empty().eat(meal("a", 1, 500, Family.SWIFT), 3).eat(meal("b", 1, 300, Family.TIDE), 3);
-        assertEquals(new Meals.Target(1, Meals.Fill.REFRESH), m.target("b", 3));
-        assertEquals(new Meals.Target(2, Meals.Fill.FILL), m.target("c", 3));
-        assertEquals(new Meals.Target(1, Meals.Fill.REPLACE), m.target("c", 2));
-        assertEquals(new Meals.Target(0, Meals.Fill.FILL), Meals.<String>empty().target("a", 2));
+        assertEquals(new Meals.Target(1, Meals.Fill.REFRESH), m.target("b", Tier.HEARTY, 3));
+        assertEquals(new Meals.Target(2, Meals.Fill.FILL), m.target("c", Tier.HEARTY, 3));
+        assertEquals(new Meals.Target(1, Meals.Fill.REPLACE), m.target("c", Tier.HEARTY, 2));
+        assertEquals(new Meals.Target(0, Meals.Fill.FILL), Meals.<String>empty().target("a", Tier.HEARTY, 2));
     }
 
     @Test
@@ -88,12 +109,19 @@ class MealsTest {
         for (int run = 0; run < 500; run++) {
             int slots = 1 + rng.nextInt(5);
             Meals<String> m = Meals.empty();
-            for (int k = rng.nextInt(7); k > 0; k--) m = m.eat(meal("d" + rng.nextInt(6), 1, 100 + rng.nextInt(900), Family.VIGOR), slots);
+            for (int k = rng.nextInt(7); k > 0; k--) {
+                m = m.eat(meal("d" + rng.nextInt(6), Tier.ofStars(1 + rng.nextInt(5)), 1, 100 + rng.nextInt(900), Family.VIGOR), slots);
+            }
             String dish = "d" + rng.nextInt(7);
-            var eaten = meal(dish, 1, 2000 + run, Family.VIGOR);
-            Meals.Target t = m.target(dish, slots);
+            var eaten = meal(dish, Tier.ofStars(1 + rng.nextInt(5)), 1, 2000 + run, Family.VIGOR);
+            Meals.Target t = m.target(dish, eaten.tier(), slots);
             Meals<String> after = m.eat(eaten, slots);
-            assertSame(eaten, after.active().get(t.slot()), "run " + run + ": " + m.active() + " + " + dish + " at " + slots + " slots");
+            String why = "run " + run + ": " + m.active() + " + " + dish + " at " + slots + " slots";
+            if (t.fill() == Meals.Fill.NONE) {
+                assertEquals(m.active(), after.active(), why);
+            } else {
+                assertSame(eaten, after.active().get(t.slot()), why);
+            }
         }
     }
 }

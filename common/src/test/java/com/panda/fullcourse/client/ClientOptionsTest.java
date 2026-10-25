@@ -20,25 +20,41 @@ class ClientOptionsTest {
     }
 
     @Test
-    void readsBothKeys() {
-        assertEquals(new ClientOptions.Values(24, true, false),
-                ClientOptions.fromProperties(props("mealRowOffset", " 24 ", "showRecoveryParticles", "TRUE", "showTierPips", "false")));
+    void readsEveryKey() {
+        assertEquals(new ClientOptions.Values(ClientOptions.Anchor.TOP_RIGHT, -12, 30, ClientOptions.ListSide.RIGHT, 5, -8, true, false),
+                ClientOptions.fromProperties(props("mealRowAnchor", " Top_Right ", "mealRowX", "-12", "mealRowY", " 30 ",
+                        "mealList", "right", "mealListX", "5", "mealListY", "-8", "showRecoveryParticles", "TRUE", "showTierPips", "false")));
+        assertEquals(ClientOptions.Anchor.BOTTOM_LEFT, ClientOptions.fromProperties(props("mealRowAnchor", "bottom-left")).mealRowAnchor());
+        assertEquals(ClientOptions.ListSide.OFF, ClientOptions.fromProperties(props("mealList", "OFF")).mealList());
     }
 
     @Test
-    void clampsTheOffsetAndIgnoresBadValues() {
-        assertEquals(ClientOptions.MAX_OFFSET, ClientOptions.fromProperties(props("mealRowOffset", "9999")).mealRowOffset());
-        assertEquals(0, ClientOptions.fromProperties(props("mealRowOffset", "-5")).mealRowOffset());
-        assertEquals(ClientOptions.DEFAULTS, ClientOptions.fromProperties(props("mealRowOffset", "lots", "showRecoveryParticles", "yes", "showTierPips", "no")));
+    void clampsTheShiftsAndIgnoresBadValues() {
+        assertEquals(ClientOptions.MAX_SHIFT, ClientOptions.fromProperties(props("mealRowX", "99999")).mealRowX());
+        assertEquals(-ClientOptions.MAX_SHIFT, ClientOptions.fromProperties(props("mealListY", "-99999")).mealListY());
+        assertEquals(ClientOptions.DEFAULTS, ClientOptions.fromProperties(props("mealRowAnchor", "middle", "mealRowY", "lots",
+                "mealList", "under", "showRecoveryParticles", "yes", "showTierPips", "no")));
     }
 
     @Test
-    void theOffsetInUseIsClampedWhateverTheLoaderGives() {
+    void theShiftsInUseAreClampedWhateverTheLoaderGives() {
         try {
-            ClientOptions.use(new ClientOptions.Values(500, false, true));
-            assertEquals(ClientOptions.MAX_OFFSET, ClientOptions.mealRowOffset());
+            ClientOptions.use(new ClientOptions.Values(null, 5000, -5000, null, 5000, 0, false, true));
+            assertEquals(ClientOptions.MAX_SHIFT, ClientOptions.mealRowX());
+            assertEquals(-ClientOptions.MAX_SHIFT, ClientOptions.mealRowY());
+            assertEquals(ClientOptions.MAX_SHIFT, ClientOptions.mealListX());
+            assertEquals(ClientOptions.Anchor.HOTBAR, ClientOptions.mealRowAnchor());
+            assertEquals(ClientOptions.ListSide.LEFT, ClientOptions.mealList());
         } finally {
             ClientOptions.use(ClientOptions.DEFAULTS);
         }
+    }
+
+    @Test
+    void theDefaultFileNamesEveryKeyInLowerCase() {
+        Properties p = ClientOptions.defaults();
+        assertEquals("hotbar", p.getProperty("mealRowAnchor"));
+        assertEquals("left", p.getProperty("mealList"));
+        assertEquals(8, p.size());
     }
 }

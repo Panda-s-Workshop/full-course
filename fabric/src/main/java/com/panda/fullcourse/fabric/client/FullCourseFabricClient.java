@@ -55,7 +55,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
         BlockEntityRenderers.register(ModBlockEntities.CUTTING_BOARD.get(), CuttingBoardRenderer::new);
         BlockColorRegistry.register(List.of(new PotSoupTint()), ModBlocks.COOKING_POT.get());
         // the meal row replaces the food bar, sits above the mount's hearts when riding, and lifts the air bubbles over it
-        // (and over the held-food marker above it)
+        // (and over the held-food marker above it); moved off the hotbar by the player's settings, it lifts nothing
         HudElementRegistry.replaceElement(VanillaHudElements.FOOD_BAR, vanilla -> (g, delta) -> {
             if (!MealHud.active()) vanilla.extractRenderState(g, delta);
         });
@@ -65,7 +65,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
             MealHud.extract(g, g.guiHeight() - FOOD_ROW_BOTTOM - 10 * MealHud.vehicleHeartRows(player));
         });
         HudElementRegistry.replaceElement(VanillaHudElements.AIR_BAR, vanilla -> (g, delta) -> {
-            if (!MealHud.active()) {
+            if (!MealHud.active() || !MealHud.stacksOnHotbar()) {
                 vanilla.extractRenderState(g, delta);
                 return;
             }
@@ -77,7 +77,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
         // the held item's name sits where the lifted air bubbles now are (and the row, when mount hearts lift it): lift it too
         HudElementRegistry.replaceElement(VanillaHudElements.HELD_ITEM_TOOLTIP, vanilla -> (g, delta) -> {
             var player = Minecraft.getInstance().player;
-            if (player == null || !MealHud.active()) {
+            if (player == null || !MealHud.active() || !MealHud.stacksOnHotbar()) {
                 vanilla.extractRenderState(g, delta);
                 return;
             }
@@ -90,7 +90,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
         // keep vanilla's spacing and the message clears the row too; NeoForge already stacks it above the HUD
         HudElementRegistry.replaceElement(VanillaHudElements.OVERLAY_MESSAGE, vanilla -> (g, delta) -> {
             var player = Minecraft.getInstance().player;
-            int lift = player == null || !MealHud.active() ? 0 : Math.max(0, MealHud.lift() - 10 + MealHud.MARKER_ROOM + 10 * MealHud.vehicleHeartRows(player));
+            int lift = player == null || !MealHud.active() || !MealHud.stacksOnHotbar() ? 0 : Math.max(0, MealHud.lift() - 10 + MealHud.MARKER_ROOM + 10 * MealHud.vehicleHeartRows(player));
             if (lift == 0) {
                 vanilla.extractRenderState(g, delta);
                 return;

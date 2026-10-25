@@ -99,6 +99,8 @@ public final class RuleChecks {
         CHECKS.put("meal_fills_slot", RuleChecks::mealFillsSlot);
         CHECKS.put("meal_refresh", RuleChecks::mealRefresh);
         CHECKS.put("meal_replace_least_time", RuleChecks::mealReplaceLeastTime);
+        CHECKS.put("meal_cheaper_food_only_heals", RuleChecks::mealCheaperFoodOnlyHeals);
+        CHECKS.put("village_chest_onions", RuleChecks::villageChestOnions);
         CHECKS.put("family_strongest_wins", RuleChecks::familyStrongestWins);
         CHECKS.put("meal_survives_milk", RuleChecks::mealSurvivesMilk);
         CHECKS.put("meals_lost_on_death", RuleChecks::mealsLostOnDeath);
@@ -432,6 +434,38 @@ public final class RuleChecks {
         eat(c, Items.BAKED_POTATO, t + 200);
         check(dishes(c).equals(List.of(id(Items.BAKED_POTATO), id(Items.BREAD))),
                 "a full row replaces the meal with the least time left (steak): %s", dishes(c));
+    }
+
+    /** A plains house chest, filled as a village fills it, holds onions about one time in two, one to three. */
+    private static void villageChestOnions(Ctx c) {
+        var table = c.server().reloadableRegistries().getLootTable(net.minecraft.world.level.storage.loot.BuiltInLootTables.VILLAGE_PLAINS_HOUSE);
+        var params = new net.minecraft.world.level.storage.loot.LootParams.Builder(c.level())
+                .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, net.minecraft.world.phys.Vec3.atCenterOf(c.spot()))
+                .create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST);
+        Item onion = com.panda.fullcourse.registry.ModItems.item("onion");
+        int with = 0, most = 0;
+        for (int seed = 0; seed < 200; seed++) {
+            var chest = new net.minecraft.world.SimpleContainer(27);
+            table.fill(chest, params, seed);
+            int n = chest.countItem(onion);
+            if (n > 0) with++;
+            most = Math.max(most, n);
+        }
+        check(with > 60 && with < 140 && most <= 3, "onions in %s of 200 plains house chests, at most %s in one", with, most);
+    }
+
+    /** Over a row of better meals a steak only heals: no slot, and the Hearty meals keep their time. */
+    private static void mealCheaperFoodOnlyHeals(Ctx c) {
+        long t = c.t();
+        Item stew = com.panda.fullcourse.registry.ModItems.item("vegetable_stew");
+        eat(c, Items.RABBIT_STEW, t);
+        eat(c, stew, t + 100);
+        Services.PLATFORM.setFoodState(c.player(), state(c).withNourish(0));   // the stews' heal used up
+        eat(c, Items.COOKED_BEEF, t + 200);
+        check(dishes(c).equals(List.of(id(Items.RABBIT_STEW), id(stew))), "a steak over two Hearty meals takes neither: %s", dishes(c));
+        check(state(c).nourish() > 0, "the steak still heals: nourish %s", state(c).nourish());
+        eat(c, Items.MUSHROOM_STEW, t + 300);
+        check(dishes(c).equals(List.of(id(Items.RABBIT_STEW), id(stew))), "nor does a one-star stew: %s", dishes(c));
     }
 
     /** Vigor from a Hearty stew (II) and a Prepared pie (I): II wins, they don't add up. */

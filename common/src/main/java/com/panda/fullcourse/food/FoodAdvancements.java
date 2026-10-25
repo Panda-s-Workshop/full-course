@@ -20,11 +20,16 @@ import net.minecraft.world.item.Item;
 public final class FoodAdvancements {
     private FoodAdvancements() {}
 
-    static void onMeal(ServerPlayer player, Tier tier, Set<Identifier> tasted) {
+    /** A meal taken, by its tier. */
+    static void onMeal(ServerPlayer player, Tier tier) {
         award(player, "first_meal");
         if (tier.stars() >= Tier.HEARTY.stars()) award(player, "hearty");
         if (tier.stars() >= Tier.GOURMET.stars()) award(player, "gourmet");
         if (tier == Tier.FEAST) award(player, "first_feast");
+    }
+
+    /** A dish tasted, whether or not it took a meal slot: the tasting advancements count every dish eaten. */
+    static void onTasted(ServerPlayer player, Set<Identifier> tasted) {
         List<Item> dishes = ModItems.dishes();
         boolean all = true, simple = true;
         for (Item dish : dishes) {

@@ -39,13 +39,15 @@ is a step too.</p>
 chain (steps, stations, ingredients) and the score. A steak is Simple; rabbit stew and cake, vanilla's best, are Hearty;
 a Shepherd's Pie from the Brick Oven is Gourmet.</p>
 <a class="shot" href="img/shots/tooltip.jpg" data-cap="A Gourmet dish with Shift held: benefits, score and the whole recipe chain"><img src="img/thumbs/tooltip.jpg" alt="A Gourmet dish with Shift held: benefits, score and the whole recipe chain" loading="lazy" width="640" height="360"></a></section><section id="slots"><h2>Meal slots</h2><p>You start with <b>two meal slots</b>. Eating a dish of one star or more fills a slot; eating the same dish again
-refreshes it. With every slot full, a new dish replaces the meal with the least time left. Raw food and remedies
-(golden apples and the like) heal but take no slot.</p>
+refreshes it. With every slot full, a new dish replaces the meal with the least time left among those no better than
+it; over a row of better meals, a cheaper food eaten to heal takes no slot. Raw food and remedies (golden apples and
+the like) heal but take no slot.</p>
 <p>Benefits of the same family don't add up: the strongest level wins. So the best loadout is a varied one.</p>
 <p>Meals are not potion effects: milk doesn't clear them. They are lost when you die, unless the server keeps them.</p>
 <p>The meal row sits where the food bar was: each meal's dish in a frame of its tier's colour, with a ring that drains
 as its time runs out, an empty frame for each free slot and a padlock for each locked one. Holding a dish shows which
-slot it would fill or replace.</p></section><section id="families"><h2>Benefit families</h2><p>A dish's benefits come from what went into it. Each ingredient group feeds one family; a dish gives as
+slot it would fill or replace. Each player can move the row to a corner or edge of the screen, and the inventory's
+meal list to either side, in their own <a href="packs.html#config">client settings</a>.</p></section><section id="families"><h2>Benefit families</h2><p>A dish's benefits come from what went into it. Each ingredient group feeds one family; a dish gives as
 many families as its tier allows, at its tier's level. Full Course's own dishes list theirs on the
 <a href="dishes.html">dishes page</a>; other mods' foods count the groups among their ingredients.</p>
 <div class="tw"><table><thead><tr><th>Family</th><th>Per level</th><th>At level IV</th><th>From</th></tr></thead><tbody><tr><td><img src="img/tex/minecraft/beef.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Brawn</b></td><td>+1 attack damage</td><td>+4</td><td>meat</td></tr><tr><td><img src="img/tex/minecraft/carrot.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Vigor</b></td><td>+1 ❤ max health</td><td>+4 ❤</td><td>vegetables, onion, kelp, pumpkin</td></tr><tr><td><img src="img/tex/minecraft/egg.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Fortitude</b></td><td>+1 armor</td><td>+4</td><td>dairy and eggs</td></tr><tr><td><img src="img/tex/minecraft/sweet_berries.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Swift</b></td><td>+5% speed</td><td>+20%</td><td>fruit and berries</td></tr><tr><td><img src="img/tex/minecraft/wheat.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Diligence</b></td><td>+10% mining speed</td><td>+40%</td><td>grain, flour, bread</td></tr><tr><td><img src="img/tex/minecraft/cocoa_beans.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Fortune</b></td><td>+1 luck (better fishing)</td><td>+4</td><td>sweets: sugar, honey, cocoa</td></tr><tr><td><img src="img/tex/minecraft/cod.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Tide</b></td><td>+1 respiration, 15% less water drag</td><td>+4, 60%</td><td>fish</td></tr><tr><td><img src="img/tex/minecraft/brown_mushroom.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Night Eye</b></td><td>night vision</td><td>night vision</td><td>mushrooms, glow berries</td></tr><tr><td><img src="img/tex/fullcourse/ember_pepper.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Ember</b></td><td>−20% burning time</td><td>−80%</td><td>Nether ingredients: Ember Pepper, nether wart, crimson and warped fungus</td></tr><tr><td><img src="img/tex/minecraft/chorus_fruit.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Lightfoot</b></td><td>+2 blocks of safe fall, +5% jump</td><td>+8, +20%</td><td>End ingredients: chorus</td></tr><tr><td><img src="img/tex/minecraft/bone.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Mending</b></td><td>+50% Recovery</td><td>+200%</td><td>broth (bone), and every soup</td></tr></tbody></table></div>
@@ -66,8 +68,8 @@ terracotta and a wooden slab.</p></div>
 <p>Hoppers work the stations like a furnace: ingredients go in from the top, the dish comes out below, and from the
 side a hopper adds the Brick Oven's fuel or the Cooking Pot's bowls and bottles. A hopper under a pot passes the heat up
 from the block under it.</p>
-<p>Two crops go with the kitchen. <b>Onions</b> grow wild in plains, meadows, forests, taiga and savannas and are planted on
-farmland. <b>Ember Peppers</b> grow wild in crimson forests and are planted on soul soil, in any dimension.</p>
+<p>Two crops go with the kitchen. <b>Onions</b> grow wild in plains, meadows, forests, taiga and savannas, turn up in
+village house chests, and are planted on farmland. <b>Ember Peppers</b> grow wild in crimson forests and are planted on soul soil, in any dimension.</p>
 <p>Every recipe is on the <a href="dishes.html">dishes page</a>; with JEI installed, each station has its own recipe category.</p></section><section id="journal"><h2>The Tasting Journal</h2><p>Craft a book with any simple dish. The journal shows every dish the game knows, the ones you've tasted
 in colour and the rest grey, with the tier, the benefits and the recipe chain on hover, and a search box (<code>@mod</code>
 searches by mod). Tasting counts even without the journal; the journal is the window.</p>
@@ -77,9 +79,9 @@ searches by mod). Tasting counts even without the journal; the journal is the wi
 <tr><td>5th</td><td>20 different dishes of three stars or more, and a serving from a feast</td></tr>
 </tbody></table></div>
 <p>A toast and a chime mark each new slot. What you have tasted is kept when you die.</p></section><section id="feasts"><h2>Feasts and cake</h2><p>A feast is placed on a block and served by using it: 8 servings for the Roast Banquet, 6 for the Harvest
-Pie, 4 for the Glow Berry Tart. Each serving is a five-star meal for whoever takes it, and each player can take one
-helping every five minutes, so a feast feeds the group rather than whoever holds the button. The last serving leaves an
-empty platter (the tart leaves nothing).</p>
+Pie, 4 for the Glow Berry Tart. Each serving is a five-star meal for whoever takes it, and each player takes one
+serving of a feast, so a feast feeds the group rather than whoever holds the button. The last serving leaves an empty
+platter (the tart leaves nothing).</p>
 <p>Cake stays vanilla's block, and each slice is a three-star meal (Fortune and Diligence II), one slice per player every
 five minutes.</p></section><section id="vanilla"><h2>What changes in vanilla</h2><div class="tw"><table><thead><tr><th>Vanilla</th><th>With Full Course</th></tr></thead><tbody>
 <tr><td>Hunger (rotten flesh, raw chicken, husks)</td><td>Renamed <b>Queasy</b>: while it lasts, Recovery pauses and food heals but gives no meal.</td></tr>
@@ -87,7 +89,7 @@ five minutes.</p></section><section id="vanilla"><h2>What changes in vanilla</h2
 <tr><td>Golden apples, suspicious stew, honey bottle, chorus fruit</td><td><b>Remedies</b>: their own effects and the heal, no meal slot.</td></tr>
 <tr><td>Milk</td><td>Clears potion effects as always; meals stay.</td></tr>
 <tr><td>Other mods' food</td><td>Rated from its recipes; its own effects still apply.</td></tr>
-<tr><td>Farmer villagers</td><td>Plant onions too.</td></tr>
+<tr><td>Villages</td><td>Farmers plant onions too; house chests hold some about one time in two.</td></tr>
 <tr><td>Animals, breeding, the composter</td><td>Unchanged.</td></tr>
 </tbody></table></div></section><section id="commands"><h2>Commands</h2><ul>
 <li><code>/fullcourse tier [item]</code>: a food's tier, score and benefits, for the item named or the one in your hand.</li>

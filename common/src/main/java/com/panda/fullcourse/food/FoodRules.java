@@ -89,13 +89,19 @@ public final class FoodRules {
                 int duration = profile.tier().durationTicks(FullCourseConfig.durationMultiplier());
                 Meals.Meal<Identifier> meal = new Meals.Meal<>(id, profile.tier(), profile.families(), profile.tier().level(), now, now + duration);
                 s = unlockSlots(player, s.withTasted(id).withHelping(id, now, FeastBlock.HELPING_TICKS));
-                Meals.Target target = s.meals().target(id, s.slots());
-                Component replaced = target.fill() == Meals.Fill.REPLACE ? itemName(s.meals().active().get(target.slot()).dish()) : null;
-                s = s.withMeals(s.meals().eat(meal, s.slots()));
-                Map<Family, Integer> others = new Meals<>(s.meals().active().stream().filter(m -> !m.dish().equals(id)).toList()).strongest();
-                player.sendSystemMessage(FoodText.mealMessage(name, profile, others, replaced), true);
-                cue(player, ModSounds.MEAL_START);
-                FoodAdvancements.onMeal(player, profile.tier(), s.tasted());
+                Meals.Target target = s.meals().target(id, profile.tier(), s.slots());
+                if (target.fill() == Meals.Fill.NONE) {
+                    // every slot holds a better meal: eaten to heal, it takes none of them
+                    player.sendSystemMessage(Component.translatable("message.fullcourse.no_meal.outranked", name).withStyle(ChatFormatting.GRAY), true);
+                } else {
+                    Component replaced = target.fill() == Meals.Fill.REPLACE ? itemName(s.meals().active().get(target.slot()).dish()) : null;
+                    s = s.withMeals(s.meals().eat(meal, s.slots()));
+                    Map<Family, Integer> others = new Meals<>(s.meals().active().stream().filter(m -> !m.dish().equals(id)).toList()).strongest();
+                    player.sendSystemMessage(FoodText.mealMessage(name, profile, others, replaced), true);
+                    cue(player, ModSounds.MEAL_START);
+                    FoodAdvancements.onMeal(player, profile.tier());
+                }
+                FoodAdvancements.onTasted(player, s.tasted());
             }
         } else if (!FullCourseConfig.keepVanillaHunger()) {
             // with no food bar to watch, say why nothing filled a slot

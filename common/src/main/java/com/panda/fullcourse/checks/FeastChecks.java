@@ -149,9 +149,17 @@ final class FeastChecks {
         serve(c, ItemStack.EMPTY);
     }
 
-    /** As if another player came to the table: a helping is per player. */
+    /**
+     * As if another player came to the table: their own food state, and a feast that hasn't served them (the mock
+     * player can't change who it is, so the feast is set down again, keeping its servings).
+     */
     private static void nextGuest(RuleChecks.Ctx c) {
         Services.PLATFORM.setFoodState(c.player(), FoodState.EMPTY);
+        BlockState feast = c.level().getBlockState(c.spot());
+        if (feast.getBlock() instanceof FeastBlock) {
+            c.level().setBlock(c.spot(), Blocks.AIR.defaultBlockState(), 3);
+            c.level().setBlock(c.spot(), feast, 3);
+        }
     }
 
     private static int servings(RuleChecks.Ctx c) {
@@ -225,26 +233,33 @@ final class FeastChecks {
     }
 
     /**
-     * Holding the use key takes one helping, not the table: a second right-click within five minutes is refused and
-     * the servings stay; the next guest takes theirs; after five minutes the same player may take another.
+     * A feast serves each player once: a second right-click is refused and the servings stay, and so is one five
+     * minutes on; the next guest takes theirs. Across feasts, one helping of a dish in five minutes: a second banquet
+     * set down at once is refused (the meal gone or not), and serves five minutes on.
      */
     private static void feastOneHelping(RuleChecks.Ctx c) {
+        Identifier banquet = BuiltInRegistries.ITEM.getKey(ModBlocks.ROAST_BANQUET.get().asItem());
         placed(c, ModBlocks.ROAST_BANQUET.get().defaultBlockState(), () -> {
             serve(c);
             serve(c);
             check(servings(c) == 7, "two right-clicks back to back take one serving, %s left", servings(c));
-            nextGuest(c);
-            serve(c);
-            check(servings(c) == 6, "the next guest takes theirs, %s left", servings(c));
-            // the helping is remembered apart from the meal: a meal replaced, lost on death or cut short frees nothing
-            Services.PLATFORM.setFoodState(c.player(), state(c).withMeals(Meals.empty()));
-            serve(c);
-            check(servings(c) == 6, "with the meal gone, still one helping in five minutes, %s left", servings(c));
-            Identifier banquet = BuiltInRegistries.ITEM.getKey(ModBlocks.ROAST_BANQUET.get().asItem());
             long now = c.level().getGameTime();
             Services.PLATFORM.setFoodState(c.player(), state(c).withHelping(banquet, now - FeastBlock.HELPING_TICKS, FeastBlock.HELPING_TICKS));
             serve(c);
-            check(servings(c) == 5, "five minutes on, another helping, %s left", servings(c));
+            check(servings(c) == 7, "five minutes on, the same feast still serves them once, %s left", servings(c));
+            nextGuest(c);
+            serve(c);
+            check(servings(c) == 6, "the next guest takes theirs, %s left", servings(c));
+        });
+        placed(c, ModBlocks.ROAST_BANQUET.get().defaultBlockState(), () -> {
+            // the helping is remembered apart from the meal: a meal replaced, lost on death or cut short frees nothing
+            Services.PLATFORM.setFoodState(c.player(), state(c).withMeals(Meals.empty()));
+            serve(c);
+            check(servings(c) == 8, "another banquet, with the meal gone: still one helping in five minutes, %s left", servings(c));
+            long now = c.level().getGameTime();
+            Services.PLATFORM.setFoodState(c.player(), state(c).withHelping(banquet, now - FeastBlock.HELPING_TICKS, FeastBlock.HELPING_TICKS));
+            serve(c);
+            check(servings(c) == 7, "five minutes on, a helping from another banquet, %s left", servings(c));
         });
     }
 

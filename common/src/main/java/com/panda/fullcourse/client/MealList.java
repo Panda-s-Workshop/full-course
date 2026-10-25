@@ -28,12 +28,14 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * The meals listed beside the survival inventory, in the space the recipe book takes when open (so it hides then):
- * each active meal with its dish, time left and benefits, the free slots, and the next slot's milestone with a bar.
- * Hovering a meal shows the dish's tooltip. Drawn at the end of the inventory screen's own frame (a client mixin).
+ * The meals listed beside the survival inventory: each active meal with its dish, time left and benefits, the free
+ * slots, and the next slot's milestone with a bar. Hovering a meal shows the dish's tooltip. The player's
+ * {@code mealList} puts it on the left (the space the recipe book takes when open, so it hides then), on the right
+ * (where vanilla lists effects), or nowhere, and {@code mealListX}/{@code mealListY} shift it, kept on screen. Drawn at
+ * the end of the inventory screen's own frame (a client mixin).
  */
 public final class MealList {
-    private static final int MAX_W = 156, MIN_W = 104, ROW = 22, PAD = 4, GAP = 4;
+    private static final int MAX_W = 156, MIN_W = 104, ROW = 22, PAD = 4, GAP = 4, INVENTORY_W = 176;
     private static final int BG = 0xD0100010, BORDER = 0xFF2A1A40, TEXT = 0xFFFFFFFF, DIM = 0xFFA0A0A0;
 
     /** Where the list was drawn last frame; null while it isn't shown. */
@@ -52,9 +54,12 @@ public final class MealList {
         shown = null;
         // shown with vanilla hunger kept too: meals still give their benefits, and this is where their time left shows
         if (player == null || !FoodProfiles.clientReady()) return;
-        // the recipe book moves the inventory off centre and takes this space
-        if (screen.leftPos != (screen.width - 176) / 2) return;
-        int w = Math.min(MAX_W, screen.leftPos - 2 * GAP);
+        ClientOptions.ListSide side = ClientOptions.mealList();
+        if (side == ClientOptions.ListSide.OFF) return;
+        boolean left = side == ClientOptions.ListSide.LEFT;
+        // the recipe book moves the inventory off centre and takes the left space
+        if (left && screen.leftPos != (screen.width - INVENTORY_W) / 2) return;
+        int w = Math.min(MAX_W, (left ? screen.leftPos : screen.width - screen.leftPos - INVENTORY_W) - 2 * GAP);
         if (w < MIN_W) return;
         Font font = mc.font;
         FoodState state = Services.PLATFORM.foodState(player);
@@ -92,7 +97,10 @@ public final class MealList {
         }
         int hidden = meals.size() - shownMeals;
         int h = fixed + (meals.isEmpty() ? ROW : rows) + (hidden > 0 ? 11 : 0);
-        int x = screen.leftPos - GAP - w, y = Math.max(GAP, Math.min(screen.topPos, screen.height - GAP - h));
+        int x = (left ? screen.leftPos - GAP - w : screen.leftPos + INVENTORY_W + GAP) + ClientOptions.mealListX();
+        int y = Math.max(GAP, Math.min(screen.topPos, screen.height - GAP - h)) + ClientOptions.mealListY();
+        x = Math.clamp(x, 0, Math.max(0, screen.width - w));
+        y = Math.clamp(y, 0, Math.max(0, screen.height - h));
         shown = new Rect2i(x, y, w, h);
         g.fill(x, y, x + w, y + h, BG);
         g.outline(x, y, w, h, BORDER);

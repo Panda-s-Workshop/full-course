@@ -26,6 +26,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
@@ -42,12 +44,13 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * A feast: placed on a solid block and served by using it, a tier-5 meal per serving for whoever takes it, one helping
- * per player every five minutes; a Queasy player is turned away without spending a serving. The
+ * A feast: placed on a solid block and served by using it, a tier-5 meal per serving for whoever takes it, one serving
+ * per player from each feast placed (and one helping of a dish every five minutes, across feasts); a Queasy player is
+ * turned away without spending a serving. The
  * banquet and the pie leave their empty platter after the last serving; the tart goes with its last quarter. Broken
  * untouched it comes back whole; broken started, it's lost, as a cake is.
  */
-public class FeastBlock extends Block {
+public class FeastBlock extends Block implements EntityBlock {
     public static final int MAX_SERVINGS = 8;
     /** One helping per player in this long: a feast is shared, not eaten by whoever holds the button. */
     public static final int HELPING_TICKS = 5 * 60 * 20;
@@ -123,10 +126,16 @@ public class FeastBlock extends Block {
         if (!player.canEat(false)) return InteractionResult.PASS;
         if (!(player instanceof ServerPlayer server)) return InteractionResult.SUCCESS;
         Component refused = refusal(server, asItem());
+        FeastBlockEntity table = level.getBlockEntity(pos) instanceof FeastBlockEntity f ? f : null;
+        if (refused == null && table != null && table.served(server.getUUID())) {
+            // one serving each from a feast: the rest are for the others at the table
+            refused = Component.translatable("message.fullcourse.feast.served", asItem().getName(new ItemStack(asItem())));
+        }
         if (refused != null) {
             server.sendOverlayMessage(refused);
             return InteractionResult.SUCCESS;
         }
+        if (table != null) table.serve(server.getUUID());
         if (FullCourseConfig.keepVanillaHunger()) server.getFoodData().eat(serving, 0.8F);
         FoodRules.onEatDish(server, asItem(), serving);
         level.playSound(null, pos, ModSounds.FEAST_SERVE.get(), SoundSource.PLAYERS, 1F, 0.9F + level.getRandom().nextFloat() * 0.2F);
@@ -164,6 +173,11 @@ public class FeastBlock extends Block {
             }
         }
         return null;
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new FeastBlockEntity(pos, state);
     }
 
     @Override

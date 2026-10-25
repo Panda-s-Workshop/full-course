@@ -23,10 +23,12 @@ import net.minecraft.world.item.ItemStack;
  * the dish inside, its frame a ring in the tier's colour that drains clockwise from the top as the time runs out, over
  * a dim track of the same colour so a meal about to end still shows its tier (the icon itself stays clear); a lighter frame with a plate for free slots and dim padlocks for slots the journal hasn't
  * unlocked yet. Holding a food that gives a meal marks the slot it would take with a small arrow above it: white over
- * the free slot it fills (shown there, dimmed) or its own slot to refresh, red over the meal it would replace (dimmed).
+ * the free slot it fills (shown there, dimmed) or its own slot to refresh, red over the meal it would replace (dimmed);
+ * none over a row of better meals, which it wouldn't take.
  * Five frames fit between the hearts and the hotbar's right edge; a server allowing more slots gets more rows, stacked
- * upward. Loaders place it and hide the food bar; the player's {@code mealRowOffset} lifts it, and the loaders lift what
- * stacks above it by {@link #lift}.
+ * upward. Loaders hide the food bar and pass the food row's place; the player's {@code mealRowAnchor} keeps it there
+ * (the loaders lift what stacks above it by {@link #lift}) or moves it to a corner or edge of the screen, out of the
+ * stack, and {@code mealRowX}/{@code mealRowY} shift it from there, kept on screen.
  */
 public final class MealHud {
     public static final Identifier LAYER = FullCourse.id("meals");
@@ -39,16 +41,30 @@ public final class MealHud {
     public static final int ROW_STEP = FRAME + MARKER_ROOM;
     /** Frames per row: a sixth would reach over the hearts. */
     static final int PER_ROW = 5;
-    /** The top of the frames as last drawn (for checks). */
-    private static int lastTop;
+    /** Room kept from the screen's edges by a row placed at a corner or edge. */
+    public static final int EDGE = 4;
+    /** The top of the frames and the right edge of the row as last drawn (for checks). */
+    private static int lastTop, lastRight;
 
     public static int lastTop() {
         return lastTop;
     }
 
-    /** What the rows add above the food row's place: their height plus the player's {@code mealRowOffset}. */
+    public static int lastRight() {
+        return lastRight;
+    }
+
+    /** Whether the row sits on the hotbar's stack, where the food bar was, so what stacks above it moves up. */
+    public static boolean stacksOnHotbar() {
+        return ClientOptions.mealRowAnchor() == ClientOptions.Anchor.HOTBAR;
+    }
+
+    /**
+     * What the rows add above the food row's place: their height, less the player's {@code mealRowY} (a negative one
+     * lifts the row and the stack above it). Only for a row on the hotbar's stack ({@link #stacksOnHotbar}).
+     */
     public static int lift() {
-        return HEIGHT + ROW_STEP * (rows() - 1) + ClientOptions.mealRowOffset();
+        return Math.max(0, HEIGHT + ROW_STEP * (rows() - 1) - ClientOptions.mealRowY());
     }
 
     /** Rows of frames for the server's most slots. */
@@ -83,20 +99,22 @@ public final class MealHud {
     }
 
     /**
-     * Draws the row with its frames' bottom edge at {@code bottom} (the bottom of vanilla's food row, or of the mount's
-     * hearts when riding). Returns whether it drew.
+     * Draws the row. {@code bottom} is the food row's place on the hotbar's stack (the bottom of vanilla's food row, or
+     * of the mount's hearts when riding), used when the row's anchor is the hotbar. Returns whether it drew.
      */
     public static boolean extract(GuiGraphicsExtractor g, int bottom) {
         if (!active()) return false;
-        bottom -= ClientOptions.mealRowOffset();
+        int[] at = place(g.guiWidth(), g.guiHeight(), bottom);
+        int right = at[0];
+        bottom = at[1];
         lastTop = bottom - FRAME - (rows() - 1) * ROW_STEP;
+        lastRight = right;
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         FoodState state = Services.PLATFORM.foodState(player);
         long now = player.level().getGameTime();
         int slots = state.slots();
         int max = FullCourseConfig.maxMealSlots();
-        int right = g.guiWidth() / 2 + 91;
         int firstTop = bottom - FRAME;
         ItemStack held = heldMeal(player);
         Meals.Target target = preview(player, state);
@@ -138,6 +156,31 @@ public final class MealHud {
         return true;
     }
 
+    /**
+     * The row's right edge and its bottom row's bottom edge on a {@code width}×{@code height} GUI: at the anchor, shifted
+     * by {@code mealRowX}/{@code mealRowY}, then kept on screen with room for the held-food marker above the top row.
+     */
+    static int[] place(int width, int height, int hotbarBottom) {
+        int cols = Math.min(PER_ROW, Math.max(1, FullCourseConfig.maxMealSlots()));
+        int w = cols * FRAME + cols - 1;
+        int h = FRAME + (rows() - 1) * ROW_STEP + MARKER_ROOM;
+        int left = EDGE + w, right = width - EDGE, centre = (width + w) / 2;
+        int top = EDGE + h, middle = (height + h) / 2, low = height - EDGE;
+        int[] at = switch (ClientOptions.mealRowAnchor()) {
+            case HOTBAR -> new int[] {width / 2 + 91, hotbarBottom};
+            case TOP_LEFT -> new int[] {left, top};
+            case TOP -> new int[] {centre, top};
+            case TOP_RIGHT -> new int[] {right, top};
+            case LEFT -> new int[] {left, middle};
+            case RIGHT -> new int[] {right, middle};
+            case BOTTOM_LEFT -> new int[] {left, low};
+            case BOTTOM_RIGHT -> new int[] {right, low};
+        };
+        at[0] = Math.clamp(at[0] + ClientOptions.mealRowX(), Math.min(w, width), Math.max(w, width));
+        at[1] = Math.clamp(at[1] + ClientOptions.mealRowY(), Math.min(h, height), Math.max(h, height));
+        return at;
+    }
+
     /** One ring pixel: the tier's colour where time is left, its track where it's gone, all of it white on a blink. */
     static int ringColor(Tier tier, boolean lit, boolean blinkOff) {
         return blinkOff ? BLINK_COLOR : lit ? tier.color() : tier.trackColor();
@@ -145,13 +188,15 @@ public final class MealHud {
 
     /**
      * Where the food in the player's hand would go if eaten now ({@link Meals#target}): a free slot, its own slot to
-     * refresh, or the meal it would replace; null when the hand holds nothing that gives a meal.
+     * refresh, the meal it would replace, or none (a row of better meals); null when the hand holds nothing that gives
+     * a meal.
      */
     public static Meals.Target preview(LocalPlayer player, FoodState state) {
         ItemStack held = heldMeal(player);
         if (held.isEmpty()) return null;
         // a slice fills its cake's slot, as eating it does
-        return state.meals().target(BuiltInRegistries.ITEM.getKey(FoodProfiles.clientTastedAs(held.getItem())), state.slots());
+        return state.meals().target(BuiltInRegistries.ITEM.getKey(FoodProfiles.clientTastedAs(held.getItem())),
+                FoodProfiles.client(held.getItem()).tier(), state.slots());
     }
 
     /** The food in the main hand, else the off hand, that would give a meal; empty if neither would. */

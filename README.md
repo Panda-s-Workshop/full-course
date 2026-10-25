@@ -22,13 +22,14 @@ ingredients), the stronger and longer its benefits. Every food from every mod ge
 
 - **Meals.** Food heals over time, and a cooked dish also fills a meal slot in the row where the food bar was. Its
   benefits (more hearts, damage, armor, speed, mining speed and more) last while its ring runs down. You start with
-  two slots; a new dish over a full row replaces the meal with the least time left.
+  two slots; a new dish over a full row replaces the meal with the least time left among those no better than it.
+  Over a row of better meals, a cheaper food only heals.
 - **Stars.** A food's tier, one to five stars on its tooltip, comes from the work in its recipe chain: steps,
   stations and ingredients. More stars give more benefits, higher levels and longer meals. Hold Shift on a food to
   see its chain.
 - **The kitchen.** The Cutting Board (food on it, then a knife), the Cooking Pot (heat under it, such as a lit
   campfire), the Brick Oven (bakes with fuel) and the Fermenting Crock (seal it and wait) make the better dishes.
-  Feasts are placed and shared: one helping per player every five minutes.
+  Feasts are placed and shared: one serving for each player.
 - **More slots.** Taste different dishes to open up to three more slots. The Tasting Journal lists what you have
   tasted and what the next slot asks for.
 - **Health.** Health comes back on its own 8 seconds after the last hit (Recovery). Mending meals make it faster.
@@ -70,12 +71,15 @@ neither Recovery nor food. Healing potions, golden apples and other effects stil
 | `tierThresholds` | `1,3,5,8,12` | Lowest recipe-chain score of tiers 1 to 5: exactly five, each higher than the last, 1–999. Anything else falls back to the defaults. |
 | `slotMilestones` | `8,15,20` | Different dishes to taste for meal slot 3 (two stars or more), 4 and 5 (three stars or more; slot 5 also needs a feast). Exactly three, each 1–9999, and slot 5's not below slot 4's; anything else falls back to the defaults. Raise them in a pack with many food mods. |
 
-Each player also has three display settings of their own, which the server never sees: `config/fullcourse-client.toml`
+Each player also has display settings of their own, which the server never sees: `config/fullcourse-client.toml`
 on NeoForge, `config/fullcourse-client.properties` on Fabric. Restart the game after editing.
 
 | Key | Default | What it does |
 |---|---|---|
-| `mealRowOffset` | `0` | GUI pixels to lift the meal row by, to make room for another mod's HUD row (0–200). |
+| `mealRowAnchor` | `hotbar` | Where the meal row sits: `hotbar` (where the food bar was; the air bubbles and other rows above it move up to make room), or `top_left`, `top`, `top_right`, `left`, `right`, `bottom_left`, `bottom_right` (a corner or edge of the screen, leaving the hotbar's rows alone). |
+| `mealRowX`, `mealRowY` | `0`, `0` | GUI pixels to move the meal row from there, + right and down (−2000 to 2000; it always stays on screen). On the hotbar, a negative `mealRowY` lifts the row and everything stacked above it, for another mod's HUD row. |
+| `mealList` | `left` | Where the meal list sits beside the survival inventory: `left`, `right` (where vanilla lists effects) or `off`. |
+| `mealListX`, `mealListY` | `0`, `0` | GUI pixels to move the meal list, + right and down (−2000 to 2000; it stays on screen). |
 | `showRecoveryParticles` | `false` | Show a heart each time Recovery heals you. |
 | `showTierPips` | `true` | A dot in the tier's colour on the icon of every food that gives a meal, in any slot. |
 
@@ -194,4 +198,4 @@ JDK 25 is pinned in `gradle.properties` (`org.gradle.java.home`); CI overrides i
 
 ## License
 
-All Rights Reserved.
+All Rights Reserved. Free to use in any modpack.

@@ -7,8 +7,9 @@ import java.util.Map;
 
 /**
  * The meals a player holds: immutable, one entry per dish. Eating a dish already held refreshes it; a new
- * dish fills a free slot or replaces the meal with the least time left. Same-family benefits don't add up: the
- * strongest level wins.
+ * dish fills a free slot or replaces, of the meals no better than it, the one with the least time left; over a row
+ * of better meals it takes none (eaten to heal, a steak doesn't push out a Gourmet meal). Same-family benefits don't
+ * add up: the strongest level wins.
  *
  * @param <D> the dish id type
  */
@@ -39,19 +40,23 @@ public record Meals<D>(List<Meal<D>> active) {
         return new Meals<>(List.of());
     }
 
-    /** How eating a dish would place it: refresh the same dish, fill a free slot, or replace the meal with least time. */
-    public enum Fill { REFRESH, FILL, REPLACE }
+    /**
+     * How eating a dish would place it: refresh the same dish, fill a free slot, replace the meal with least time of
+     * those no better than it, or none when every slot holds a better meal (the food only heals).
+     */
+    public enum Fill { REFRESH, FILL, REPLACE, NONE }
 
-    /** The slot (an index into {@link #active()}, or its size for a new slot) a dish would take, and how. */
+    /** The slot (an index into {@link #active()}, or its size for a new slot; -1 for {@code NONE}) a dish would take, and how. */
     public record Target(int slot, Fill fill) {}
 
-    /** Where eating {@code dish} with {@code slots} slots would put it, as {@link #eat} does. */
-    public Target target(D dish, int slots) {
+    /** Where eating {@code dish} of {@code tier} with {@code slots} slots would put it, as {@link #eat} does. */
+    public Target target(D dish, Tier tier, int slots) {
         for (int i = 0; i < active.size(); i++) {
             if (active.get(i).dish().equals(dish)) return new Target(i, Fill.REFRESH);
         }
         if (active.size() < slots) return new Target(active.size(), Fill.FILL);
-        return new Target(leastTime(active.subList(0, Math.min(active.size(), Math.max(1, slots)))), Fill.REPLACE);
+        int at = leastTime(active.subList(0, Math.min(active.size(), Math.max(1, slots))), tier);
+        return at < 0 ? new Target(-1, Fill.NONE) : new Target(at, Fill.REPLACE);
     }
 
     /** Eats a meal with {@code slots} slots available. */
@@ -67,15 +72,22 @@ public record Meals<D>(List<Meal<D>> active) {
         if (next.size() < slots) {
             next.add(meal);
         } else {
-            next.set(leastTime(next), meal);
+            int at = leastTime(next, meal.tier());
+            if (at >= 0) next.set(at, meal);
         }
         return new Meals<>(next);
     }
 
     private static <D> int leastTime(List<Meal<D>> meals) {
-        int at = 0;
-        for (int i = 1; i < meals.size(); i++) {
-            if (meals.get(i).end() < meals.get(at).end()) at = i;
+        return leastTime(meals, Tier.FEAST);
+    }
+
+    /** The meal with least time left among those of {@code tier} or lower; -1 when every one is better. */
+    private static <D> int leastTime(List<Meal<D>> meals, Tier tier) {
+        int at = -1;
+        for (int i = 0; i < meals.size(); i++) {
+            if (meals.get(i).tier().stars() > tier.stars()) continue;
+            if (at < 0 || meals.get(i).end() < meals.get(at).end()) at = i;
         }
         return at;
     }

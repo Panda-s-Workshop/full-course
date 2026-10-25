@@ -4,6 +4,7 @@ import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.kitchen.BrickOvenBlockEntity;
 import com.panda.fullcourse.kitchen.CookingPotBlockEntity;
 import com.panda.fullcourse.kitchen.CuttingBoardBlockEntity;
+import com.panda.fullcourse.kitchen.FeastBlockEntity;
 import com.panda.fullcourse.kitchen.FermentingCrockBlockEntity;
 import com.panda.fullcourse.platform.registry.DeferredHolder;
 import com.panda.fullcourse.platform.registry.DeferredRegister;
@@ -22,6 +23,8 @@ public final class ModBlockEntities {
             () -> new BlockEntityType<>(BrickOvenBlockEntity::new, Set.of(ModBlocks.BRICK_OVEN.get())));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FermentingCrockBlockEntity>> FERMENTING_CROCK = TYPES.register("fermenting_crock",
             () -> new BlockEntityType<>(FermentingCrockBlockEntity::new, Set.of(ModBlocks.FERMENTING_CROCK.get())));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FeastBlockEntity>> FEAST = TYPES.register("feast",
+            () -> new BlockEntityType<>(FeastBlockEntity::new, Set.of(ModBlocks.ROAST_BANQUET.get(), ModBlocks.HARVEST_PIE.get(), ModBlocks.GLOW_BERRY_TART.get())));
 
     private ModBlockEntities() {}
 }
