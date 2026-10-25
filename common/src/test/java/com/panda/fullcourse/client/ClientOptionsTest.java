@@ -21,20 +21,21 @@ class ClientOptionsTest {
 
     @Test
     void readsBothKeys() {
-        assertEquals(new ClientOptions.Values(24, true), ClientOptions.fromProperties(props("mealRowOffset", " 24 ", "showRecoveryParticles", "TRUE")));
+        assertEquals(new ClientOptions.Values(24, true, false),
+                ClientOptions.fromProperties(props("mealRowOffset", " 24 ", "showRecoveryParticles", "TRUE", "showTierPips", "false")));
     }
 
     @Test
     void clampsTheOffsetAndIgnoresBadValues() {
         assertEquals(ClientOptions.MAX_OFFSET, ClientOptions.fromProperties(props("mealRowOffset", "9999")).mealRowOffset());
         assertEquals(0, ClientOptions.fromProperties(props("mealRowOffset", "-5")).mealRowOffset());
-        assertEquals(new ClientOptions.Values(0, false), ClientOptions.fromProperties(props("mealRowOffset", "lots", "showRecoveryParticles", "yes")));
+        assertEquals(ClientOptions.DEFAULTS, ClientOptions.fromProperties(props("mealRowOffset", "lots", "showRecoveryParticles", "yes", "showTierPips", "no")));
     }
 
     @Test
     void theOffsetInUseIsClampedWhateverTheLoaderGives() {
         try {
-            ClientOptions.use(new ClientOptions.Values(500, false));
+            ClientOptions.use(new ClientOptions.Values(500, false, true));
             assertEquals(ClientOptions.MAX_OFFSET, ClientOptions.mealRowOffset());
         } finally {
             ClientOptions.use(ClientOptions.DEFAULTS);

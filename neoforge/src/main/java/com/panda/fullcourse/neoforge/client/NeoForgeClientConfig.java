@@ -13,9 +13,13 @@ final class NeoForgeClientConfig implements ClientOptions.Source {
     private static final ModConfigSpec.BooleanValue SHOW_RECOVERY_PARTICLES = B
             .comment("Show a heart each time Recovery heals you.")
             .define("showRecoveryParticles", ClientOptions.DEFAULTS.showRecoveryParticles());
+    private static final ModConfigSpec.BooleanValue SHOW_TIER_PIPS = B
+            .comment("A dot in the tier's colour on the icon of every food that gives a meal.")
+            .define("showTierPips", ClientOptions.DEFAULTS.showTierPips());
 
     static final ModConfigSpec SPEC = B.build();
 
     @Override public int mealRowOffset() { return SPEC.isLoaded() ? MEAL_ROW_OFFSET.get() : ClientOptions.DEFAULTS.mealRowOffset(); }
     @Override public boolean showRecoveryParticles() { return SPEC.isLoaded() ? SHOW_RECOVERY_PARTICLES.get() : ClientOptions.DEFAULTS.showRecoveryParticles(); }
+    @Override public boolean showTierPips() { return SPEC.isLoaded() ? SHOW_TIER_PIPS.get() : ClientOptions.DEFAULTS.showTierPips(); }
 }

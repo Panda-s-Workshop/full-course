@@ -4,6 +4,6 @@
   "package": "com.panda.fullcourse.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": ["CakeBlockMixin", "FoodDataMixin", "FoodPropertiesMixin", "LivingEntityMixin", "PlayerMixin", "ServerPlayerMixin"],
-  "client": ["client.InventoryScreenMixin"],
+  "client": ["client.GuiGraphicsExtractorMixin", "client.InventoryScreenMixin"],
   "injectors": { "defaultRequire": 1 }
 }
