@@ -96,7 +96,7 @@ final class KitchenChecks {
 
     static void register(Map<String, Consumer<RuleChecks.Ctx>> checks) {
         checks.put("recipes_loaded", KitchenChecks::recipesLoaded);
-        checks.put("fire_recipes_shadow_nothing", KitchenChecks::fireRecipesShadowNothing);
+        checks.put("recipes_shadow_nothing", KitchenChecks::recipesShadowNothing);
         checks.put("machine_recipe_fields", KitchenChecks::machineRecipeFields);
         checks.put("roster_tiers", KitchenChecks::rosterTiers);
         checks.put("board_cuts_with_knife", KitchenChecks::boardCutsWithKnife);
@@ -145,9 +145,11 @@ final class KitchenChecks {
 
     /**
      * No furnace, smoker or campfire recipe of ours takes an input another recipe of the same kind takes: the station
-     * picks one, and ours sorting first would take vanilla's away (chorus fruit pops for purpur).
+     * picks one, and ours sorting first would take vanilla's away (chorus fruit pops for purpur). Likewise no crafting
+     * grid of ours (each ingredient's first item, in its shape) is one another crafting recipe takes too, as our flint
+     * knife and Farmer's Delight's would be if ours didn't step aside.
      */
-    private static void fireRecipesShadowNothing(RuleChecks.Ctx c) {
+    private static void recipesShadowNothing(RuleChecks.Ctx c) {
         var recipes = c.server().getRecipeManager().getRecipes();
         List<String> clashes = new ArrayList<>();
         for (RecipeHolder<?> ours : recipes) {
@@ -163,11 +165,38 @@ final class KitchenChecks {
                 }
             });
         }
+        for (RecipeHolder<?> ours : recipes) {
+            if (!ours.id().identifier().getNamespace().equals(FullCourse.MODID)
+                    || !(ours.value() instanceof net.minecraft.world.item.crafting.CraftingRecipe crafting)) continue;
+            var grid = sampleGrid(crafting);
+            if (grid == null) continue;
+            // the sample is a grid the recipe itself takes, or the search below finds nothing for nothing
+            if (!crafting.matches(grid, c.level())) clashes.add(ours.id().identifier() + " doesn't take its own sample grid");
+            for (RecipeHolder<?> other : recipes) {
+                if (other != ours && other.value() instanceof net.minecraft.world.item.crafting.CraftingRecipe o && o.matches(grid, c.level())) {
+                    clashes.add(ours.id().identifier() + " and " + other.id().identifier() + " both take the same grid");
+                }
+            }
+        }
         check(clashes.isEmpty(), "recipes of one kind share an input: %s", clashes);
         var input = new net.minecraft.world.item.crafting.SingleRecipeInput(new ItemStack(Items.CHORUS_FRUIT));
         ItemStack popped = c.server().getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.SMELTING, input, c.level())
                 .map(h -> h.value().assemble(input)).orElse(ItemStack.EMPTY);
         check(popped.is(Items.POPPED_CHORUS_FRUIT), "a furnace should pop chorus fruit for purpur: %s", popped);
+    }
+
+    /** A grid a crafting recipe takes: each ingredient's first item, in the recipe's shape; null for a special recipe. */
+    private static net.minecraft.world.item.crafting.CraftingInput sampleGrid(net.minecraft.world.item.crafting.CraftingRecipe recipe) {
+        List<ItemStack> items = new ArrayList<>();
+        if (recipe instanceof net.minecraft.world.item.crafting.ShapedRecipe shaped) {
+            for (var slot : shaped.getIngredients()) items.add(slot.flatMap(i -> i.items().findFirst()).map(h -> new ItemStack(h.value())).orElse(ItemStack.EMPTY));
+            return net.minecraft.world.item.crafting.CraftingInput.of(shaped.getWidth(), shaped.getHeight(), items);
+        }
+        if (recipe.placementInfo().isImpossibleToPlace()) return null;
+        for (var ingredient : recipe.placementInfo().ingredients()) items.add(ingredient.items().findFirst().map(h -> new ItemStack(h.value())).orElse(ItemStack.EMPTY));
+        if (items.isEmpty() || items.size() > 9) return null;
+        while (items.size() < 9) items.add(ItemStack.EMPTY);
+        return net.minecraft.world.item.crafting.CraftingInput.of(3, 3, items);
     }
 
         private static void recipesLoaded(RuleChecks.Ctx c) {
