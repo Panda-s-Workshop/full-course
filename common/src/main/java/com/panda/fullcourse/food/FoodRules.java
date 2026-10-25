@@ -84,8 +84,10 @@ public final class FoodRules {
                 int duration = profile.tier().durationTicks(FullCourseConfig.durationMultiplier());
                 Meals.Meal<Identifier> meal = new Meals.Meal<>(id, profile.tier(), profile.families(), profile.tier().level(), now, now + duration);
                 s = unlockSlots(player, s.withTasted(id).withHelping(id, now, FeastBlock.HELPING_TICKS));
+                Meals.Target target = s.meals().target(id, s.slots());
+                Component replaced = target.fill() == Meals.Fill.REPLACE ? itemName(s.meals().active().get(target.slot()).dish()) : null;
                 s = s.withMeals(s.meals().eat(meal, s.slots()));
-                player.sendSystemMessage(FoodText.mealMessage(name, profile), true);
+                player.sendSystemMessage(FoodText.mealMessage(name, profile, replaced), true);
                 cue(player, ModSounds.MEAL_START);
                 FoodAdvancements.onMeal(player, profile.tier(), s.tasted());
             }
@@ -154,6 +156,11 @@ public final class FoodRules {
         }
         set(player, before, s);
         if (now % 20 == 0 || s.meals() != before.meals()) Benefits.apply(player, s.meals().strongest());
+    }
+
+    private static Component itemName(Identifier dish) {
+        Item item = BuiltInRegistries.ITEM.getValue(dish);
+        return item.getName(new ItemStack(item));
     }
 
     /** Plays a meal cue to {@code player} alone: their meals are their own news, not the room's. */

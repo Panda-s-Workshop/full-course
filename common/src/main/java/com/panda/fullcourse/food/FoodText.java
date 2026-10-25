@@ -84,8 +84,11 @@ public final class FoodText {
                 .append(Component.translatable("family.fullcourse." + family.key() + ".effect", effectArgs(family, level)));
     }
 
-    /** The action-bar line on eating a meal: "Rabbit Stew: Vigor II, Mending II · 10:00". */
-    public static Component mealMessage(Component dish, Profile p) {
+    /**
+     * The action-bar line on eating a meal: "Rabbit Stew: Vigor II, Mending II · 10:00", and "· replaces Steak" when
+     * it took a full row's meal with the least time left ({@code replaced}, else null).
+     */
+    public static Component mealMessage(Component dish, Profile p, Component replaced) {
         MutableComponent families = Component.empty();
         for (int i = 0; i < p.families().size(); i++) {
             if (i > 0) families.append(Component.literal(", "));
@@ -93,8 +96,10 @@ public final class FoodText {
                     .append(Component.literal(" "))
                     .append(Component.translatable("enchantment.level." + p.tier().level()));
         }
-        return Component.translatable("message.fullcourse.meal", dish, families,
-                duration(p.tier().durationTicks(FullCourseConfig.durationMultiplier()))).withStyle(Style.EMPTY.withColor(p.tier().color() & 0xFFFFFF));
+        MutableComponent line = Component.translatable("message.fullcourse.meal", dish, families,
+                duration(p.tier().durationTicks(FullCourseConfig.durationMultiplier())));
+        if (replaced != null) line = Component.translatable("message.fullcourse.meal_replaces", line, replaced);
+        return line.withStyle(Style.EMPTY.withColor(p.tier().color() & 0xFFFFFF));
     }
 
     /** The numbers in a family's effect text, from the same table the attribute modifiers use. */

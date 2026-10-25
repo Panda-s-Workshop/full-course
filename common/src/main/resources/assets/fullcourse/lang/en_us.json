@@ -232,6 +232,7 @@
   "message.fullcourse.feast.had_share": "You've had your helping of %s. Another in %s",
   "message.fullcourse.feast.queasy": "Queasy: %s would give no meal now",
   "message.fullcourse.meal": "%s: %s · %s",
+  "message.fullcourse.meal_replaces": "%s · replaces %s",
   "message.fullcourse.no_meal.raw": "%s heals only: made into a dish, it gives a meal",
   "message.fullcourse.no_meal.remedy": "%s works its own way: no meal",
   "message.fullcourse.queasy": "Queasy: %s heals, but gives no meal",
