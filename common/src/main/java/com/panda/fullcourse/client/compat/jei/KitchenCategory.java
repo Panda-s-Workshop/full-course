@@ -85,12 +85,17 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
         return extras.addText(Component.literal(FoodText.duration(ticks)), 30, 10).setPosition(x, y).setColor(0xFF606060);
     }
 
-    /** The result's stars in its tier's colour, centred under its slot at (x, y), if it gives a meal. */
+    private static final int STARS_W = 50;
+
+    /**
+     * The result's stars in its tier's colour, centred under the output slot whose item sits at x, from y down, if it
+     * gives a meal. The box is wide enough for five stars, so JEI never cuts them short.
+     */
     static void stars(IRecipeExtrasBuilder extras, ItemStackTemplate result, int x, int y) {
         Profile profile = FoodProfiles.client(result.create().getItem());
         if (!profile.givesMeal()) return;
-        extras.addText(Component.literal("★".repeat(profile.tier().stars())), 30, 10)
-                .setPosition(x - 6, y, 30, 10, HorizontalAlignment.CENTER, VerticalAlignment.TOP)
+        extras.addText(Component.literal("★".repeat(profile.tier().stars())), STARS_W, 10)
+                .setPosition(x + 8 - STARS_W / 2, y, STARS_W, 10, HorizontalAlignment.CENTER, VerticalAlignment.TOP)
                 .setTextAlignment(HorizontalAlignment.CENTER)
                 .setColor(profile.tier().color());
     }
@@ -134,14 +139,14 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
             extras.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(64, 10);
             extras.addAnimatedRecipeFlameWidget(300).setPosition(20, 40).setTooltip(HeatText.needsHeat());
             time(extras, holder.value().time(), 84, 42);
-            stars(extras, holder.value().result(), 99, 29);
+            stars(extras, holder.value().result(), 99, 32);
         }
     }
 
     /** Oven: up to four ingredients baked with fuel. */
     static final class Baking extends KitchenCategory<BakingRecipe> {
         Baking(IRecipeHolderType<BakingRecipe> type, ItemLike block, IGuiHelper gui) {
-            super(type, "oven", block, gui, 100, 38);
+            super(type, "oven", block, gui, 100, 42);
         }
 
         @Override
@@ -155,14 +160,14 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
             extras.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(44, 10);
             extras.addAnimatedRecipeFlameWidget(300).setPosition(48, -2).setTooltip(Component.translatable("gui.fullcourse.oven.unlit"));
             time(extras, holder.value().time(), 44, 28);
-            stars(extras, holder.value().result(), 79, 29);
+            stars(extras, holder.value().result(), 79, 32);
         }
     }
 
     /** Crock: up to four ingredients sealed for a while. */
     static final class Fermenting extends KitchenCategory<FermentingRecipe> {
         Fermenting(IRecipeHolderType<FermentingRecipe> type, ItemLike block, IGuiHelper gui) {
-            super(type, "crock", block, gui, 100, 38);
+            super(type, "crock", block, gui, 100, 42);
         }
 
         @Override
@@ -176,7 +181,7 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
             extras.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(44, 10);
             // the crock goes by the overworld's clock too, so sleeping through the night counts toward this
             time(extras, holder.value().time(), 44, 28).setTooltip(Component.translatable("gui.fullcourse.jei.crock_sleep"));
-            stars(extras, holder.value().result(), 79, 29);
+            stars(extras, holder.value().result(), 79, 32);
         }
     }
 }
