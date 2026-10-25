@@ -6,6 +6,7 @@ import com.panda.fullcourse.command.FullCourseCommand;
 import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.network.ProfilesPayload;
+import com.panda.fullcourse.network.RecoveryPayload;
 import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.platform.registry.DeferredRegister;
 import com.panda.fullcourse.registry.ModAttributes;
@@ -54,6 +55,7 @@ public final class FullCourseFabric implements ModInitializer {
         FabricDefaultAttributeRegistry.MODIFY.register(ctx -> ctx.modify(EntityTypes.PLAYER, (type, builder) -> builder.add(ModAttributes.RECOVERY_RATE.holder())));
 
         PayloadTypeRegistry.clientboundPlay().register(ProfilesPayload.TYPE, ProfilesPayload.STREAM_CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(RecoveryPayload.TYPE, RecoveryPayload.STREAM_CODEC);
         ModRecipes.kitchenSerializers().forEach(RecipeSynchronization::synchronizeRecipeSerializer); // for recipe viewers
         // wild onions and ember peppers (NeoForge reads data/fullcourse/neoforge/biome_modifier/*.json instead)
         BiomeModifications.addFeature(BiomeSelectors.tag(TagKey.create(Registries.BIOME, FullCourse.id("has_wild_onions"))),

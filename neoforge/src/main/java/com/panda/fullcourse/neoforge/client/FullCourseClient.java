@@ -2,6 +2,7 @@ package com.panda.fullcourse.neoforge.client;
 
 import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.client.BrickOvenScreen;
+import com.panda.fullcourse.client.ClientOptions;
 import com.panda.fullcourse.client.ClientSync;
 import com.panda.fullcourse.client.CookingPotScreen;
 import com.panda.fullcourse.client.CuttingBoardRenderer;
@@ -15,6 +16,7 @@ import com.panda.fullcourse.client.compat.cfb.CookingForBlockheadsClient;
 import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.neoforge.client.compat.AppleSkinCompat;
 import com.panda.fullcourse.network.ProfilesPayload;
+import com.panda.fullcourse.network.RecoveryPayload;
 import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModBlocks;
 import com.panda.fullcourse.registry.ModMenus;
@@ -29,6 +31,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -47,7 +50,12 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 @Mod(value = FullCourse.MODID, dist = Dist.CLIENT)
 public final class FullCourseClient {
     public FullCourseClient(IEventBus modBus, ModContainer container) {
-        modBus.addListener((RegisterClientPayloadHandlersEvent e) -> e.register(ProfilesPayload.TYPE, (payload, context) -> ClientSync.received(payload)));
+        container.registerConfig(ModConfig.Type.CLIENT, NeoForgeClientConfig.SPEC);
+        ClientOptions.use(new NeoForgeClientConfig());
+        modBus.addListener((RegisterClientPayloadHandlersEvent e) -> {
+            e.register(ProfilesPayload.TYPE, (payload, context) -> ClientSync.received(payload));
+            e.register(RecoveryPayload.TYPE, (payload, context) -> ClientSync.recovered());
+        });
         modBus.addListener((RegisterMenuScreensEvent e) -> {
             e.register(ModMenus.COOKING_POT.get(), CookingPotScreen::new);
             e.register(ModMenus.BRICK_OVEN.get(), BrickOvenScreen::new);
@@ -58,7 +66,7 @@ public final class FullCourseClient {
         // the meal row sits where the food bar was, above the mount's hearts when riding; it stacks the rows above it
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAbove(VanillaGuiLayers.VEHICLE_HEALTH, MealHud.LAYER, (g, delta) -> {
             Hud hud = Minecraft.getInstance().gui.hud;
-            if (MealHud.extract(g, g.guiHeight() - hud.rightHeight + 9)) hud.rightHeight += MealHud.HEIGHT;
+            if (MealHud.extract(g, g.guiHeight() - hud.rightHeight + 9)) hud.rightHeight += MealHud.lift();
         }));
         NeoForge.EVENT_BUS.addListener((RenderGuiLayerEvent.Pre e) -> {
             if (e.getName().equals(VanillaGuiLayers.FOOD_LEVEL) && MealHud.active()) e.setCanceled(true);

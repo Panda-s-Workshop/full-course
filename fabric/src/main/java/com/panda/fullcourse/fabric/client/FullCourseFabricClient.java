@@ -1,6 +1,7 @@
 package com.panda.fullcourse.fabric.client;
 
 import com.panda.fullcourse.client.BrickOvenScreen;
+import com.panda.fullcourse.client.ClientOptions;
 import com.panda.fullcourse.client.ClientSync;
 import com.panda.fullcourse.client.CookingPotScreen;
 import com.panda.fullcourse.client.CuttingBoardRenderer;
@@ -13,6 +14,7 @@ import com.panda.fullcourse.client.PotSoupTint;
 import com.panda.fullcourse.client.compat.cfb.CookingForBlockheadsClient;
 import com.panda.fullcourse.food.TastingJournalItem;
 import com.panda.fullcourse.network.ProfilesPayload;
+import com.panda.fullcourse.network.RecoveryPayload;
 import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModBlocks;
 import com.panda.fullcourse.registry.ModMenus;
@@ -43,7 +45,9 @@ public final class FullCourseFabricClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ClientOptions.use(FabricClientConfig.load());
         ClientPlayNetworking.registerGlobalReceiver(ProfilesPayload.TYPE, (payload, context) -> ClientSync.received(payload));
+        ClientPlayNetworking.registerGlobalReceiver(RecoveryPayload.TYPE, (payload, context) -> ClientSync.recovered());
         MenuScreens.register(ModMenus.COOKING_POT.get(), CookingPotScreen::new);
         MenuScreens.register(ModMenus.BRICK_OVEN.get(), BrickOvenScreen::new);
         BlockEntityRenderers.register(ModBlockEntities.CUTTING_BOARD.get(), CuttingBoardRenderer::new);
@@ -63,7 +67,7 @@ public final class FullCourseFabricClient implements ClientModInitializer {
                 return;
             }
             g.pose().pushMatrix();
-            g.pose().translate(0, -(MealHud.HEIGHT - 10));
+            g.pose().translate(0, -(MealHud.lift() - 10));
             vanilla.extractRenderState(g, delta);
             g.pose().popMatrix();
         });
@@ -75,15 +79,16 @@ public final class FullCourseFabricClient implements ClientModInitializer {
                 return;
             }
             g.pose().pushMatrix();
-            g.pose().translate(0, -(MealHud.HEIGHT - 10 + 10 * MealHud.vehicleHeartRows(player)));
+            g.pose().translate(0, -(MealHud.lift() - 10 + 10 * MealHud.vehicleHeartRows(player)));
             vanilla.extractRenderState(g, delta);
             g.pose().popMatrix();
         });
         // vanilla's action-bar message (bottom 63 above the screen's bottom) would cover the row once two or more rows of
-        // mount hearts lift it (row top 48 + 10 per heart row above the bottom); NeoForge already stacks it above the HUD
+        // mount hearts, or a large mealRowOffset, lift it (row top 48 + 10 per heart row above the bottom); NeoForge
+        // already stacks it above the HUD
         HudElementRegistry.replaceElement(VanillaHudElements.OVERLAY_MESSAGE, vanilla -> (g, delta) -> {
             var player = Minecraft.getInstance().player;
-            int lift = player == null || !MealHud.active() ? 0 : Math.max(0, 10 * MealHud.vehicleHeartRows(player) - 14);
+            int lift = player == null || !MealHud.active() ? 0 : Math.max(0, 10 * MealHud.vehicleHeartRows(player) + ClientOptions.mealRowOffset() - 14);
             if (lift == 0) {
                 vanilla.extractRenderState(g, delta);
                 return;

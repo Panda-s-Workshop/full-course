@@ -4,6 +4,7 @@ import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.logic.Meals;
 import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.logic.Recovery;
+import com.panda.fullcourse.network.RecoveryPayload;
 import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.platform.registry.DeferredHolder;
 import com.panda.fullcourse.registry.ModAttributes;
@@ -128,7 +129,10 @@ public final class FoodRules {
             saturation(player);
             if (recovers(player)) {
                 int interval = Recovery.interval(FullCourseConfig.recoveryIntervalTicks(), recoveryRate(player));
-                if (Recovery.healsNow(now - player.lastDamageStamp, FullCourseConfig.recoveryDelayTicks(), interval)) player.heal(1F);
+                if (Recovery.healsNow(now - player.lastDamageStamp, FullCourseConfig.recoveryDelayTicks(), interval)) {
+                    player.heal(1F);
+                    Services.PLATFORM.sendToPlayer(player, RecoveryPayload.INSTANCE);
+                }
             }
         }
         set(player, before, s);

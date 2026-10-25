@@ -11,14 +11,18 @@ import com.panda.fullcourse.registry.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * The client's copy of the server's food table and config, and the first-join hint: a toast that says
  * hunger is gone and meals are the point, shown once per login until the player has eaten their first meal; and the
- * toast and chime when the Tasting Journal's milestones unlock a meal slot. Loaders
+ * toast and chime when the Tasting Journal's milestones unlock a meal slot; and a heart on each Recovery heal when the
+ * player's {@link ClientOptions} ask for it. Loaders
  * call {@link #received} with the server's table, {@link #tick} every client tick and {@link #disconnected} on leaving.
  */
 public final class ClientSync {
@@ -72,6 +76,35 @@ public final class ClientSync {
         mc.gui.toastManager().addToast(new SlotToast(title, body));
         mc.getSoundManager().play(SimpleSoundInstance.forUI(ModSounds.SLOT_UNLOCK.get(), 1F, 1F));
         mc.getSoundManager().play(SimpleSoundInstance.forUI(ModSounds.SLOT_UNLOCK_FANFARE.get(), 1F, 1F));
+    }
+
+    /** Recovery heals the client was told of, and hearts it showed for them (for checks). */
+    private static int recoveries, hearts;
+
+    /** Recovery healed this player: a heart where they can see it, if they asked for it. */
+    public static void recovered() {
+        recoveries++;
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        if (!ClientOptions.showRecoveryParticles() || player == null || mc.level == null) return;
+        hearts++;
+        Vec3 at;
+        if (mc.options.getCameraType().isFirstPerson()) {
+            // in front of the eyes and a little low, rising into view
+            Vec3 look = player.getLookAngle();
+            at = player.getEyePosition().add(look.x * 0.9, look.y * 0.9 - 0.45, look.z * 0.9);
+        } else {
+            at = new Vec3(player.getX(), player.getY() + player.getBbHeight() + 0.3, player.getZ());
+        }
+        mc.level.addParticle(ParticleTypes.HEART, at.x, at.y, at.z, 0, 0.02, 0);
+    }
+
+    public static int recoveriesHeard() {
+        return recoveries;
+    }
+
+    public static int heartsShown() {
+        return hearts;
     }
 
     /** The slot toast is on screen (for checks). */

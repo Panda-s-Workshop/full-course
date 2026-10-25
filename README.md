@@ -39,6 +39,14 @@ Restart the server (or the game, in single player) after editing either file.
 | `durationMultiplier` | `1.0` | Multiplies every meal's duration (0.05–20). |
 | `tierThresholds` | `1,3,5,8,12` | Lowest recipe-chain score of tiers 1 to 5: exactly five, ascending. Anything else falls back to the defaults. |
 
+Each player also has two display settings of their own, which the server never sees: `config/fullcourse-client.toml`
+on NeoForge, `config/fullcourse-client.properties` on Fabric. Restart the game after editing.
+
+| Key | Default | What it does |
+|---|---|---|
+| `mealRowOffset` | `0` | GUI pixels to lift the meal row by, to make room for another mod's HUD row (0–200). |
+| `showRecoveryParticles` | `false` | Show a heart each time Recovery heals you. |
+
 ## Compatibility
 
 Full Course rates every food in the game from its recipes, including foods from other mods, so it needs no list of
