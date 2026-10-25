@@ -266,6 +266,11 @@ final class KitchenChecks {
             CuttingBoardBlockEntity board = (CuttingBoardBlockEntity) c.level().getBlockEntity(pos);
             check(board.item().is(Items.WHEAT) && board.item().getCount() == 2 && wheat.isEmpty(),
                     "the stack lies on the board: board %s, hand %s", board.item(), wheat);
+            // more wheat adds to the stack, up to a full one, and leaves the rest in hand
+            ItemStack more = new ItemStack(Items.WHEAT, 63);
+            use(c, pos, more);
+            check(board.item().getCount() == 64 && more.getCount() == 1, "more wheat adds to the stack: board %s, hand %s", board.item(), more);
+            board.setItem(new ItemStack(Items.WHEAT, 2));
             ItemStack knife = new ItemStack(item("iron_knife"));
             check(knife.is(KitchenTags.KNIVES), "the iron knife is a knife");
             c.player().getAdvancements().revoke(c.server().getAdvancements().get(FullCourse.id("cutting_board")), "done");

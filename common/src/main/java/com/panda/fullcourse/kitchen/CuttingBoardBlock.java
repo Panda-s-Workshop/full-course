@@ -37,8 +37,9 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * The Cutting Board: use an item on it to lay the stack down, use a knife to cut one (hold to keep cutting),
- * use an empty hand to take the stack back. Anything can lie on it; only items with a cutting recipe can be cut.
+ * The Cutting Board: use an item on it to lay the stack down (more of the same adds to it), use a knife to cut one
+ * (hold to keep cutting), use an empty hand to take the stack back. Anything can lie on it; only items with a cutting
+ * recipe can be cut.
  */
 public class CuttingBoardBlock extends Block implements EntityBlock {
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
@@ -93,7 +94,17 @@ public class CuttingBoardBlock extends Block implements EntityBlock {
             if (level instanceof ServerLevel server) cut(server, pos, board, stack, player, hand);
             return InteractionResult.SUCCESS;
         }
-        if (!board.item().isEmpty()) return InteractionResult.TRY_WITH_EMPTY_HAND;
+        ItemStack lying = board.item();
+        if (!lying.isEmpty() && ItemStack.isSameItemSameComponents(lying, stack)) {
+            // more of the same: added to the stack up to a full one
+            int room = lying.getMaxStackSize() - lying.getCount();
+            if (room > 0 && !level.isClientSide()) {
+                board.setItem(lying.copyWithCount(lying.getCount() + stack.consumeAndReturn(Math.min(room, stack.getCount()), player).getCount()));
+                level.playSound(null, pos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 0.7F, 1.2F);
+            }
+            return InteractionResult.SUCCESS;
+        }
+        if (!lying.isEmpty()) return InteractionResult.TRY_WITH_EMPTY_HAND;
         if (!level.isClientSide()) {
             board.setItem(stack.consumeAndReturn(stack.getCount(), player));
             level.playSound(null, pos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 0.7F, 1.2F);
