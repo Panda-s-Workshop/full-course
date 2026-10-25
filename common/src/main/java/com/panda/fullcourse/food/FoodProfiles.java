@@ -58,6 +58,7 @@ public final class FoodProfiles {
     /** Each serving's dish on the server, from the {@code serving_of} overrides (a pie slice: its pie). */
     private static Map<Item, Item> servingOf = Map.of();
     private static Map<Item, Profile> client = Map.of();
+    private static Map<Item, Item> clientServings = Map.of();
     /** The server sent its table: it runs Full Course. Without it the client shows vanilla's food bar and tooltips. */
     private static boolean clientReady;
 
@@ -84,6 +85,27 @@ public final class FoodProfiles {
         return servingOf.getOrDefault(item, item);
     }
 
+    /** Each serving's dish on the server (its {@code serving_of} override). */
+    public static Map<Item, Item> servings(MinecraftServer mcServer) {
+        all(mcServer);
+        return servingOf;
+    }
+
+    /**
+     * What eating {@code item} counts as, tasted and as a meal: the dish it is a serving of when that dish gives a meal
+     * itself (a slice and the whole cake are one dish), else the item.
+     */
+    public static Item tastedAs(MinecraftServer mcServer, Item item) {
+        Item dish = dishOf(mcServer, item);
+        return dish != item && get(mcServer, dish).givesMeal() ? dish : item;
+    }
+
+    /** {@link #tastedAs} on the client, from the table the server sent. */
+    public static Item clientTastedAs(Item item) {
+        Item dish = clientServings.getOrDefault(item, item);
+        return dish != item && client(dish).givesMeal() ? dish : item;
+    }
+
     /** Forget the server table (the server stopped; an integrated server restarts in the same JVM). */
     public static synchronized void reset() {
         computedFor = null;
@@ -96,8 +118,9 @@ public final class FoodProfiles {
         return client.getOrDefault(item, Profile.NONE);
     }
 
-    public static void setClient(Map<Item, Profile> profiles) {
+    public static void setClient(Map<Item, Profile> profiles, Map<Item, Item> servings) {
         client = Map.copyOf(profiles);
+        clientServings = Map.copyOf(servings);
         clientReady = true;
     }
 
@@ -108,6 +131,7 @@ public final class FoodProfiles {
     /** Disconnected: forget the last server's table. */
     public static void clearClient() {
         client = Map.of();
+        clientServings = Map.of();
         clientReady = false;
     }
 

@@ -78,7 +78,8 @@ public final class FoodRules {
             if (player.hasEffect(MobEffects.HUNGER)) {
                 player.sendSystemMessage(Component.translatable("message.fullcourse.queasy", name).withStyle(ChatFormatting.GREEN), true);
             } else {
-                Identifier id = BuiltInRegistries.ITEM.getKey(dish);
+                // a slice is its cake: one tasted dish, one meal
+                Identifier id = BuiltInRegistries.ITEM.getKey(FoodProfiles.tastedAs(player.level().getServer(), dish));
                 int duration = profile.tier().durationTicks(FullCourseConfig.durationMultiplier());
                 Meals.Meal<Identifier> meal = new Meals.Meal<>(id, profile.tier(), profile.families(), profile.tier().level(), now, now + duration);
                 s = unlockSlots(player, s.withTasted(id));

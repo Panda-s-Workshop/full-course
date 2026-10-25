@@ -136,7 +136,8 @@ public class JournalScreen extends Screen {
         List<Item> out = new ArrayList<>();
         for (Map.Entry<Item, Profile> e : FoodProfiles.clientAll().entrySet()) {
             Profile p = e.getValue();
-            if (!p.givesMeal()) continue;
+            // a serving is listed as its dish
+            if (!p.givesMeal() || FoodProfiles.clientTastedAs(e.getKey()) != e.getKey()) continue;
             Identifier id = BuiltInRegistries.ITEM.getKey(e.getKey());
             String ns = id.getNamespace();
             if (ns.equals(FullCourse.MODID) || ns.equals("minecraft") || p.tier().stars() >= Tier.PREPARED.stars() || tasted.contains(id)) {

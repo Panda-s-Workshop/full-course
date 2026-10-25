@@ -54,7 +54,7 @@ public final class FoodTooltips {
         }
         if (food) {
             boolean tasted = mc.player != null
-                    && Services.PLATFORM.foodState(mc.player).tasted().contains(BuiltInRegistries.ITEM.getKey(stack.getItem()));
+                    && Services.PLATFORM.foodState(mc.player).tasted().contains(BuiltInRegistries.ITEM.getKey(FoodProfiles.clientTastedAs(stack.getItem())));
             var component = stack.get(DataComponents.FOOD);
             // a feast heals per serving, not as an item
             int nutrition = component != null ? component.nutrition()

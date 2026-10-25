@@ -16,14 +16,16 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 
 /**
- * Server → client: every food's profile and the server's config, sent at login and after each {@code /reload} (the
- * client has no recipes, and its own config file may differ from the server's).
+ * Server → client: every food's profile, each serving's dish and the server's config, sent at login and after each
+ * {@code /reload} (the client has no recipes, and its own config file may differ from the server's).
  */
-public record ProfilesPayload(Map<Identifier, Profile> profiles, FullCourseConfig.Snapshot config) implements CustomPacketPayload {
+public record ProfilesPayload(Map<Identifier, Profile> profiles, Map<Identifier, Identifier> servings, FullCourseConfig.Snapshot config)
+        implements CustomPacketPayload {
     public static final Type<ProfilesPayload> TYPE = new Type<>(FullCourse.id("profiles"));
     public static final int MAX_FOODS = 65536;
     public static final StreamCodec<RegistryFriendlyByteBuf, ProfilesPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.map(HashMap::new, Identifier.STREAM_CODEC, Profile.STREAM_CODEC, MAX_FOODS), p -> new HashMap<>(p.profiles()),
+            ByteBufCodecs.map(HashMap::new, Identifier.STREAM_CODEC, Identifier.STREAM_CODEC, MAX_FOODS), p -> new HashMap<>(p.servings()),
             FullCourseConfig.Snapshot.STREAM_CODEC, ProfilesPayload::config,
             ProfilesPayload::new);
 
@@ -36,7 +38,9 @@ public record ProfilesPayload(Map<Identifier, Profile> profiles, FullCourseConfi
     public static ProfilesPayload of(ServerPlayer player) {
         Map<Identifier, Profile> out = new HashMap<>();
         FoodProfiles.all(player.level().getServer()).forEach((item, profile) -> out.put(BuiltInRegistries.ITEM.getKey(item), profile));
-        return new ProfilesPayload(out, FullCourseConfig.snapshot());
+        Map<Identifier, Identifier> servings = new HashMap<>();
+        FoodProfiles.servings(player.level().getServer()).forEach((serving, dish) -> servings.put(BuiltInRegistries.ITEM.getKey(serving), BuiltInRegistries.ITEM.getKey(dish)));
+        return new ProfilesPayload(out, servings, FullCourseConfig.snapshot());
     }
 
     /** On the client: use the server's config and store the table. */
@@ -44,6 +48,9 @@ public record ProfilesPayload(Map<Identifier, Profile> profiles, FullCourseConfi
         FullCourseConfig.useServer(config);
         Map<Item, Profile> byItem = new HashMap<>();
         profiles.forEach((id, profile) -> BuiltInRegistries.ITEM.get(id).ifPresent(h -> byItem.put(h.value(), profile)));
-        FoodProfiles.setClient(byItem);
+        Map<Item, Item> byServing = new HashMap<>();
+        servings.forEach((serving, dish) -> BuiltInRegistries.ITEM.get(serving)
+                .ifPresent(s -> BuiltInRegistries.ITEM.get(dish).ifPresent(d -> byServing.put(s.value(), d.value()))));
+        FoodProfiles.setClient(byItem, byServing);
     }
 }
