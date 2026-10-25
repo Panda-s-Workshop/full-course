@@ -239,6 +239,24 @@ class TierScorerTest {
         assertEquals(List.of(), TierScorer.benefits("salad", Set.of("lettuce"), of, false, 0), "a raw food gives none");
     }
 
+    /**
+     * A cycle (a jam made from a preserve and back, as two mods' recipes can be) scores the same whichever end is
+     * scored first: the preserve's cheap way through the jam isn't lost because the jam was on the stack.
+     */
+    @Test
+    void cyclesScoreTheSameInAnyOrder() {
+        r("jam", "crafting", "preserve");
+        r("jam", "crafting", "apple");
+        r("preserve", "crafting", "jam");
+        r("preserve", "crock", "apple", "sugar", "milk"); // 4: worse than through the jam
+        TierScorer<String> jamFirst = scorer();
+        jamFirst.score("jam");
+        TierScorer.Score<String> afterJam = jamFirst.score("preserve");
+        TierScorer.Score<String> alone = scorer().score("preserve");
+        assertEquals(alone.score(), afterJam.score(), "the preserve scored after the jam vs alone");
+        assertEquals(3, alone.score(), "the preserve through the jam: two crafting steps from an apple");
+    }
+
     @Test
     void thresholdsAreConfigurable() {
         assertEquals(Tier.RAW, Tier.fromScore(0, Tier.DEFAULT_THRESHOLDS));

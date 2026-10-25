@@ -84,9 +84,21 @@ public final class TierScorer<T> {
         }
     }
 
+    /**
+     * How many items the scorer may explore before it remembers every result, cycle cuts included: a pack whose cycle
+     * groups would take longer gets order-dependent scores rather than a slow load.
+     */
+    static final int VISIT_BUDGET = 200_000;
+
     private final Graph<T> graph;
     private final Map<T, Score<T>> memo = new HashMap<>();
     private final Set<T> onStack = new HashSet<>();
+    /**
+     * Per item being explored, the items further up the stack its recipes ran into. A result that cut such a cycle
+     * holds only for this visit order, so it isn't remembered: scored from elsewhere, the item may do better.
+     */
+    private final java.util.Deque<Set<T>> stackHits = new java.util.ArrayDeque<>();
+    private int visits;
 
     public TierScorer(Graph<T> graph) {
         this.graph = graph;
@@ -105,7 +117,11 @@ public final class TierScorer<T> {
     private Score<T> best(T item) {
         Score<T> known = memo.get(item);
         if (known != null) return known;
-        if (onStack.contains(item)) return null;
+        if (onStack.contains(item)) {
+            if (!stackHits.isEmpty()) stackHits.peek().add(item);
+            return null;
+        }
+        visits++;
         if (graph.raw(item) && !graph.prep(item).isEmpty()) return prepared(item);
         List<Recipe<T>> recipes = graph.raw(item) ? List.of() : graph.recipesFor(item);
         if (recipes.isEmpty()) {
@@ -113,7 +129,7 @@ public final class TierScorer<T> {
             memo.put(item, leaf);
             return leaf;
         }
-        onStack.add(item);
+        enter(item);
         Score<T> bestScore = null;
         boolean cycled = false;
         for (Recipe<T> recipe : recipes) {
@@ -127,24 +143,43 @@ public final class TierScorer<T> {
                 bestScore = s;
             }
         }
-        onStack.remove(item);
+        boolean settled = leave(item);
         if (bestScore == null && !cycled) bestScore = Score.leaf(item); // only unpacking recipes: a raw item
-        if (bestScore != null) memo.put(item, bestScore);
+        if (bestScore != null && settled) memo.put(item, bestScore);
         return bestScore;
+    }
+
+    private void enter(T item) {
+        onStack.add(item);
+        stackHits.push(new HashSet<>());
+    }
+
+    /** Leaves the item; true when its result holds whatever the visit order (or the budget is spent). */
+    private boolean leave(T item) {
+        onStack.remove(item);
+        Set<T> hits = stackHits.pop();
+        hits.remove(item); // a recipe that needs the item itself is no way to make it, in any order
+        if (!stackHits.isEmpty()) stackHits.peek().addAll(hits);
+        return hits.isEmpty() || visits > VISIT_BUDGET;
+    }
+
+    /** Items explored so far, for the log. */
+    public int visits() {
+        return visits;
     }
 
     /** A raw item through its cheapest preparation, still its own leaf; a leaf if every preparation cycles. */
     private Score<T> prepared(T item) {
-        onStack.add(item);
+        enter(item);
         Score<T> best = null;
         for (Recipe<T> recipe : graph.prep(item)) {
             Score<T> s = viaRecipe(recipe);
             if (s != null && (best == null || s.score() < best.score())) best = s;
         }
-        onStack.remove(item);
+        boolean settled = leave(item);
         Score<T> out = best == null ? Score.leaf(item)
                 : new Score<>(best.depth() + best.stationWeight(), best.depth(), best.stations(), Set.of(item)); // one leaf: no leaf bonus
-        memo.put(item, out);
+        if (settled) memo.put(item, out);
         return out;
     }
 

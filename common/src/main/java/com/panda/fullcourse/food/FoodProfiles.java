@@ -96,9 +96,10 @@ public final class FoodProfiles {
     public static synchronized Map<Item, Profile> all(MinecraftServer mcServer) {
         RecipeManager recipes = mcServer.getRecipeManager();
         if (recipes != computedFor) {
+            long started = System.nanoTime();
             server = compute(mcServer);
             computedFor = recipes;
-            FullCourse.LOGGER.info("Full Course rated {} foods", server.size());
+            FullCourse.LOGGER.info("Full Course rated {} foods in {} ms", server.size(), (System.nanoTime() - started) / 1_000_000);
             if (server.values().stream().noneMatch(p -> p.tier() == Tier.FEAST)) {
                 // the fifth meal slot asks for a feast: with none, it can't open
                 FullCourse.LOGGER.warn("Full Course: no food rates Feast with tierThresholds {}, so the fifth meal slot can't open; "
