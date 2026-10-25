@@ -105,18 +105,20 @@ final class ConfigChecks {
         });
     }
 
-    /** Three starting slots: a new player holds three meals. */
+    /** Three starting slots: a new player holds three meals; back at two, the next tick drops the one with least time. */
     private static void startingSlots(RuleChecks.Ctx c) {
         var three = new FullCourseConfig.Snapshot(false, D.recoveryDelaySeconds(), D.recoveryIntervalTicks(), 3, D.maxMealSlots(),
                 D.keepMealsOnDeath(), D.durationMultiplier(), D.tierThresholds());
+        long t = c.t();
         FullCourseConfig.with(three, () -> {
             check(state(c).slots() == 3, "slots %s, expected 3", state(c).slots());
-            long t = c.t();
             eat(c, Items.COOKED_BEEF, t);
             eat(c, Items.BREAD, t + 100);
             eat(c, Items.BAKED_POTATO, t + 200);
             check(dishes(c).size() == 3, "three meals held: %s", dishes(c));
         });
+        FoodRules.tick(c.player(), t + 201);
+        check(dishes(c).size() == 2 && !dishes(c).contains(id(Items.COOKED_BEEF)), "slots lowered to 2: the steak, with least time, goes at once: %s", dishes(c));
     }
 
     /** A maximum of three: slots unlocked past it don't count, and a fourth meal still leaves three held. */

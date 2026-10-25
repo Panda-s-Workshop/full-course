@@ -133,7 +133,8 @@ public final class FoodRules {
         if (!player.level().tickRateManager().runsNormally()) return;
         restoreHealth(player);
         FoodState before = state(player);
-        FoodState s = before.withMeals(before.meals().expire(now));
+        // a server that lowered its slots trims the meals past them now, not at the next meal
+        FoodState s = before.withMeals(before.meals().expire(now).trim(before.slots()));
         // a meal of a food whose mod was removed ends: nothing can show it
         if (s.meals().active().stream().anyMatch(m -> !BuiltInRegistries.ITEM.containsKey(m.dish()))) {
             s = s.withMeals(new Meals<>(s.meals().active().stream().filter(m -> BuiltInRegistries.ITEM.containsKey(m.dish())).toList()));

@@ -80,6 +80,14 @@ public record Meals<D>(List<Meal<D>> active) {
         return at;
     }
 
+    /** Drops the meals with least time left until at most {@code slots} remain (the config lowered); else the same instance. */
+    public Meals<D> trim(int slots) {
+        if (active.size() <= Math.max(1, slots)) return this;
+        List<Meal<D>> next = new ArrayList<>(active);
+        while (next.size() > Math.max(1, slots)) next.remove(leastTime(next));
+        return new Meals<>(next);
+    }
+
     /** Drops the meals that have run out; the same instance when none has. */
     public Meals<D> expire(long now) {
         boolean any = false;

@@ -35,6 +35,14 @@ class MealsTest {
     }
 
     @Test
+    void trimDropsTheMealsWithLeastTimePastTheSlots() {
+        Meals<String> m = new Meals<>(List.of(meal("a", 1, 500, Family.SWIFT), meal("b", 1, 300, Family.TIDE), meal("c", 1, 800, Family.EMBER)));
+        assertEquals(List.of("a", "c"), m.trim(2).active().stream().map(Meals.Meal::dish).toList());
+        assertSame(m, m.trim(3));
+        assertEquals(List.of("c"), m.trim(0).active().stream().map(Meals.Meal::dish).toList());
+    }
+
+    @Test
     void strongestLevelWinsPerFamily() {
         Meals<String> m = Meals.<String>empty().eat(meal("a", 1, 500, Family.VIGOR, Family.SWIFT), 3).eat(meal("b", 3, 500, Family.VIGOR), 3);
         assertEquals(Map.of(Family.VIGOR, 3, Family.SWIFT, 1), m.strongest());
