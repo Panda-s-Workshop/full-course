@@ -49,6 +49,17 @@ class FoodStateTest {
         assertEquals(s, FoodState.STREAM_CODEC.decode(buf));
     }
 
+    /** A save holding more heal-over-time than a player can have waiting (an edited file) doesn't load it as is. */
+    @Test
+    void aSavedNourishBeyondTheCapIsNotLoaded() {
+        var over = com.google.gson.JsonParser.parseString("{\"nourish\":" + (com.panda.fullcourse.logic.Recovery.MAX_NOURISH + 1) + "}");
+        var parsed = FoodState.CODEC.parse(JsonOps.INSTANCE, over);
+        org.junit.jupiter.api.Assertions.assertTrue(parsed.result().filter(s -> s.nourish() > com.panda.fullcourse.logic.Recovery.MAX_NOURISH).isEmpty(),
+                "loaded " + parsed);
+        var atCap = com.google.gson.JsonParser.parseString("{\"nourish\":" + com.panda.fullcourse.logic.Recovery.MAX_NOURISH + "}");
+        assertEquals(com.panda.fullcourse.logic.Recovery.MAX_NOURISH, FoodState.CODEC.parse(JsonOps.INSTANCE, atCap).getOrThrow().nourish());
+    }
+
     @Test
     void helpingsOutsideTheWindowAreDropped() {
         FoodState s = FoodState.EMPTY.withHelping(CAKE, 100, 6000).withHelping(BANQUET, 6099, 6000);

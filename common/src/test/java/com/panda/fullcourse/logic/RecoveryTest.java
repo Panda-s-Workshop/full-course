@@ -29,6 +29,16 @@ class RecoveryTest {
         assertTrue(Recovery.healsNow(160, 0, 80));
     }
 
+    /** A modded food can name any nutrition: the heal-over-time waiting stops at the cap. */
+    @Test
+    void nourishIsCapped() {
+        assertEquals(Recovery.MAX_NOURISH, Recovery.nourish(0, 50_000));
+        assertEquals(Recovery.MAX_NOURISH, Recovery.nourish(Recovery.MAX_NOURISH, 1));
+        assertEquals(6, Recovery.nourish(2, 6), "a bigger heal replaces a smaller one");
+        assertEquals(6, Recovery.nourish(6, 2), "a smaller one doesn't");
+        assertEquals(3, Recovery.nourish(3, -4), "a negative nutrition adds nothing");
+    }
+
     @Test
     void anIntervalOfZeroTurnsRecoveryOff() {
         assertEquals(0, Recovery.interval(0, 1.0));

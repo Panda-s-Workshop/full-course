@@ -110,6 +110,7 @@ final class KitchenChecks {
         checks.put("pot_needs_heat", KitchenChecks::potNeedsHeat);
         checks.put("pot_cooks_stew", KitchenChecks::potCooksStew);
         checks.put("pot_returns_containers", KitchenChecks::potReturnsContainers);
+        checks.put("pot_keeps_soup_color", KitchenChecks::potKeepsSoupColor);
         checks.put("pot_stray_item_blocks", KitchenChecks::potStrayItemBlocks);
         checks.put("pot_hopper_faces", KitchenChecks::potHopperFaces);
         checks.put("pot_pools_split_stacks", KitchenChecks::potPoolsSplitStacks);
@@ -386,6 +387,21 @@ final class KitchenChecks {
             check(pot.getItem(2).getCount() == 2 && pot.getItem(CookingPotBlockEntity.CONTAINER).getCount() == 1,
                     "one potato and one bowl used: %s, %s", pot.getItem(2), pot.getItem(CookingPotBlockEntity.CONTAINER));
             check(pot.getItem(3).is(Items.GLASS_BOTTLE), "the broth leaves its bottle in its slot: %s", pot.getItem(3));
+        });
+    }
+
+    /** The pot's soup takes its recipe's colour, and keeps it through a save and a load (a restart, a chunk reload). */
+    private static void potKeepsSoupColor(RuleChecks.Ctx c) {
+        List<ItemStack> stew = List.of(new ItemStack(item("chopped_vegetables")), new ItemStack(item("chopped_onion")),
+                new ItemStack(Items.BAKED_POTATO, 3), new ItemStack(item("broth")));
+        pot(c, Blocks.MAGMA_BLOCK.defaultBlockState(), stew, new ItemStack(Items.BOWL, 2), 200, pot -> {
+            int color = 0xB87A3A; // vegetable_stew's soup_color
+            check(pot.soupColor() == color, "the stew's colour: %06X, expected %06X", pot.soupColor(), color);
+            var registries = c.level().registryAccess();
+            var loaded = net.minecraft.world.level.block.entity.BlockEntity.loadStatic(pot.getBlockPos(), pot.getBlockState(),
+                    pot.saveWithFullMetadata(registries), registries);
+            check(loaded instanceof CookingPotBlockEntity again && again.soupColor() == color, "after a load: %s",
+                    loaded instanceof CookingPotBlockEntity again ? String.format("%06X", again.soupColor()) : loaded);
         });
     }
 
