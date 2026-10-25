@@ -104,9 +104,12 @@ public final class FoodText {
         return Component.translatable("tooltip.fullcourse.heal", number(nutrition / 2.0), nutrition);
     }
 
-    /** "Score 5 · Gourmet at 8", or the top tier. */
+    /** "Score 5 · Gourmet at 8", the top tier, or "set to Simple" when data or a rule set the tier, not the score. */
     static MutableComponent score(Profile p) {
         int[] thresholds = FullCourseConfig.tierThresholds();
+        if (Tier.fromScore(p.score(), thresholds) != p.tier()) {
+            return Component.translatable("tooltip.fullcourse.score_set", p.score(), Component.translatable("tier.fullcourse." + p.tier().ordinal()));
+        }
         int next = p.tier().ordinal(); // thresholds[i] is the lowest score of tier i + 1
         if (next >= thresholds.length || next >= Tier.FEAST.ordinal()) return Component.translatable("tooltip.fullcourse.score_top", p.score());
         return Component.translatable("tooltip.fullcourse.score", p.score(),
