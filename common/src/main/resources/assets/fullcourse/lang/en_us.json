@@ -76,6 +76,7 @@
   "gui.fullcourse.jei.served_in": "The dish is served in this; the pot uses one up",
   "gui.fullcourse.journal.all": "Every meal slot is open",
   "gui.fullcourse.journal.count": "%s of %s dishes tasted",
+  "gui.fullcourse.journal.counts": "Counts toward meal slot %s",
   "gui.fullcourse.journal.progress": "%s / %s %s",
   "gui.fullcourse.journal.progress_feast": "%s / %s %s + feast",
   "gui.fullcourse.journal.rule": "Meal slot %s: taste %s different dishes with %s or more",

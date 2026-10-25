@@ -50,4 +50,42 @@ class MilestoneTest {
         assertEquals(Milestones.Next.NONE, Milestones.next(count(0, 0, false), 3));
         assertEquals(Milestones.next(count(12, 9, false)), Milestones.next(count(12, 9, false), 0));
     }
+
+    @Test
+    void countsMarksDishesThatMoveTheNextSlot() {
+        Milestones.Next third = Milestones.next(count(5, 2, false));
+        assertTrue(Milestones.counts(third, Tier.PREPARED));
+        assertTrue(Milestones.counts(third, Tier.FEAST));
+        assertFalse(Milestones.counts(third, Tier.SIMPLE));
+        Milestones.Next fourth = Milestones.next(count(9, 4, false));
+        assertFalse(Milestones.counts(fourth, Tier.PREPARED));
+        assertTrue(Milestones.counts(fourth, Tier.HEARTY));
+        // twenty hearty dishes but no feast: only a feast still helps
+        Milestones.Next fifth = Milestones.next(count(25, 22, false));
+        assertFalse(Milestones.counts(fifth, Tier.GOURMET));
+        assertTrue(Milestones.counts(fifth, Tier.FEAST));
+        assertFalse(Milestones.counts(Milestones.next(count(25, 22, true)), Tier.FEAST));
+    }
+
+    @Test
+    void countsAgreesWithWhatTastingDoes() {
+        for (int prepared = 0; prepared <= 24; prepared++) {
+            for (int hearty = 0; hearty <= prepared; hearty++) {
+                for (boolean feast : new boolean[] {false, true}) {
+                    if (feast && hearty == 0) continue;
+                    Milestones.Count before = count(prepared, hearty, feast);
+                    Milestones.Next next = Milestones.next(before);
+                    for (Tier tier : Tier.values()) {
+                        Milestones.Count after = count(prepared + (tier.stars() >= 2 ? 1 : 0), hearty + (tier.stars() >= 3 ? 1 : 0),
+                                feast || tier == Tier.FEAST);
+                        Milestones.Next then = Milestones.next(after);
+                        boolean moved = Milestones.reached(after) > Milestones.reached(before)
+                                || Math.min(then.have(), then.need()) > Math.min(next.have(), next.need())
+                                || next.needsFeast() && !then.needsFeast();
+                        assertEquals(moved, Milestones.counts(next, tier), before + " + a " + tier + " dish");
+                    }
+                }
+            }
+        }
+    }
 }

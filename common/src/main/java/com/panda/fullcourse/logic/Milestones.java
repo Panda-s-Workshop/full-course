@@ -46,6 +46,15 @@ public final class Milestones {
     }
 
     /**
+     * Whether tasting a new meal dish of {@code tier} would move {@code next} along: one of its tier or higher while
+     * dishes are still short, or a feast while the fifth slot waits only on one.
+     */
+    public static boolean counts(Next next, Tier tier) {
+        if (next == Next.NONE || tier.stars() < next.stars()) return false;
+        return next.have() < next.need() || next.needsFeast() && tier == Tier.FEAST;
+    }
+
+    /**
      * The next milestone past those reached and those already {@code earned} (slots given by a command, or earned before
      * a datapack rated dishes lower): the one whose slot the player doesn't have yet.
      */

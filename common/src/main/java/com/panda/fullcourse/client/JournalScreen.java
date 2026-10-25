@@ -30,8 +30,9 @@ import net.minecraft.world.item.ItemStack;
 /**
  * The Tasting Journal's screen: every dish the server rates (the mod's, vanilla's, and other mods' of two stars or
  * more, plus anything already tasted), by tier, in a grid; tasted dishes in colour inside a frame of their tier's
- * colour, the rest faded. Hovering a dish shows its tooltip (tier, benefits, and with Shift the recipe chain). The
- * next meal slot's milestone and a bar sit at the top. Reads only the synced food state: nothing is sent.
+ * colour, the rest faded, with a pip on those whose tasting would move the next slot along. Hovering a dish shows its
+ * tooltip (tier, benefits, and with Shift the recipe chain). The next meal slot's milestone and a bar sit at the top.
+ * Reads only the synced food state: nothing is sent.
  */
 public class JournalScreen extends Screen {
     private static final Identifier TEXTURE = FullCourse.id("textures/gui/journal.png");
@@ -40,7 +41,7 @@ public class JournalScreen extends Screen {
     /** The layout drawn into textures/gui/journal.png: panel, bar, grid and scrollbar track. */
     public static final int W = 212, H = 194, GRID_X = 8, GRID_Y = 46, COLS = 10, ROWS = 7, BAR_X = 8, BAR_Y = 30, BAR_W = 196,
             BAR_H = 4, SCROLL_X = 195, SCROLL_Y = 46, SCROLL_H = ROWS * 18 - 2;
-    private static final int LABEL = 0xFF404040, FADE = 0xB08B8B8B, WELL = 0xFF3C3C3C;
+    private static final int LABEL = 0xFF404040, FADE = 0xB08B8B8B, WELL = 0xFF3C3C3C, PIP_EDGE = 0xFF202020;
 
     private final List<Item> dishes = new ArrayList<>();
     /** A fixed list to show instead of the server's dishes (for checks: a pack with more dishes than one page). */
@@ -123,6 +124,7 @@ public class JournalScreen extends Screen {
         g.text(font, title, left + 8, top + 6, LABEL, false);
         milestone(g, state, mouseX, mouseY);
 
+        Milestones.Next next = nextSlot(state);
         Item hovered = null;
         for (int i = scroll * COLS; i < dishes.size() && i < (scroll + ROWS) * COLS; i++) {
             Item item = dishes.get(i);
@@ -134,7 +136,14 @@ public class JournalScreen extends Screen {
                 g.outline(x - 1, y - 1, 18, 18, FoodProfiles.client(item).tier().color());
             }
             g.item(new ItemStack(item), x, y);
-            if (!has) g.fill(x, y, x + 16, y + 16, FADE);
+            if (!has) {
+                g.fill(x, y, x + 16, y + 16, FADE);
+                // a pip in the progress bar's colour: tasting this one moves the next slot along
+                if (countsToward(next, item)) {
+                    g.fill(x + 11, y, x + 16, y + 5, PIP_EDGE);
+                    g.fill(x + 12, y + 1, x + 15, y + 4, barTier(next).color());
+                }
+            }
             if (mouseX >= x - 1 && mouseX < x + 17 && mouseY >= y - 1 && mouseY < y + 17) {
                 hovered = item;
                 g.fill(x, y, x + 16, y + 16, 0x80FFFFFF);
@@ -154,9 +163,29 @@ public class JournalScreen extends Screen {
             List<Component> lines = new ArrayList<>(getTooltipFromItem(minecraft, stack));
             if (!tasted.contains(BuiltInRegistries.ITEM.getKey(hovered))) {
                 lines.add(Math.min(1, lines.size()), Component.translatable("gui.fullcourse.journal.untasted").withStyle(ChatFormatting.DARK_GRAY));
+                if (countsToward(next, hovered)) {
+                    lines.add(Math.min(2, lines.size()), Component.translatable("gui.fullcourse.journal.counts", next.slot()).withStyle(ChatFormatting.GRAY));
+                }
             }
             g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
         }
+    }
+
+    /** The next slot to earn, or {@code NONE} once there is none left (all earned, or the config's maximum reached). */
+    public static Milestones.Next nextSlot(FoodState state) {
+        Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()), state.bonusSlots());
+        return state.slots() >= FullCourseConfig.maxMealSlots() ? Milestones.Next.NONE : next;
+    }
+
+    /** An untasted dish whose tasting would move {@code next} along ({@link Milestones#counts}). */
+    public static boolean countsToward(Milestones.Next next, Item item) {
+        var profile = FoodProfiles.client(item);
+        return profile.givesMeal() && Milestones.counts(next, profile.tier());
+    }
+
+    /** The tier whose colour the progress bar (and the pips) use. */
+    private static Tier barTier(Milestones.Next next) {
+        return Tier.ofStars(next.stars());
     }
 
     /** "Meal slot 4" and "9 / 15 ★★★", a bar in the counted tier's colour, and the whole rule on hover. */
