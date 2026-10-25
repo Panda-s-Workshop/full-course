@@ -77,7 +77,7 @@ public class JournalScreen extends Screen {
         all.addAll(fixed != null ? fixed : dishes(state().tasted()));
         String query = search == null ? "" : search.getValue();
         search = new EditBox(font, left + W - 8 - SEARCH_W, top + 4, SEARCH_W, 12, Component.translatable("gui.fullcourse.journal.search"));
-        search.setHint(Component.translatable("gui.fullcourse.journal.search_hint").withStyle(ChatFormatting.DARK_GRAY));
+        search.setHint(Component.translatable("gui.fullcourse.journal.search_hint").withStyle(ChatFormatting.GRAY));
         search.setValue(query);
         search.setResponder(text -> filter());
         addRenderableWidget(search);
@@ -267,7 +267,7 @@ public class JournalScreen extends Screen {
         if (mouseX >= left + 8 && mouseX < left + W - 8 && mouseY >= y - 1 && mouseY < top + BAR_Y + BAR_H + 1) {
             Component rule = Component.translatable(next.needsFeast() ? "gui.fullcourse.journal.rule_feast" : "gui.fullcourse.journal.rule",
                     slot, next.need(), "★".repeat(counted.stars()));
-            g.setTooltipForNextFrame(font, rule, mouseX, mouseY);
+            g.setTooltipForNextFrame(font, font.split(rule, 200), mouseX, mouseY);
         }
     }
 
