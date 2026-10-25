@@ -236,6 +236,7 @@
   "station.fullcourse.craft": "Crafting",
   "station.fullcourse.crock": "Fermenting Crock",
   "station.fullcourse.fire": "Furnace, smoker or campfire",
+  "station.fullcourse.fire_no_furnace": "Smoker or campfire",
   "station.fullcourse.oven": "Brick Oven",
   "station.fullcourse.pot": "Cooking Pot",
   "subtitles.fullcourse.board.chop": "Knife chops",

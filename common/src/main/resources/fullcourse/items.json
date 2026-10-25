@@ -372,7 +372,7 @@
     ],
     "made": [
       {
-        "station": "fire",
+        "station": "fire_no_furnace",
         "from": [
           "minecraft:chorus_fruit"
         ]

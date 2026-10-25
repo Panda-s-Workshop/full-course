@@ -96,6 +96,7 @@ final class KitchenChecks {
 
     static void register(Map<String, Consumer<RuleChecks.Ctx>> checks) {
         checks.put("recipes_loaded", KitchenChecks::recipesLoaded);
+        checks.put("fire_recipes_shadow_nothing", KitchenChecks::fireRecipesShadowNothing);
         checks.put("machine_recipe_fields", KitchenChecks::machineRecipeFields);
         checks.put("roster_tiers", KitchenChecks::rosterTiers);
         checks.put("board_cuts_with_knife", KitchenChecks::boardCutsWithKnife);
@@ -140,6 +141,33 @@ final class KitchenChecks {
                 List.of(new Output(Items.CAKE, 1))));
         check(assembly.isPresent() && assembly.get().result().is(Items.CAKE),
                 "an assembly's result is its results, not its transitional item: %s", assembly);
+    }
+
+    /**
+     * No furnace, smoker or campfire recipe of ours takes an input another recipe of the same kind takes: the station
+     * picks one, and ours sorting first would take vanilla's away (chorus fruit pops for purpur).
+     */
+    private static void fireRecipesShadowNothing(RuleChecks.Ctx c) {
+        var recipes = c.server().getRecipeManager().getRecipes();
+        List<String> clashes = new ArrayList<>();
+        for (RecipeHolder<?> ours : recipes) {
+            if (!ours.id().identifier().getNamespace().equals(FullCourse.MODID)
+                    || !(ours.value() instanceof net.minecraft.world.item.crafting.AbstractCookingRecipe cooking)) continue;
+            cooking.input().items().forEach(item -> {
+                ItemStack stack = new ItemStack(item);
+                for (RecipeHolder<?> other : recipes) {
+                    if (other != ours && other.value().getType() == cooking.getType()
+                            && other.value() instanceof net.minecraft.world.item.crafting.AbstractCookingRecipe o && o.input().test(stack)) {
+                        clashes.add(ours.id().identifier() + " and " + other.id().identifier() + " both take " + item.getRegisteredName());
+                    }
+                }
+            });
+        }
+        check(clashes.isEmpty(), "recipes of one kind share an input: %s", clashes);
+        var input = new net.minecraft.world.item.crafting.SingleRecipeInput(new ItemStack(Items.CHORUS_FRUIT));
+        ItemStack popped = c.server().getRecipeManager().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.SMELTING, input, c.level())
+                .map(h -> h.value().assemble(input)).orElse(ItemStack.EMPTY);
+        check(popped.is(Items.POPPED_CHORUS_FRUIT), "a furnace should pop chorus fruit for purpur: %s", popped);
     }
 
         private static void recipesLoaded(RuleChecks.Ctx c) {
