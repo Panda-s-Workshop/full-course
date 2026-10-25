@@ -78,14 +78,20 @@ public final class MealList {
 
         int tx = PAD + 20, room = w - tx - PAD;
         List<List<FormattedCharSequence>> lines = new ArrayList<>();
-        int rows = 0;
+        List<Integer> rowHeights = new ArrayList<>();
         for (Meals.Meal<Identifier> meal : meals) {
             List<FormattedCharSequence> wrapped = font.split(Component.literal(benefits(meal, now)), room);
             lines.add(wrapped);
-            rows += Math.max(ROW, 12 + 10 * wrapped.size());
+            rowHeights.add(Math.max(ROW, 12 + 10 * wrapped.size()));
         }
-        int h = PAD + 12 + (meals.isEmpty() ? ROW : rows) + (free > 0 && !meals.isEmpty() ? 11 : 0) + (recoveryLines.isEmpty() ? 0 : 10 * recoveryLines.size() + 1) + (more ? 22 : 0)
-                + PAD - 2;
+        int fixed = PAD + 12 + (free > 0 && !meals.isEmpty() ? 11 : 0) + (recoveryLines.isEmpty() ? 0 : 10 * recoveryLines.size() + 1) + (more ? 22 : 0) + PAD - 2;
+        // as many meals as the screen holds; the rest are counted in one line
+        int shownMeals = meals.size(), rows = rowHeights.stream().mapToInt(Integer::intValue).sum();
+        while (shownMeals > 1 && fixed + rows + (shownMeals < meals.size() ? 11 : 0) > screen.height - 2 * GAP) {
+            rows -= rowHeights.get(--shownMeals);
+        }
+        int hidden = meals.size() - shownMeals;
+        int h = fixed + (meals.isEmpty() ? ROW : rows) + (hidden > 0 ? 11 : 0);
         int x = screen.leftPos - GAP - w, y = Math.max(GAP, Math.min(screen.topPos, screen.height - GAP - h));
         shown = new Rect2i(x, y, w, h);
         g.fill(x, y, x + w, y + h, BG);
@@ -100,7 +106,7 @@ public final class MealList {
             cy += ROW;
         }
         ItemStack hovered = null;
-        for (int i = 0; i < meals.size(); i++) {
+        for (int i = 0; i < shownMeals; i++) {
             Meals.Meal<Identifier> meal = meals.get(i);
             ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.getValue(meal.dish()));
             g.item(stack, x + PAD, cy + 2);
@@ -110,6 +116,10 @@ public final class MealList {
             int rowH = Math.max(ROW, 12 + 10 * wrapped.size());
             if (mouseX >= x && mouseX < x + w && mouseY >= cy && mouseY < cy + rowH) hovered = stack;
             cy += rowH;
+        }
+        if (hidden > 0) {
+            g.text(font, Component.translatable("gui.fullcourse.meals.more", hidden), x + PAD, cy, DIM, false);
+            cy += 11;
         }
         if (free > 0 && !meals.isEmpty()) {
             g.text(font, Component.translatable(free == 1 ? "gui.fullcourse.meals.free_one" : "gui.fullcourse.meals.free", free), x + PAD, cy, DIM, false);

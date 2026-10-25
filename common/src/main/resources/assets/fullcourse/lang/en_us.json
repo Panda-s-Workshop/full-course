@@ -101,6 +101,7 @@
   "gui.fullcourse.journal.untasted": "Not tasted yet",
   "gui.fullcourse.meals.free": "%s free slots",
   "gui.fullcourse.meals.free_one": "1 free slot",
+  "gui.fullcourse.meals.more": "+%s more meals",
   "gui.fullcourse.meals.next": "Slot %s: %s / %s %s",
   "gui.fullcourse.meals.next_feast": "Slot %s: %s / %s %s + feast",
   "gui.fullcourse.meals.none": "No meals yet: eat a cooked dish",
