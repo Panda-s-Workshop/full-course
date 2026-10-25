@@ -144,6 +144,7 @@ public final class FullCourseJeiPlugin implements IModPlugin {
         registration.addGuiScreenHandler(JournalScreen.class, new IScreenHandler<JournalScreen>() {
             @Override
             public IGuiProperties apply(JournalScreen screen) {
+                if (screen.width <= 1 || screen.height <= 1) return null; // asked before the screen is laid out
                 return new IGuiProperties() {
                     @Override public Class<? extends Screen> screenClass() { return JournalScreen.class; }
                     @Override public int guiLeft() { return screen.left(); }
