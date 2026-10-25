@@ -72,7 +72,7 @@
   "family.fullcourse.tide": "Tide",
   "family.fullcourse.tide.effect": "+%s respiration, %s%% less water drag",
   "family.fullcourse.vigor": "Vigor",
-  "family.fullcourse.vigor.effect": "+%s max health",
+  "family.fullcourse.vigor.effect": "+%s ❤ max health",
   "fullcourse.configuration.durationMultiplier": "Meal duration multiplier",
   "fullcourse.configuration.keepMealsOnDeath": "Keep meals on death",
   "fullcourse.configuration.keepVanillaHunger": "Keep vanilla hunger",

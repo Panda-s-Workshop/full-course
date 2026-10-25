@@ -640,7 +640,7 @@ public final class RuleChecks {
     private static void tooltipLines(Ctx c) {
         List<String> stew = text(c, Items.RABBIT_STEW, false, false);
         check(stew.get(0).contains("Hearty") && !stew.get(0).contains("✔"), "stars line %s", stew.get(0));
-        check(stew.get(1).equals("Vigor II: +4 max health"), "first benefit %s", stew.get(1));
+        check(stew.get(1).equals("Vigor II: +2 ❤ max health"), "first benefit, in hearts as the heals are: %s", stew.get(1));
         check(stew.get(2).equals("Mending II: +100% Recovery"), "second benefit %s", stew.get(2));
         check(stew.get(3).equals("Lasts 10:00 · Heals 5 ❤ over 10 s"), "duration and heal %s", stew.get(3));
         check(stew.get(4).startsWith("Shift"), "shift hint %s", stew);

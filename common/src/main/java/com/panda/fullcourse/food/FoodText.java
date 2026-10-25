@@ -105,9 +105,11 @@ public final class FoodText {
         for (int i = 0; i < effects.size(); i++) {
             Benefits.Effect e = effects.get(i);
             double v = Math.abs(e.perLevel() * level);
-            // water movement efficiency is a share of water's drag taken away (1 = none), so it reads as a percentage
+            // water movement efficiency is a share of water's drag taken away (1 = none), so it reads as a percentage;
+            // max health reads in hearts, as the heals do
             boolean percent = e.operation() != Operation.ADD_VALUE || e.attribute().get() == Attributes.WATER_MOVEMENT_EFFICIENCY;
-            args[i] = number(percent ? v * 100 : v);
+            boolean hearts = e.attribute().get() == Attributes.MAX_HEALTH;
+            args[i] = number(percent ? v * 100 : hearts ? v / 2 : v);
         }
         return args;
     }
