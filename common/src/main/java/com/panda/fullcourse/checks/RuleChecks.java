@@ -103,6 +103,7 @@ public final class RuleChecks {
         CHECKS.put("meals_lost_on_death", RuleChecks::mealsLostOnDeath);
         CHECKS.put("relog_keeps_vigor_hearts", RuleChecks::relogKeepsVigorHearts);
         CHECKS.put("relog_keeps_recovery_delay", RuleChecks::relogKeepsRecoveryDelay);
+        CHECKS.put("end_exit_keeps_vigor_hearts", RuleChecks::endExitKeepsVigorHearts);
         CHECKS.put("vanilla_tiers", RuleChecks::vanillaTiers);
         CHECKS.put("benefit_attribute_applied", RuleChecks::benefitApplied);
         CHECKS.put("benefit_removed_on_expiry", RuleChecks::benefitRemovedOnExpiry);
@@ -469,6 +470,23 @@ public final class RuleChecks {
         FoodRules.tick(loaded, c.t() + 1);
         check(loaded.getMaxHealth() == 24F, "max health after loading %s, expected 24", loaded.getMaxHealth());
         check(Math.abs(loaded.getHealth() - 24F) < 0.01F, "health after loading %s, expected 24", loaded.getHealth());
+    }
+
+    /**
+     * At 24 of 24 with Vigor II, leaving the End (a new player that keeps everything): 24 of 24 again once the meal is
+     * back, not the 20 the new player's health was clamped to.
+     */
+    private static void endExitKeepsVigorHearts(Ctx c) {
+        eat(c, Items.RABBIT_STEW, c.t());
+        c.player().setHealth(24F);
+        health(c, 24F, "before leaving the End");
+        ServerPlayer exited = new ServerPlayer(c.server(), c.level(), new GameProfile(UUID.randomUUID(), "fc_end_exit"), ClientInformation.createDefault());
+        exited.restoreFrom(c.player(), true);
+        // NeoForge copies the state in restoreFrom; Fabric copies it later in the respawn, which a test player skips
+        if (FoodRules.state(exited).meals().active().isEmpty()) Services.PLATFORM.setFoodState(exited, FoodRules.state(c.player()));
+        FoodRules.tick(exited, c.t() + 1);
+        check(exited.getMaxHealth() == 24F, "max health after the End exit %s, expected 24", exited.getMaxHealth());
+        check(Math.abs(exited.getHealth() - 24F) < 0.01F, "health after the End exit %s, expected 24", exited.getHealth());
     }
 
     /** A player saved hurt comes back with Recovery's delay to wait out, as after a hit; one leaving the End keeps its hit time. */
