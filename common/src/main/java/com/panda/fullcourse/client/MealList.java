@@ -123,7 +123,6 @@ public final class MealList {
         if (hovered != null) g.setTooltipForNextFrame(font, hovered, mouseX, mouseY);
     }
 
-    /** "19:59 · III · Brawn, Vigor, Mending": time left, then the level, which applies to every family the meal gives. */
     /**
      * "Recovery: ½ ❤ every 2.0 s" (each Recovery heal is 1 HP) when {@code fullcourse:recovery_rate} (Mending, another
      * mod, a command) moves Recovery off its default pace, "Recovery: off" at 0; null at the default pace, or while
@@ -139,11 +138,13 @@ public final class MealList {
         return Component.translatable("gui.fullcourse.meals.recovery", String.format(Locale.ROOT, "%.1f", interval / 20.0));
     }
 
+    /** "19:59 · Brawn III, Vigor III, Mending III": time left, then each family at its level, as the action bar says it. */
     private static String benefits(Meals.Meal<Identifier> meal, long now) {
-        String names = meal.families().stream().map(f -> Component.translatable("family.fullcourse." + f.key()).getString())
+        String level = Component.translatable("enchantment.level." + meal.level()).getString();
+        String names = meal.families().stream().map(f -> Component.translatable("family.fullcourse." + f.key()).getString() + " " + level)
                 .collect(Collectors.joining(", "));
         String time = FoodText.duration((int) Math.min(Integer.MAX_VALUE, meal.remaining(now)));
-        return time + " · " + Component.translatable("enchantment.level." + meal.level()).getString() + " · " + names;
+        return time + " · " + names;
     }
 
     /** {@code s} cut to {@code width} with an ellipsis. */
