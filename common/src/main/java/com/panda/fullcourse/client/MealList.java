@@ -51,7 +51,8 @@ public final class MealList {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         shown = null;
-        if (player == null || !FoodProfiles.clientReady() || FullCourseConfig.keepVanillaHunger()) return;
+        // shown with vanilla hunger kept too: meals still give their benefits, and this is where their time left shows
+        if (player == null || !FoodProfiles.clientReady()) return;
         // the recipe book moves the inventory off centre and takes this space
         if (screen.leftPos != (screen.width - 176) / 2) return;
         int w = Math.min(MAX_W, screen.leftPos - 2 * GAP);
