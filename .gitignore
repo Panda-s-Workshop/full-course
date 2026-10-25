@@ -4,3 +4,4 @@ run/
 _legacy/
 __pycache__/
 *.log
+logs/
