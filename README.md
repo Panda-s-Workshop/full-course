@@ -4,7 +4,12 @@
 
 **Download:** not released yet (CurseForge link here after the first release).
 
-A Minecraft 26.3 mod for NeoForge (26.3.0.89) and Fabric (Fabric API 0.161.0), Java 25.
+A Minecraft 26.3 mod for NeoForge and Fabric, Java 25.
+
+- **NeoForge:** 26.3.0.89 or later. Nothing else is needed.
+- **Fabric:** Fabric Loader 0.19.5 or later and Fabric API 0.161.0+26.3 or later. Nothing else is needed.
+
+It takes the place of the vanilla food bar, so it doesn't belong in a pack with another mod that reworks hunger.
 
 **No more hunger.** The food bar is gone, sprinting always works and health comes back on its own a few seconds after
 the last hit. Food becomes a choice that makes you stronger, and the more work a dish took (steps, stations,
@@ -26,7 +31,8 @@ slots always match the server.
 - NeoForge: `config/fullcourse-synced.toml`, created with the defaults and a comment for each key on first start.
 - Fabric: `config/fullcourse.properties`, created the same way. It is read once at startup.
 
-Restart the server (or the game, in single player) after editing either file.
+Restart the server (or the game, in single player) after editing either file. NeoForge's in-game config screen marks
+these keys the same way: they take effect on the next world load.
 
 | Key | Default | What it does |
 |---|---|---|
@@ -34,10 +40,11 @@ Restart the server (or the game, in single player) after editing either file.
 | `recoveryDelaySeconds` | `8` | Seconds without taking damage before health starts coming back (0–600). |
 | `recoveryIntervalTicks` | `80` | Ticks between heals of 1 HP, before meal benefits shorten it (1–12000). |
 | `startingMealSlots` | `2` | Meal slots a new player has (1–16). |
-| `maxMealSlots` | `5` | The most meal slots the Tasting Journal can unlock (1–16). |
+| `maxMealSlots` | `5` | The most meal slots a player can have (1–16). The Tasting Journal opens three past the starting slots; `/fullcourse unlock` can go up to this. |
 | `keepMealsOnDeath` | `false` | Keep held meals through death. |
 | `durationMultiplier` | `1.0` | Multiplies every meal's duration (0.05–20). |
-| `tierThresholds` | `1,3,5,8,12` | Lowest recipe-chain score of tiers 1 to 5: exactly five, ascending. Anything else falls back to the defaults. |
+| `tierThresholds` | `1,3,5,8,12` | Lowest recipe-chain score of tiers 1 to 5: exactly five, ascending, 0–999. Anything else falls back to the defaults. |
+| `slotMilestones` | `8,15,20` | Different dishes to taste for meal slot 3 (two stars or more), 4 and 5 (three stars or more; slot 5 also needs a feast). Exactly three. Raise them in a pack with many food mods. |
 
 Each player also has three display settings of their own, which the server never sees: `config/fullcourse-client.toml`
 on NeoForge, `config/fullcourse-client.properties` on Fabric. Restart the game after editing.
@@ -51,7 +58,10 @@ on NeoForge, `config/fullcourse-client.properties` on Fabric. Restart the game a
 ## Compatibility
 
 Full Course rates every food in the game from its recipes, including foods from other mods, so it needs no list of
-supported mods. Some mods get more than that:
+supported mods. Machine recipes that don't list their ingredients the usual way (Create's, for instance) are read from
+their own fields where they can be. Recipes it still can't read are counted in one line of the log at server start,
+by recipe type; a food made only that way rates as a raw ingredient until a pack rates it (see below). Some mods get
+more than that:
 
 - **Farmer's Delight Refabricated** (Fabric): its dishes get tiers from their cooking-pot and cutting-board recipes
   (a cut such as minced beef or bacon is still a raw ingredient, but the cut counts toward every dish made from it),
@@ -63,8 +73,60 @@ supported mods. Some mods get more than that:
 - **Cooking for Blockheads**: the Cooking Table lists Full Course's crafted dishes and ingredients and can sort them
   by tier, and its oven heats a Cooking Pot set on top while the oven is cooking something.
 
-Packs can add heat sources to the `fullcourse:heat_sources` block tag. A block with a `lit` or `burning` state heats
-only while that state is on; any other block in the tag always heats.
+## For pack makers
+
+Everything below is data, so a data pack changes it; `/reload` re-rates every food.
+
+**Rating a food by hand.** `data/<namespace>/fullcourse/food_profiles/<item path>.json` rates the item
+`<namespace>:<item path>`. Every field is optional; what's left out comes from the recipes. An empty object `{}`
+puts a replaced file back to the scored values.
+
+```json
+{"tier": 4, "families": ["brawn", "vigor"], "remedy": false, "serving_of": "minecraft:cake"}
+```
+
+- `tier`: stars, 0 to 5 (0 gives no meal).
+- `families`: any of `vigor`, `brawn`, `fortitude`, `swift`, `diligence`, `fortune`, `tide`, `night_eye`, `ember`,
+  `lightfoot`, `mending`.
+- `remedy`: true for foods like the golden apple, which keep their own effects and heal but give no meal.
+- `serving_of`: the dish this is a serving or slice of (a feast block, a pie); it rates exactly as that dish.
+
+**Item tags** (namespace `fullcourse`):
+
+| Tag | What it means |
+|---|---|
+| `raw_ingredients` | Obtained raw (crops, drops, fruit): always the start of a recipe chain, never a meal. |
+| `culinary` | Not edible, but followed down its recipes as an ingredient (flour, sugar). Anything edible already is. |
+| `containers` | Bowls, bottles, buckets: ignored as ingredients. |
+| `remedies` | Their own effects and the heal only, no meal. |
+| `placed_meals` | Placed and eaten as a block (feasts, cake): their score gets +3. |
+| `soups` | Always give Mending. |
+| `groups/<family>` | The ingredients that give each benefit family. |
+| `journal_foods` | The "any simple dish" the Tasting Journal's recipe takes. |
+
+**Block tags:** `fullcourse:heat_sources` heat a Cooking Pot set on top. A block with a `lit` or `burning` state heats
+only while that state is on; any other block in the tag always heats. `fullcourse:heat_conductors` (a hopper, so a pot
+can be emptied from below) pass heat up from a source under them.
+
+**Effect tag:** `fullcourse:needs_hunger` lists effects that act only through the food bar (vanilla Hunger, Farmer's
+Delight's Nourishment and Comfort). With hunger off they do nothing, and tooltips grey them out and say so.
+
+**Biome tags:** `fullcourse:has_wild_onions` and `fullcourse:has_wild_ember_peppers` choose where the wild crops grow.
+
+**Shared tags.** Recipes take `#c:eggs`, `#c:foods/dough`, `#c:foods/cooked_egg`, `#c:foods/raw_meat`,
+`#c:foods/raw_fish` and `#c:crops/onion`, so other mods' items work in them. The mod puts its onion, ember pepper,
+dough, fried egg, grilled fillet and flatbread in the matching `c:` tags.
+
+**Recipe types**, for data packs:
+
+| Type | Fields |
+|---|---|
+| `fullcourse:cutting` | `ingredient`, `result` (Cutting Board, one knife use) |
+| `fullcourse:cooking` | `ingredients` (up to 6), optional `container` the dish is served in, `result`, optional `time` (ticks, default 200), optional `soup_color` (`"#RRGGBB"`) |
+| `fullcourse:baking` | `ingredients` (up to 4), `result`, optional `time` (default 300) |
+| `fullcourse:fermenting` | `ingredients` (up to 4), `result`, optional `time` (default 12000; sleeping counts) |
+
+Every other mod's recipe type counts too: each type is its own station in a dish's score.
 
 ## Building and running
 
