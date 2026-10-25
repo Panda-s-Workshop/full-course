@@ -112,8 +112,9 @@ puts a replaced file back to the scored values.
 only while that state is on; any other block in the tag always heats. `fullcourse:heat_conductors` (a hopper, so a pot
 can be emptied from below) pass heat up from a source under them.
 
-**Effect tag:** `fullcourse:needs_hunger` lists effects that act only through the food bar (vanilla Hunger, Farmer's
-Delight's Nourishment and Comfort). With hunger off they do nothing, and tooltips grey them out and say so.
+**Effect tag:** `fullcourse:needs_hunger` lists effects that act only through the food bar (Farmer's Delight's
+Nourishment and Comfort). With hunger off they do nothing, and tooltips grey them out and say so. Vanilla Hunger isn't
+in it: here it is Queasy, which blocks meal benefits and pauses Recovery.
 
 **Biome tags:** `fullcourse:has_wild_onions` and `fullcourse:has_wild_ember_peppers` choose where the wild crops grow.
 

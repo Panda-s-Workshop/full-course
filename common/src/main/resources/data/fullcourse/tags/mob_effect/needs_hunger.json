@@ -1,6 +1,5 @@
 {
   "values": [
-    "minecraft:hunger",
     {
       "id": "farmersdelight:nourishment",
       "required": false
