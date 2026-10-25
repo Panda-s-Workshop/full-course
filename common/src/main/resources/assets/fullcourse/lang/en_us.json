@@ -121,7 +121,7 @@
   "gui.fullcourse.oven.status.no_recipe": "No recipe",
   "gui.fullcourse.oven.unlit": "Put fuel under the flame: coal, charcoal, wood, a lava bucket",
   "gui.fullcourse.pot.click_recipes": "Click for all pot recipes",
-  "gui.fullcourse.pot.cold": "Needs heat below, lit if it can be:",
+  "gui.fullcourse.pot.cold": "Needs one of these under it, burning:",
   "gui.fullcourse.pot.cold.cfb": "Cooking for Blockheads ovens heat only while they cook something",
   "gui.fullcourse.pot.conducts": "Heat rises through one %s between them",
   "gui.fullcourse.pot.from": "%s — %s",
