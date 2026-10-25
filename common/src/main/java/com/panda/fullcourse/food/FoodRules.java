@@ -131,7 +131,11 @@ public final class FoodRules {
         if (!player.isAlive()) return;
         // under /tick freeze players keep ticking while the game time stands still; a /tick step runs the game,
         // its last tick included (the step count is spent before the tick runs)
-        if (!player.level().tickRateManager().runsNormally()) return;
+        if (!player.level().tickRateManager().runsNormally()) {
+            // meals stand still with the clock, but the player's own effects still count down: Night Eye stays on
+            if (player.tickCount % 20 == 0) Benefits.apply(player, state(player).meals().strongest());
+            return;
+        }
         restoreHealth(player, now);
         FoodState before = state(player);
         // a server that lowered its slots trims the meals past them now, not at the next meal

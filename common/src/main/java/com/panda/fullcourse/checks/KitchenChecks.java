@@ -441,6 +441,19 @@ final class KitchenChecks {
         MobEffectInstance vision = c.player().getEffect(MobEffects.NIGHT_VISION);
         check(vision != null && vision.isAmbient() && !vision.showIcon(), "a mushroom skewer gives hidden Night Vision: %s", vision);
         c.player().removeEffect(MobEffects.NIGHT_VISION);
+        // under /tick freeze the player's effects still count down: the meal keeps night vision on
+        var clock = c.server().tickRateManager();
+        clock.setFrozen(true);
+        try {
+            clock.tick();
+            c.player().tickCount = 40;
+            FoodRules.tick(c.player(), c.t() + 2);
+            check(c.player().hasEffect(MobEffects.NIGHT_VISION), "no night vision under /tick freeze");
+        } finally {
+            clock.setFrozen(false);
+            clock.tick();
+            c.player().removeEffect(MobEffects.NIGHT_VISION);
+        }
     }
 
     // ---- onions -------------------------------------------------------------------------------------------------
