@@ -521,6 +521,9 @@ final class KitchenChecks {
         var plains = c.level().registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.PLAINS);
         var desert = c.level().registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.DESERT);
         check(plains.value().getGenerationSettings().hasFeature(placed.value()), "plains should grow wild onions");
+        // a biome named only by the shared c:is_taiga tag, as another mod's taiga would be
+        var pine = c.level().registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(Biomes.OLD_GROWTH_PINE_TAIGA);
+        check(pine.value().getGenerationSettings().hasFeature(placed.value()), "a c:is_taiga biome should grow wild onions");
         check(!desert.value().getGenerationSettings().hasFeature(placed.value()), "deserts shouldn't");
     }
 

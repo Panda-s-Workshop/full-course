@@ -7,6 +7,22 @@
     "minecraft:flower_forest",
     "minecraft:birch_forest",
     "minecraft:taiga",
-    "minecraft:savanna"
+    "minecraft:savanna",
+    {
+      "id": "#c:is_plains",
+      "required": false
+    },
+    {
+      "id": "#c:is_forest",
+      "required": false
+    },
+    {
+      "id": "#c:is_taiga",
+      "required": false
+    },
+    {
+      "id": "#c:is_savanna",
+      "required": false
+    }
   ]
 }
