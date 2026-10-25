@@ -87,7 +87,8 @@ puts a replaced file back to the scored values.
 
 - `tier`: stars, 0 to 5 (0 gives no meal).
 - `families`: any of `vigor`, `brawn`, `fortitude`, `swift`, `diligence`, `fortune`, `tide`, `night_eye`, `ember`,
-  `lightfoot`, `mending`.
+  `lightfoot`, `mending`. A name not in this list is logged and skipped; an empty list leaves the families to the
+  recipes.
 - `remedy`: true for foods like the golden apple, which keep their own effects and heal but give no meal.
 - `serving_of`: the dish this is a serving or slice of (a feast block, a pie); it rates exactly as that dish.
 

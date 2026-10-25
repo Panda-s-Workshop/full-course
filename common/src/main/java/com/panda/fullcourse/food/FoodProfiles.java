@@ -350,8 +350,13 @@ public final class FoodProfiles {
                 Optional<List<Family>> families = Optional.empty();
                 if (json.has("families")) {
                     List<Family> list = new ArrayList<>();
-                    for (JsonElement el : json.getAsJsonArray("families")) Family.byKey(el.getAsString()).ifPresent(list::add);
-                    families = Optional.of(List.copyOf(list));
+                    for (JsonElement el : json.getAsJsonArray("families")) {
+                        Optional<Family> family = Family.byKey(el.getAsString());
+                        if (family.isPresent()) list.add(family.get());
+                        else FullCourse.LOGGER.warn("Full Course: food profile override {} names no family \"{}\"", file, el.getAsString());
+                    }
+                    // an empty list leaves the families to the recipes, as leaving the key out does
+                    if (!list.isEmpty()) families = Optional.of(List.copyOf(list));
                 }
                 Optional<Item> servingOf = json.has("serving_of")
                         ? BuiltInRegistries.ITEM.get(Identifier.parse(json.get("serving_of").getAsString())).map(Holder::value) : Optional.empty();
