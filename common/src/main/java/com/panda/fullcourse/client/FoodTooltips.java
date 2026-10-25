@@ -48,6 +48,9 @@ public final class FoodTooltips {
             String key = "tooltip.fullcourse." + id.getPath();
             if (Language.getInstance().has(key + ".use")) lines.add(1, Component.translatable(key + ".use").withStyle(ChatFormatting.GRAY));
             if (Language.getInstance().has(key + ".craft")) made.add(Component.translatable(key + ".craft").withStyle(ChatFormatting.DARK_AQUA));
+        } else if (Language.getInstance().has("tooltip.fullcourse." + id.toLanguageKey() + ".use")) {
+            // what the mod changes about another's item (cake: one slice per helping)
+            lines.add(1, Component.translatable("tooltip.fullcourse." + id.toLanguageKey() + ".use").withStyle(ChatFormatting.GRAY));
         }
         if (food) {
             boolean tasted = mc.player != null
