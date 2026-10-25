@@ -39,7 +39,7 @@ neither Recovery nor food. Healing potions, golden apples and other effects stil
 
 | Key | Default | What it does |
 |---|---|---|
-| `keepVanillaHunger` | `false` | Keep the vanilla food bar and regeneration. Meals still give their benefits. |
+| `keepVanillaHunger` | `false` | Keep the vanilla food bar and regeneration. Meals still give their benefits, except Mending: with Recovery off it has nothing to speed up (tooltips say so). |
 | `recoveryDelaySeconds` | `8` | Seconds without taking damage before health starts coming back (0–600). |
 | `recoveryIntervalTicks` | `80` | Ticks between heals of 1 HP, before meal benefits shorten it (1–12000). |
 | `startingMealSlots` | `2` | Meal slots a new player has (1–16). |

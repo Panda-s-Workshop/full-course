@@ -318,6 +318,7 @@
   "tooltip.fullcourse.lasts": "Lasts %s",
   "tooltip.fullcourse.minecraft.cake.use": "Place it and share it: each player takes one slice every five minutes",
   "tooltip.fullcourse.needs_hunger": " · does nothing without hunger",
+  "tooltip.fullcourse.no_recovery": " · does nothing with vanilla hunger",
   "tooltip.fullcourse.onion.use": "Grows wild in plains, meadows, forests, taiga and savannas · plant on farmland",
   "tooltip.fullcourse.raw": "Heals only. Made into a dish, it gives a meal",
   "tooltip.fullcourse.remedy": "Remedy · keeps its effects, no meal",

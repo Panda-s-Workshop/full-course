@@ -14,6 +14,7 @@ import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.food.FoodState;
+import com.panda.fullcourse.food.FoodText;
 import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.logic.Tier;
 import java.util.List;
@@ -66,6 +67,10 @@ final class ConfigChecks {
             c.player().setHealth(10F);
             eat(c, Items.BREAD, t + 400);
             check(dishes(c).equals(List.of(id(Items.BREAD))), "meals still come with vanilla hunger: %s", dishes(c));
+            // food fills the bar rather than healing over time, and Mending has no Recovery to speed up: the tooltip says so
+            List<String> stew = FoodText.lines(profile(c, Items.RABBIT_STEW), 10, false, false).stream().map(net.minecraft.network.chat.Component::getString).toList();
+            check(stew.stream().noneMatch(l -> l.contains("Heals")), "no heal line with vanilla hunger: %s", stew);
+            check(stew.stream().anyMatch(l -> l.startsWith("Mending II") && l.endsWith("does nothing with vanilla hunger")), "Mending marked off: %s", stew);
             // the bar decides when cake is eaten, as in vanilla: no helping rule, two slices in a row for a hungry player
             var pos = c.spot();
             var before = c.level().getBlockState(pos);

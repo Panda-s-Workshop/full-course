@@ -26,6 +26,9 @@ public final class FoodText {
      */
     public static List<Component> lines(Profile p, int nutrition, boolean shift, boolean tasted) {
         List<Component> out = new ArrayList<>();
+        // with vanilla hunger food fills the bar instead of healing over time, and Recovery (Mending's work) is off
+        boolean hunger = FullCourseConfig.keepVanillaHunger();
+        if (hunger) nutrition = 0;
         if (p.remedy()) { // no tier, so no stars
             out.add(Component.translatable("tooltip.fullcourse.remedy").withStyle(ChatFormatting.LIGHT_PURPLE));
             if (nutrition > 0) out.add(heal(nutrition).withStyle(ChatFormatting.GRAY));
@@ -41,7 +44,14 @@ public final class FoodText {
             out.add(Component.translatable("tooltip.fullcourse.raw").withStyle(ChatFormatting.GRAY));
             if (nutrition > 0) out.add(heal(nutrition).withStyle(ChatFormatting.GRAY));
         } else {
-            for (Family family : p.families()) out.add(benefit(family, tier.level()).withStyle(ChatFormatting.BLUE));
+            for (Family family : p.families()) {
+                if (hunger && family == Family.MENDING) {
+                    out.add(benefit(family, tier.level()).withStyle(ChatFormatting.DARK_GRAY)
+                            .append(Component.translatable("tooltip.fullcourse.no_recovery").withStyle(ChatFormatting.DARK_GRAY)));
+                } else {
+                    out.add(benefit(family, tier.level()).withStyle(ChatFormatting.BLUE));
+                }
+            }
             // why a feast's benefits are a level above a gourmet dish's
             if (tier == Tier.FEAST) out.add(Component.translatable("tooltip.fullcourse.feast_bonus").withStyle(ChatFormatting.LIGHT_PURPLE));
             MutableComponent lasts = Component.translatable("tooltip.fullcourse.lasts",
