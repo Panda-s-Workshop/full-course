@@ -126,9 +126,9 @@ dough, fried egg, grilled fillet and flatbread in the matching `c:` tags.
 | Type | Fields |
 |---|---|
 | `fullcourse:cutting` | `ingredient`, `result` (Cutting Board, one knife use) |
-| `fullcourse:cooking` | `ingredients` (up to 6), optional `container` the dish is served in, `result`, optional `time` (ticks, default 200), optional `soup_color` (`"#RRGGBB"`) |
-| `fullcourse:baking` | `ingredients` (up to 4), `result`, optional `time` (default 300) |
-| `fullcourse:fermenting` | `ingredients` (up to 4), `result`, optional `time` (default 12000; sleeping counts) |
+| `fullcourse:cooking` | `ingredients` (up to 6), optional `container` the dish is served in, `result`, optional `time` (ticks, 1 to 32767, default 200), optional `soup_color` (`"#RRGGBB"`) |
+| `fullcourse:baking` | `ingredients` (up to 4), `result`, optional `time` (1 to 32767, default 300) |
+| `fullcourse:fermenting` | `ingredients` (up to 4), `result`, optional `time` (1 to 1000000, default 12000; sleeping counts) |
 
 Every other mod's recipe type counts too: each type is its own station in a dish's score.
 
