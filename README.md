@@ -2,6 +2,8 @@
 
 [![Build](https://github.com/Panda-s-Workshop/full-course/actions/workflows/build.yml/badge.svg)](https://github.com/Panda-s-Workshop/full-course/actions/workflows/build.yml)
 
+**Website:** https://panda-s-workshop.github.io/full-course/ (every dish, recipe and number)
+
 **Download:** not released yet (CurseForge link here after the first release).
 
 A Minecraft 26.3 mod for NeoForge and Fabric, Java 25.
@@ -13,12 +15,13 @@ It takes the place of the vanilla food bar, so it doesn't belong in a pack with 
 
 **No more hunger.** The food bar is gone, sprinting always works and health comes back on its own a few seconds after
 the last hit. Food becomes a choice that makes you stronger, and the more work a dish took (steps, stations,
-ingredients), the stronger and longer its benefits. Every food from every mod gets a tier from its recipe chain.
+ingredients), the stronger and longer its benefits. Every food from every mod gets a tier from its recipe chain
+(see Compatibility for recipes it can't read).
 
 ## Commands
 
 - `/fullcourse tier [item]`: a food's tier, score and benefits, for the item named or the one in your hand.
-- `/fullcourse meals [player]`: the meals you hold, your meal slots, the dishes you have tasted and the next slot.
+- `/fullcourse meals [player]`: the meals you hold, your meal slots, how many dishes you have tasted and the next slot.
   Naming another player needs operator rights.
 - `/fullcourse unlock <players> <slots>` (operators): raises the players' meal slots to that many, up to the config's
   maximum. It never takes slots away.
@@ -105,7 +108,7 @@ puts a replaced file back to the scored values.
 | `remedies` | Their own effects and the heal only, no meal. |
 | `placed_meals` | Placed and eaten as a block (feasts, cake): their score gets +3. A dish named only by a `serving_of` override (another mod's feast block) gets +1. |
 | `soups` | Always give Mending. |
-| `groups/<family>` | The ingredients that give each benefit family. |
+| `groups/<family>` | The ingredients that give each benefit family to foods rated from their recipes. Full Course's own dishes, Grilled Fillet, Flatbread and cake have their families set in their food profiles, so these tags don't change them. |
 | `journal_foods` | The "any simple dish" the Tasting Journal's recipe takes. |
 
 **Block tags:** `fullcourse:heat_sources` heat a Cooking Pot set on top. A block with a `lit` or `burning` state heats
@@ -114,7 +117,7 @@ can be emptied from below) pass heat up from a source under them.
 
 **Effect tag:** `fullcourse:needs_hunger` lists effects that act only through the food bar (Farmer's Delight's
 Nourishment and Comfort). With hunger off they do nothing, and tooltips grey them out and say so. Vanilla Hunger isn't
-in it: here it is Queasy, which blocks meal benefits and pauses Recovery.
+in it: here it is Queasy, which stops new meals from starting and pauses Recovery.
 
 **Biome tags:** `fullcourse:has_wild_onions` and `fullcourse:has_wild_ember_peppers` choose where the wild crops grow.
 

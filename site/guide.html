@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it plays · Full Course</title>
+<meta name="description" content="Recovery, tiers, meal slots, benefit families, the kitchen, the Tasting Journal and feasts, with every number.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="How it plays · Full Course">
+<meta property="og:description" content="Recovery, tiers, meal slots, benefit families, the kitchen, the Tasting Journal and feasts, with every number.">
+<meta property="og:image" content="https://panda-s-workshop.github.io/full-course/img/social.jpg">
+<meta property="og:url" content="https://panda-s-workshop.github.io/full-course/guide.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#16100c">
+<link rel="icon" type="image/png" href="img/icon.png">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap">
+<a class="brand" href="index.html"><img src="img/icon.png" alt="">Full Course</a>
+<button class="menu-btn" aria-label="Menu" aria-expanded="false">Menu</button>
+<nav class="nav" aria-label="Main"><a href="index.html">Home</a><a href="guide.html" aria-current="page">How it plays</a><a href="dishes.html">Dishes</a><a href="showcase.html">Showcase</a><a href="packs.html">Modpacks and config</a><a href="https://github.com/Panda-s-Workshop/full-course" rel="noopener">GitHub</a></nav>
+</div></header>
+<main id="main">
+<div class="pagehead"><div class="wrap"><div class="eyebrow">Guide</div><h1>How it plays</h1><p>Everything Full Course changes, with the numbers the game uses.</p></div></div><div class="wrap with-toc"><nav class="toc" aria-label="On this page"><a href="#hunger">No hunger</a><a href="#tiers">Tiers: effort is the price</a><a href="#slots">Meal slots</a><a href="#families">Benefit families</a><a href="#kitchen">The kitchen</a><a href="#journal">The Tasting Journal</a><a href="#feasts">Feasts and cake</a><a href="#vanilla">What changes in vanilla</a><a href="#commands">Commands</a></nav><div><section id="hunger"><h2>No hunger</h2><p>The food bar is gone. Sprinting always works, nobody starves, and any food can be eaten at any time.
+Where the food bar was, a row of meal slots shows what you have eaten.</p>
+<p><b>Recovery</b> takes the place of natural regeneration: 8 seconds after you last took damage, you heal 1 HP every
+4 seconds. Taking damage starts the wait again. Mending meals shorten the 4 seconds.</p>
+<p><b>Food heals over time</b>: a food heals as many HP as its hunger value, one a second (a steak heals 8 HP over
+8 seconds). Heals don't stack: a new one replaces the running heal only when it would heal more.</p>
+<div class="callout"><p>The <code>natural_health_regeneration</code> gamerule still works: turned off, nothing heals on its own, neither
+Recovery nor food. Healing potions, golden apples and other effects still work.</p></div></section><section id="tiers"><h2>Tiers: effort is the price</h2><p>Every food has a tier from <b>Raw</b> to <b>Feast</b>. The tier comes from the food's recipe chain: the
+longest chain of steps down to raw ingredients, the stations it uses, and how many different raw ingredients go in.
+A food takes its cheapest recipe, and a placed meal (a feast, a cake) gets three more points, since setting it out
+is a step too.</p>
+<div class="tw"><table><thead><tr><th>Stars</th><th>Tier</th><th>Score</th><th>What a meal gives</th></tr></thead><tbody><tr><td><span class="stars tier0"><span class="tname"></span>☆☆☆☆☆</span></td><td><span class="tier0"><span class="tname">Raw</span></span></td><td>0</td><td>heals only</td></tr><tr><td><span class="stars tier1"><span class="tname">★</span>☆☆☆☆</span></td><td><span class="tier1"><span class="tname">Simple</span></span></td><td>1–2</td><td>1 benefit at level I, 2 min</td></tr><tr><td><span class="stars tier2"><span class="tname">★★</span>☆☆☆</span></td><td><span class="tier2"><span class="tname">Prepared</span></span></td><td>3–4</td><td>2 benefits at level I, 5 min</td></tr><tr><td><span class="stars tier3"><span class="tname">★★★</span>☆☆</span></td><td><span class="tier3"><span class="tname">Hearty</span></span></td><td>5–7</td><td>2 benefits at level II, 10 min</td></tr><tr><td><span class="stars tier4"><span class="tname">★★★★</span>☆</span></td><td><span class="tier4"><span class="tname">Gourmet</span></span></td><td>8–11</td><td>3 benefits at level III, 20 min</td></tr><tr><td><span class="stars tier5"><span class="tname">★★★★★</span></span></td><td><span class="tier5"><span class="tname">Feast</span></span></td><td>12+</td><td>3 benefits at level IV, 30 min (level III, +1 feast bonus)</td></tr></tbody></table></div>
+<p>The tooltip shows it all: the stars, the benefits and how long they last, and, holding <kbd>Shift</kbd>, the recipe
+chain (steps, stations, ingredients) and the score. A steak is Simple; rabbit stew and cake, vanilla's best, are Hearty;
+a Shepherd's Pie from the Brick Oven is Gourmet.</p>
+<a class="shot" href="img/shots/tooltip.jpg" data-cap="A Gourmet dish with Shift held: benefits, score and the whole recipe chain"><img src="img/thumbs/tooltip.jpg" alt="A Gourmet dish with Shift held: benefits, score and the whole recipe chain" loading="lazy" width="640" height="360"></a></section><section id="slots"><h2>Meal slots</h2><p>You start with <b>two meal slots</b>. Eating a dish of one star or more fills a slot; eating the same dish again
+refreshes it. With every slot full, a new dish replaces the meal with the least time left. Raw food and remedies
+(golden apples and the like) heal but take no slot.</p>
+<p>Benefits of the same family don't add up: the strongest level wins. So the best loadout is a varied one.</p>
+<p>Meals are not potion effects: milk doesn't clear them. They are lost when you die, unless the server keeps them.</p>
+<p>The meal row sits where the food bar was: each meal's dish in a frame of its tier's colour, with a ring that drains
+as its time runs out, an empty frame for each free slot and a padlock for each locked one. Holding a dish shows which
+slot it would fill or replace.</p></section><section id="families"><h2>Benefit families</h2><p>A dish's benefits come from what went into it. Each ingredient group feeds one family; a dish gives as
+many families as its tier allows, at its tier's level. Full Course's own dishes list theirs on the
+<a href="dishes.html">dishes page</a>; other mods' foods count the groups among their ingredients.</p>
+<div class="tw"><table><thead><tr><th>Family</th><th>Per level</th><th>At level IV</th><th>From</th></tr></thead><tbody><tr><td><img src="img/tex/minecraft/beef.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Brawn</b></td><td>+1 attack damage</td><td>+4</td><td>meat</td></tr><tr><td><img src="img/tex/minecraft/carrot.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Vigor</b></td><td>+2 max health (1 heart)</td><td>+8 (4 hearts)</td><td>vegetables, onion, kelp, pumpkin</td></tr><tr><td><img src="img/tex/minecraft/egg.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Fortitude</b></td><td>+1 armor</td><td>+4</td><td>dairy and eggs</td></tr><tr><td><img src="img/tex/minecraft/sweet_berries.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Swift</b></td><td>+5% speed</td><td>+20%</td><td>fruit and berries</td></tr><tr><td><img src="img/tex/minecraft/wheat.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Diligence</b></td><td>+10% mining speed</td><td>+40%</td><td>grain, flour, bread</td></tr><tr><td><img src="img/tex/minecraft/cocoa_beans.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Fortune</b></td><td>+1 luck (better fishing)</td><td>+4</td><td>sweets: sugar, honey, cocoa</td></tr><tr><td><img src="img/tex/minecraft/cod.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Tide</b></td><td>+1 respiration, +0.15 water movement (Depth Strider's attribute)</td><td>+4, +0.6</td><td>fish</td></tr><tr><td><img src="img/tex/minecraft/brown_mushroom.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Night Eye</b></td><td>night vision</td><td>night vision</td><td>mushrooms, glow berries</td></tr><tr><td><img src="img/tex/fullcourse/ember_pepper.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Ember</b></td><td>−20% burning time</td><td>−80%</td><td>Nether ingredients: Ember Pepper, nether wart, crimson and warped fungus</td></tr><tr><td><img src="img/tex/minecraft/chorus_fruit.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Lightfoot</b></td><td>+2 blocks of safe fall, +5% jump</td><td>+8, +20%</td><td>End ingredients: chorus</td></tr><tr><td><img src="img/tex/minecraft/bone.png" alt="" class="i" width="24" height="24" loading="lazy"><b>Mending</b></td><td>+50% Recovery</td><td>+200%</td><td>broth (bone), and every soup</td></tr></tbody></table></div>
+<p>Fortune is luck, which vanilla uses only for fishing. Night Eye keeps night vision on while the meal lasts.
+Mending at level II halves the time between Recovery heals.</p></section><section id="kitchen"><h2>The kitchen</h2><div class="grid g2">
+<div class="card feature"><img src="img/tex/fullcourse/cutting_board.png" alt="" class="ico" width="48" height="48" loading="lazy"><h3>Cutting Board</h3><p>Use food on it to place it, then use a knife on it:
+the pieces pop out and the knife takes one use. A Flint Knife has 64 uses, an Iron Knife 250, and other mods' knives work
+too. Crafted from two wooden slabs and a stick.</p></div>
+<div class="card feature"><img src="img/tex/fullcourse/cooking_pot.png" alt="" class="ico" width="48" height="48" loading="lazy"><h3>Cooking Pot</h3><p>Six ingredient slots and a slot for the bowl or bottle
+the dish is served in. It cooks over heat below it: a lit campfire, fire, magma or lava, or a lit furnace, smoker
+or blast furnace. Without heat it says so. Ten seconds a dish. Crafted from five iron ingots, a bucket and two sticks.</p></div>
+<div class="card feature"><img src="img/tex/fullcourse/brick_oven.png" alt="" class="ico" width="48" height="48" loading="lazy"><h3>Brick Oven</h3><p>Four ingredients and fuel, like a furnace: fifteen
+seconds a dish. Pies, bakes, Nether Flatbread and the feasts. Crafted from six bricks blocks around a furnace.</p></div>
+<div class="card feature"><img src="img/tex/fullcourse/fermenting_crock.png" alt="" class="ico" width="48" height="48" loading="lazy"><h3>Fermenting Crock</h3><p>Use ingredients on it, then an empty hand
+to seal it. Half a day later (sleeping counts) it holds butter, cheese, sweet cream or pickles. No fuel. Crafted from five
+terracotta and a wooden slab.</p></div>
+</div>
+<p>Hoppers work the stations like a furnace: ingredients go in from the top, the dish comes out below, and from the
+side a hopper adds the Brick Oven's fuel or the Cooking Pot's bowls and bottles. A hopper under a pot passes the heat up
+from the block under it.</p>
+<p>Two crops go with the kitchen. <b>Onions</b> grow wild in plains, meadows, forests, taiga and savannas and are planted on
+farmland. <b>Ember Peppers</b> grow wild in crimson forests and are planted on soul soil, in any dimension.</p>
+<p>Every recipe is on the <a href="dishes.html">dishes page</a>; with JEI installed, each station has its own recipe category.</p></section><section id="journal"><h2>The Tasting Journal</h2><p>Craft a book with any simple dish. The journal shows every dish the game knows, the ones you've tasted
+in colour and the rest grey, with the tier, the benefits and the recipe chain on hover, and a search box (<code>@mod</code>
+searches by mod). Tasting counts even without the journal; the journal is the window.</p>
+<div class="tw"><table><thead><tr><th>Slot</th><th>Needs</th></tr></thead><tbody>
+<tr><td>3rd</td><td>8 different dishes of two stars or more</td></tr>
+<tr><td>4th</td><td>15 different dishes of three stars or more</td></tr>
+<tr><td>5th</td><td>20 different dishes of three stars or more, and a serving from a feast</td></tr>
+</tbody></table></div>
+<p>A toast and a chime mark each new slot. What you have tasted is kept when you die.</p></section><section id="feasts"><h2>Feasts and cake</h2><p>A feast is placed on a block and served by using it: 8 servings for the Roast Banquet, 6 for the Harvest
+Pie, 4 for the Glow Berry Tart. Each serving is a five-star meal for whoever takes it, and each player can take one
+helping every five minutes, so a feast feeds the group rather than whoever holds the button. The last serving leaves an
+empty platter (the tart leaves nothing).</p>
+<p>Cake stays vanilla's block, and each slice is a three-star meal (Fortune and Diligence II), one slice per player every
+five minutes.</p></section><section id="vanilla"><h2>What changes in vanilla</h2><div class="tw"><table><thead><tr><th>Vanilla</th><th>With Full Course</th></tr></thead><tbody>
+<tr><td>Hunger (rotten flesh, raw chicken, husks)</td><td>Renamed <b>Queasy</b>: while it lasts, Recovery pauses and food heals but gives no meal.</td></tr>
+<tr><td>Saturation</td><td>Heals instead of filling the food bar.</td></tr>
+<tr><td>Golden apples, suspicious stew, honey bottle, chorus fruit</td><td><b>Remedies</b>: their own effects and the heal, no meal slot.</td></tr>
+<tr><td>Milk</td><td>Clears potion effects as always; meals stay.</td></tr>
+<tr><td>Other mods' food</td><td>Rated from its recipes; its own effects still apply.</td></tr>
+<tr><td>Farmer villagers</td><td>Plant onions too.</td></tr>
+<tr><td>Animals, breeding, the composter</td><td>Unchanged.</td></tr>
+</tbody></table></div></section><section id="commands"><h2>Commands</h2><ul>
+<li><code>/fullcourse tier [item]</code>: a food's tier, score and benefits, for the item named or the one in your hand.</li>
+<li><code>/fullcourse meals [player]</code>: the meals you hold, your meal slots, how many dishes you have tasted and the next slot. Naming another player needs operator rights.</li>
+<li><code>/fullcourse unlock &lt;players&gt; &lt;slots&gt;</code> (operators): raises the players' meal slots to that many, up to the server's maximum. It never takes slots away.</li>
+</ul></section></div></div>
+</main>
+<footer><div class="wrap cols">
+<div><b>Full Course</b><br>A Minecraft 26.3 mod for NeoForge and Fabric.</div>
+<div><ul><li><a href="index.html">Home</a></li><li><a href="guide.html">How it plays</a></li><li><a href="dishes.html">Dishes</a></li><li><a href="showcase.html">Showcase</a></li><li><a href="packs.html">Modpacks and config</a></li></ul></div>
+<div><ul>
+<li><a href="https://www.curseforge.com/minecraft/mc-mods/full-course" rel="noopener">Download on CurseForge</a></li>
+<li><a href="https://github.com/Panda-s-Workshop/full-course/releases">GitHub Releases (manual installs)</a></li>
+<li><a href="https://github.com/Panda-s-Workshop/full-course">Source code</a></li>
+<li><a href="https://github.com/Panda-s-Workshop/full-course/issues">Report a bug</a></li>
+</ul></div>
+</div></footer>
+<script src="assets/site.js" defer></script>
+</body>
+</html>
