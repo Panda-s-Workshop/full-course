@@ -215,7 +215,7 @@
   "jei.fullcourse.info.feast": "Place it, then use it to take a serving: a five-star meal for whoever takes it. Each player can take one helping every five minutes, so a feast is shared.",
   "jei.fullcourse.info.fermenting_crock": "Use ingredients on it, then use it with an empty hand to seal it. It ferments by the overworld's clock as well as its own, so sleeping through the night counts. When it's done, use it with an empty hand to take the result. Before sealing, sneak and use it with an empty hand to take the ingredients back.",
   "jei.fullcourse.info.knife": "Use it on a Cutting Board with food on it to cut the food. Each cut wears the knife by one.",
-  "jei.fullcourse.info.onion": "Grows wild in plains, meadows, forests, taiga and savannas: break the wild onions for one or two. Plant one on farmland and it grows like a carrot; farmer villagers plant them too.",
+  "jei.fullcourse.info.onion": "Grows wild in plains, meadows, forests, taiga and savannas: break the wild onions for one or two. Plant one on farmland and it grows like a carrot; farmer villagers will plant any you give them.",
   "jei.fullcourse.info.tasting_journal": "Use it to see every dish you have tasted. Tasting different dishes of two stars or more opens more meal slots; the journal shows what the next one asks for, and marks the dishes that count.",
   "message.fullcourse.board.empty": "Put food on the board first, then use the knife on it",
   "message.fullcourse.board.no_recipe": "Nothing to cut from %s",
