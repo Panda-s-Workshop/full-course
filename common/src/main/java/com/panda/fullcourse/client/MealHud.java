@@ -199,9 +199,11 @@ public final class MealHud {
     static void freeFrame(GuiGraphicsExtractor g, int x, int y) {
         frame(g, x, y, 0xFF9A9A9A, 0x66000000);
         for (int row = 0; row < PLATE.length; row++) {
-            for (int col = 0; col < 16; col++) {
-                char c = PLATE[row].charAt(col);
-                if (c != ' ') g.fill(x + 1 + col, y + 3 + row, x + 2 + col, y + 4 + row, c == 'o' ? 0x58FFFFFF : 0x22FFFFFF);
+            String line = PLATE[row];
+            for (int col = 0, end; col < 16; col = end) {   // each run of one colour as one fill
+                char c = line.charAt(col);
+                for (end = col + 1; end < 16 && line.charAt(end) == c; end++) { }
+                if (c != ' ') g.fill(x + 1 + col, y + 3 + row, x + 1 + end, y + 4 + row, c == 'o' ? 0x58FFFFFF : 0x22FFFFFF);
             }
         }
     }

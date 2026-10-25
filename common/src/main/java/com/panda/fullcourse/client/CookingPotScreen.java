@@ -93,6 +93,7 @@ public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
         List<Component> lines = new ArrayList<>(arrowLines());
         if (lines.isEmpty() && grid().stream().allMatch(ItemStack::isEmpty)) {
             lines.add(Component.translatable("gui.fullcourse.pot.empty").withStyle(ChatFormatting.GRAY));
+            lines.add(Component.translatable("gui.fullcourse.pot.empty.shift").withStyle(ChatFormatting.GRAY));
         }
         if (arrowOpensViewer) lines.add(Component.translatable("gui.fullcourse.pot.click_recipes").withStyle(ChatFormatting.GRAY));
         return lines;

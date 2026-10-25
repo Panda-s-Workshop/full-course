@@ -10,6 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
 
 /**
@@ -50,15 +51,29 @@ public final class HeatText {
         return out;
     }
 
-    /** The tag's blocks by name, "A, B, C", or "A, B, … and 3 more" past {@link #MAX_NAMES}. */
+    /**
+     * The tag's blocks by name, "A, B, C", or "A, B, … and 3 more" past {@link #MAX_NAMES}. A dyed copy of a block
+     * already named (Cooking for Blockheads' Orange Oven beside its Oven) isn't named again.
+     */
     static Component names(TagKey<Block> tag) {
         List<Component> names = new ArrayList<>();
         for (Block block : blocks(tag)) {
             Component name = block.getName();
             if (names.stream().noneMatch(n -> n.getString().equals(name.getString()))) names.add(name);
         }
+        List<String> plain = names.stream().map(Component::getString).toList();
+        names.removeIf(n -> dyedCopy(n.getString(), plain));
         if (names.size() <= MAX_NAMES) return ComponentUtils.formatList(names, Component.literal(", "));
         Component shown = ComponentUtils.formatList(names.subList(0, MAX_NAMES), Component.literal(", "));
         return Component.translatable("gui.fullcourse.pot.more", shown, names.size() - MAX_NAMES);
+    }
+
+    /** "Orange Oven" when "Oven" is among {@code names}: a colour's name, a space, then a name listed on its own. */
+    static boolean dyedCopy(String name, List<String> names) {
+        for (DyeColor dye : DyeColor.values()) {
+            String colour = Component.translatable("color.minecraft." + dye.getName()).getString() + " ";
+            if (name.startsWith(colour) && names.contains(name.substring(colour.length()))) return true;
+        }
+        return false;
     }
 }

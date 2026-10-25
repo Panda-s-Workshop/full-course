@@ -98,7 +98,8 @@ public class CuttingBoardBlock extends Block implements EntityBlock {
         if (!lying.isEmpty() && ItemStack.isSameItemSameComponents(lying, stack)) {
             // more of the same: added to the stack up to a full one
             int room = lying.getMaxStackSize() - lying.getCount();
-            if (room > 0 && !level.isClientSide()) {
+            if (room <= 0) return InteractionResult.TRY_WITH_EMPTY_HAND;   // full: as a different food would
+            if (!level.isClientSide()) {
                 board.setItem(lying.copyWithCount(lying.getCount() + stack.consumeAndReturn(Math.min(room, stack.getCount()), player).getCount()));
                 level.playSound(null, pos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 0.7F, 1.2F);
             }
