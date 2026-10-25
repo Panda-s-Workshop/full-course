@@ -452,7 +452,7 @@ public final class RuleChecks {
 
     /** Saved at 24 of 24 with Vigor II, loaded into a new player: 24 of 24 again once the meal is back. */
     private static void relogKeepsVigorHearts(Ctx c) {
-        eat(c, Items.RABBIT_STEW, c.level().getGameTime());
+        eat(c, Items.RABBIT_STEW, c.t());
         c.player().setHealth(24F);
         health(c, 24F, "before saving");
         var registries = c.server().registryAccess();
@@ -462,7 +462,8 @@ public final class RuleChecks {
         ServerPlayer loaded = new ServerPlayer(c.server(), c.level(), new GameProfile(UUID.randomUUID(), "fc_relog"), ClientInformation.createDefault());
         loaded.load(TagValueInput.create(ProblemReporter.DISCARDING, registries, saved));
         check(dishes(new Ctx(loaded, c.t(), c.spot())).equals(List.of(id(Items.RABBIT_STEW))), "the meal was saved with the player");
-        FoodRules.tick(loaded, c.level().getGameTime());
+        // off the 20-tick nourish beat: a state change there would sync through a connection this test player hasn't got
+        FoodRules.tick(loaded, c.t() + 1);
         check(loaded.getMaxHealth() == 24F, "max health after loading %s, expected 24", loaded.getMaxHealth());
         check(Math.abs(loaded.getHealth() - 24F) < 0.01F, "health after loading %s, expected 24", loaded.getHealth());
     }
