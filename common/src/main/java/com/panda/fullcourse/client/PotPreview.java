@@ -40,7 +40,7 @@ public final class PotPreview {
     public static List<Component> lines(List<ItemStack> grid) {
         List<RecipeHolder<CookingRecipe>> recipes = KitchenRecipes.of(ModRecipes.COOKING.get());
         if (recipes != cachedRecipes || !sameGrid(grid, cachedGrid)) {
-            cachedLines = compute(grid, recipes);
+            cachedLines = preview(grid, recipes.stream().map(RecipeHolder::value).toList());
             cachedRecipes = recipes;
             cachedGrid = grid.stream().map(ItemStack::copy).toList();
         }
@@ -53,12 +53,12 @@ public final class PotPreview {
         return true;
     }
 
-    private static List<Component> compute(List<ItemStack> grid, List<RecipeHolder<CookingRecipe>> recipes) {
+    /** The arrow's lines for these grid items against these recipes, uncached. */
+    public static List<Component> preview(List<ItemStack> grid, List<CookingRecipe> recipes) {
         if (recipes.isEmpty() || grid.stream().allMatch(s -> s.isEmpty() || s.is(FoodTags.CONTAINERS))) return List.of();
         CookingRecipe nearest = null;
         int[] nearestMissing = null;
-        for (RecipeHolder<CookingRecipe> holder : recipes) {
-            CookingRecipe recipe = holder.value();
+        for (CookingRecipe recipe : recipes) {
             List<Ingredient> ingredients = recipe.ingredients();
             int[] missing = IngredientMatch.missing(ingredients, grid, Ingredient::test, ItemStack::getCount,
                     ItemStack::isSameItemSameComponents, s -> s.is(FoodTags.CONTAINERS));
@@ -120,10 +120,10 @@ public final class PotPreview {
     }
 
     /** Names the first item no pot recipe uses; when each fits some recipe, says none uses them all. */
-    private static Component strays(List<ItemStack> grid, List<RecipeHolder<CookingRecipe>> recipes) {
+    private static Component strays(List<ItemStack> grid, List<CookingRecipe> recipes) {
         for (ItemStack stack : grid) {
             if (stack.isEmpty() || stack.is(FoodTags.CONTAINERS)) continue;
-            boolean used = recipes.stream().anyMatch(h -> h.value().ingredients().stream().anyMatch(i -> i.test(stack)));
+            boolean used = recipes.stream().anyMatch(r -> r.ingredients().stream().anyMatch(i -> i.test(stack)));
             if (!used) return Component.translatable("gui.fullcourse.pot.unused", stack.getHoverName()).withStyle(ChatFormatting.GRAY);
         }
         return Component.translatable("gui.fullcourse.pot.strays").withStyle(ChatFormatting.GRAY);
