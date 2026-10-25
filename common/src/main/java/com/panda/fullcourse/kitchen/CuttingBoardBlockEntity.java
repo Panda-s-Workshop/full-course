@@ -47,7 +47,8 @@ public class CuttingBoardBlockEntity extends BlockEntity {
 
     /** The cutting recipe for what lies on the board, if any. */
     public Optional<RecipeHolder<CuttingRecipe>> recipe(ServerLevel level) {
-        if (item.isEmpty()) return Optional.empty();
+        // a cut from another mod's board isn't cut again (minced beef into our minced meat would double it)
+        if (item.isEmpty() || com.panda.fullcourse.food.FoodProfiles.isCut(level.getServer(), item.getItem())) return Optional.empty();
         return level.getServer().getRecipeManager().getRecipeFor(ModRecipes.CUTTING.get(), new SingleRecipeInput(item), level);
     }
 

@@ -60,6 +60,8 @@ public final class FoodProfiles {
     private static Map<Item, Profile> server = Map.of();
     /** Each serving's dish on the server, from the {@code serving_of} overrides (a pie slice: its pie). */
     private static Map<Item, Item> servingOf = Map.of();
+    /** Raw ingredients another mod's board cuts out of something (minced beef, bacon): see {@link #isCut}. */
+    private static Set<Item> cuts = Set.of();
     private static Map<Item, Profile> client = Map.of();
     private static Map<Item, Item> clientServings = Map.of();
     /** The server sent its table: it runs Full Course. Without it the client shows vanilla's food bar and tooltips. */
@@ -117,6 +119,15 @@ public final class FoodProfiles {
         return servingOf.getOrDefault(item, item);
     }
 
+    /**
+     * {@code item} is already a cut, made on another mod's board (Farmer's Delight's minced beef, bacon): our board
+     * doesn't cut it again, though its tags (c:foods/raw_meat) would let it, two of ours out of each.
+     */
+    public static boolean isCut(MinecraftServer mcServer, Item item) {
+        all(mcServer);
+        return cuts.contains(item);
+    }
+
     /** Each serving's dish on the server (its {@code serving_of} override). */
     public static Map<Item, Item> servings(MinecraftServer mcServer) {
         all(mcServer);
@@ -148,6 +159,7 @@ public final class FoodProfiles {
         computedFor = null;
         server = Map.of();
         servingOf = Map.of();
+        cuts = Set.of();
     }
 
     /** The client's copy: what the server sent last. */
@@ -188,6 +200,7 @@ public final class FoodProfiles {
         Map<Item, Item> servings = new HashMap<>();
         overrides.forEach((serving, o) -> o.servingOf().ifPresent(dish -> servings.put(serving, dish)));
         servingOf = Map.copyOf(servings);
+        cuts = Set.copyOf(rawCuts.keySet());
         // a dish served from a block (a feast, a pie cut into slices) is assembled: a step, though only the tagged placed
         // meals (our feasts, cake) are feasts
         Set<Item> servedFrom = new HashSet<>();
