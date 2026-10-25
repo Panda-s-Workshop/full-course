@@ -24,7 +24,8 @@ public final class Milestones {
     /**
      * The next slot to earn and how far along it is; {@code slot} is 0 once all three are earned.
      *
-     * @param slot 3, 4 or 5 (counting from the two every player starts with)
+     * @param slot 3, 4 or 5 counting from two starting slots: which milestone, not the slot's number on a server
+     *     with other starting slots (that is the player's slots + 1)
      * @param stars the dish tier this milestone counts (2 or 3)
      * @param have dishes of that tier tasted
      * @param need dishes of that tier it asks for

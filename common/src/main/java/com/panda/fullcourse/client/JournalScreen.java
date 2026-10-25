@@ -221,7 +221,7 @@ public class JournalScreen extends Screen {
             if (!tasted.contains(BuiltInRegistries.ITEM.getKey(hovered))) {
                 lines.add(Math.min(1, lines.size()), Component.translatable("gui.fullcourse.journal.untasted").withStyle(ChatFormatting.DARK_GRAY));
                 if (countsToward(next, hovered)) {
-                    lines.add(Math.min(2, lines.size()), Component.translatable("gui.fullcourse.journal.counts", next.slot()).withStyle(ChatFormatting.GRAY));
+                    lines.add(Math.min(2, lines.size()), Component.translatable("gui.fullcourse.journal.counts", state.slots() + 1).withStyle(ChatFormatting.GRAY));
                 }
             }
             g.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);
