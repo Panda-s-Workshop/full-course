@@ -309,17 +309,30 @@ public final class RuleChecks {
         health(c, 10F, "Peaceful heals its own way");
     }
 
-    /** {@code /tick freeze} stops the game clock while players keep ticking: nothing heals until it thaws. */
+    /**
+     * {@code /tick freeze} stops the game clock while players keep ticking: nothing heals until it thaws, except on
+     * the ticks a {@code /tick step} runs, the last one included. The clock's own tick decides what runs, as the
+     * server's does at the start of each tick.
+     */
     private static void recoveryHoldsUnderTickFreeze(Ctx c) {
         long t = c.t();
         hurtAt(c, t);
-        c.server().tickRateManager().setFrozen(true);
+        var clock = c.server().tickRateManager();
+        clock.setFrozen(true);
         try {
-            ticks(c, t + 160, t + 400);
+            clock.tick();
+            ticks(c, t + 160, t + 399);
+            health(c, 10F, "frozen clock");
+            clock.setFrozenTicksToRun(1);
+            clock.tick();
+            FoodRules.tick(c.player(), t + 400);
+            health(c, 11F, "the last tick of a /tick step");
         } finally {
-            c.server().tickRateManager().setFrozen(false);
+            clock.setFrozen(false);
+            clock.setFrozenTicksToRun(0);
+            clock.tick();
         }
-        health(c, 10F, "frozen clock");
+        hurtAt(c, t);
         FoodRules.tick(c.player(), t + 400);
         health(c, 11F, "thawed");
     }

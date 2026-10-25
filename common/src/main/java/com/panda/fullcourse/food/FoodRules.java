@@ -121,9 +121,9 @@ public final class FoodRules {
     /** One tick at game time {@code now} (rule checks step through time with it). */
     public static void tick(ServerPlayer player, long now) {
         if (!player.isAlive()) return;
-        // under /tick freeze players keep ticking while the game time stands still (a /tick step moves it)
-        var clock = player.level().tickRateManager();
-        if (clock.isFrozen() && !clock.isSteppingForward()) return;
+        // under /tick freeze players keep ticking while the game time stands still; a /tick step runs the game,
+        // its last tick included (the step count is spent before the tick runs)
+        if (!player.level().tickRateManager().runsNormally()) return;
         restoreHealth(player);
         FoodState before = state(player);
         FoodState s = before.withMeals(before.meals().expire(now));
