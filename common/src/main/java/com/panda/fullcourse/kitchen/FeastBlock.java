@@ -1,6 +1,7 @@
 package com.panda.fullcourse.kitchen;
 
 import com.panda.fullcourse.FullCourseConfig;
+import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.food.FoodText;
 import com.panda.fullcourse.logic.Meals;
@@ -139,9 +140,9 @@ public class FeastBlock extends Block {
     }
 
     /**
-     * Why {@code player} can't take a serving of {@code dish} (a feast, or cake) now, or null: Queasy (the serving would
-     * give no meal), or a helping of it within the last {@link #HELPING_TICKS}, so holding the use key can't clear the
-     * table for everyone else.
+     * Why {@code player} can't take a serving of {@code dish} (a feast, cake, another mod's pie) now, or null: Queasy
+     * (the serving would give no meal), or a helping of it or one of its servings within the last {@link #HELPING_TICKS},
+     * so holding the use key can't clear the table for everyone else.
      */
     public static Component refusal(ServerPlayer player, Item dish) {
         Component name = dish.getName(new ItemStack(dish));
@@ -152,7 +153,9 @@ public class FeastBlock extends Block {
         long now = player.level().getGameTime();
         for (Meals.Meal<Identifier> meal : FoodRules.state(player).meals().active()) {
             long since = now - meal.start();
-            if (meal.dish().equals(id) && since >= 0 && since < HELPING_TICKS) {
+            boolean same = meal.dish().equals(id) || BuiltInRegistries.ITEM.get(meal.dish())
+                    .map(h -> FoodProfiles.dishOf(player.level().getServer(), h.value()) == dish).orElse(false);
+            if (same && since >= 0 && since < HELPING_TICKS) {
                 return Component.translatable("message.fullcourse.feast.had_share", name, FoodText.duration((int) (HELPING_TICKS - since)));
             }
         }

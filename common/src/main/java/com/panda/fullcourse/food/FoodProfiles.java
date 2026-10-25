@@ -55,6 +55,8 @@ public final class FoodProfiles {
 
     private static RecipeManager computedFor;
     private static Map<Item, Profile> server = Map.of();
+    /** Each serving's dish on the server, from the {@code serving_of} overrides (a pie slice: its pie). */
+    private static Map<Item, Item> servingOf = Map.of();
     private static Map<Item, Profile> client = Map.of();
     /** The server sent its table: it runs Full Course. Without it the client shows vanilla's food bar and tooltips. */
     private static boolean clientReady;
@@ -76,10 +78,17 @@ public final class FoodProfiles {
         return server;
     }
 
+    /** The dish {@code item} is a serving of on the server, or the item itself. */
+    public static Item dishOf(MinecraftServer mcServer, Item item) {
+        all(mcServer);
+        return servingOf.getOrDefault(item, item);
+    }
+
     /** Forget the server table (the server stopped; an integrated server restarts in the same JVM). */
     public static synchronized void reset() {
         computedFor = null;
         server = Map.of();
+        servingOf = Map.of();
     }
 
     /** The client's copy: what the server sent last. */
@@ -115,6 +124,9 @@ public final class FoodProfiles {
         Map<Item, List<TierScorer.Recipe<Item>>> rawCuts = new HashMap<>();
         Map<Item, List<TierScorer.Recipe<Item>>> byOutput = recipeGraph(mcServer, rawCuts);
         Map<Item, ProfileOverride> overrides = overrides(mcServer);
+        Map<Item, Item> servings = new HashMap<>();
+        overrides.forEach((serving, o) -> o.servingOf().ifPresent(dish -> servings.put(serving, dish)));
+        servingOf = Map.copyOf(servings);
         // a dish served from a block (a feast, a pie cut into slices) is assembled: a step, though only the tagged placed
         // meals (our feasts, cake) are feasts
         Set<Item> servedFrom = new HashSet<>();
