@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.compat.FarmersDelightCuts;
+import com.panda.fullcourse.compat.RecipeFields;
 import com.panda.fullcourse.logic.Family;
 import com.panda.fullcourse.logic.Tier;
 import com.panda.fullcourse.logic.TierScorer;
@@ -216,50 +217,72 @@ public final class FoodProfiles {
     }
 
     /**
-     * Every recipe of every type, as output item → recipes; recipes that can't be placed or have no result are skipped,
-     * except Farmer's Delight's cuts ({@link FarmersDelightCuts}). A cut that makes a raw ingredient of its own mod
+     * Every recipe of every type, as output item → recipes. A recipe that can't be placed is read from its own fields
+     * instead (Farmer's Delight's cuts, {@link FarmersDelightCuts}; machine records, {@link RecipeFields}), or counted
+     * and logged as unread. A cut that makes a raw ingredient of its own mod
      * (minced beef, bacon, rice) goes to {@code rawCuts} instead: the only way to get that item, so it counts toward
      * every dish made from it. A cut back to something obtained raw anyway (ham into porkchops) doesn't.
      */
     private static Map<Item, List<TierScorer.Recipe<Item>>> recipeGraph(MinecraftServer mcServer, Map<Item, List<TierScorer.Recipe<Item>>> rawCuts) {
         ContextMap context = SlotDisplayContext.fromLevel(mcServer.overworld());
         Map<Item, List<TierScorer.Recipe<Item>>> byOutput = new HashMap<>();
+        Map<String, Integer> unread = new java.util.TreeMap<>();
         for (RecipeHolder<?> holder : mcServer.getRecipeManager().getRecipes()) {
-            Recipe<?> recipe = holder.value();
-            List<Ingredient> ingredients;
-            ItemStack result;
-            Optional<FarmersDelightCuts.Cut> cut = FarmersDelightCuts.read(recipe);
-            if (cut.isPresent()) {
-                ingredients = List.of(cut.get().input());
-                result = cut.get().result();
-            } else {
-                try {
-                    if (recipe.placementInfo().isImpossibleToPlace()) continue;
-                    ingredients = recipe.placementInfo().ingredients();
-                } catch (RuntimeException e) {
-                    continue; // a mod's recipe that can't describe itself
-                }
-                result = result(recipe, context);
+            try {
+                add(holder, context, byOutput, rawCuts, unread);
+            } catch (RuntimeException e) {
+                unread.merge(station(holder.value().getType()), 1, Integer::sum); // one mod's broken recipe isn't everyone's table
             }
-            if (result.isEmpty()) continue;
-            List<Set<Item>> slots = new ArrayList<>();
-            Set<Ingredient> seen = new LinkedHashSet<>();
-            for (Ingredient ingredient : ingredients) {
-                if (!seen.add(ingredient)) continue; // the same ingredient twice is one ingredient
-                Set<Item> alternatives = new LinkedHashSet<>();
-                ingredient.items().forEach(h -> alternatives.add(h.value()));
-                if (!alternatives.isEmpty()) slots.add(alternatives);
-            }
-            if (slots.isEmpty()) continue;
-            String station = station(recipe.getType());
-            int weight = STATION_WEIGHTS.getOrDefault(station, 1);
-            TierScorer.Recipe<Item> step = new TierScorer.Recipe<>(station, weight, List.copyOf(slots), result.getCount());
-            Item made = result.getItem();
-            boolean rawCut = cut.isPresent() && made.builtInRegistryHolder().is(FoodTags.RAW_INGREDIENTS)
-                    && BuiltInRegistries.ITEM.getKey(made).getNamespace().equals(holder.id().identifier().getNamespace());
-            (rawCut ? rawCuts : byOutput).computeIfAbsent(made, k -> new ArrayList<>()).add(step);
+        }
+        if (!unread.isEmpty()) {
+            FullCourse.LOGGER.info("Full Course couldn't read the ingredients of {} recipes ({}); a food made only by them rates as raw "
+                    + "unless a food_profiles override rates it", unread.values().stream().mapToInt(Integer::intValue).sum(), unread);
         }
         return byOutput;
+    }
+
+    private static void add(RecipeHolder<?> holder, ContextMap context, Map<Item, List<TierScorer.Recipe<Item>>> byOutput,
+                            Map<Item, List<TierScorer.Recipe<Item>>> rawCuts, Map<String, Integer> unread) {
+        Recipe<?> recipe = holder.value();
+        List<Ingredient> ingredients;
+        ItemStack result;
+        Optional<FarmersDelightCuts.Cut> cut = FarmersDelightCuts.read(recipe);
+        if (cut.isPresent()) {
+            ingredients = List.of(cut.get().input());
+            result = cut.get().result();
+        } else if (!recipe.placementInfo().isImpossibleToPlace()) {
+            ingredients = recipe.placementInfo().ingredients();
+            result = result(recipe, context);
+        } else {
+            Optional<RecipeFields.Read> fields = RecipeFields.read(recipe);
+            if (fields.isEmpty()) {
+                String type = station(recipe.getType());
+                // vanilla's own unplaceable recipes (special crafting, smithing) make no food
+                if (!recipe.isSpecial() && type.contains(":") && !type.startsWith("minecraft:")) unread.merge(type, 1, Integer::sum);
+                return;
+            }
+            ingredients = fields.get().ingredients();
+            result = fields.get().result();
+        }
+        if (result.isEmpty()) return;
+        List<Set<Item>> slots = new ArrayList<>();
+        Set<Ingredient> seen = new LinkedHashSet<>();
+        for (Ingredient ingredient : ingredients) {
+            if (!seen.add(ingredient)) continue; // the same ingredient twice is one ingredient
+            Set<Item> alternatives = new LinkedHashSet<>();
+            ingredient.items().forEach(h -> alternatives.add(h.value()));
+            if (!alternatives.isEmpty()) slots.add(alternatives);
+        }
+        if (slots.isEmpty()) return;
+        String station = station(recipe.getType());
+        int weight = STATION_WEIGHTS.getOrDefault(station, 1);
+        TierScorer.Recipe<Item> step = new TierScorer.Recipe<>(station, weight, List.copyOf(slots), result.getCount());
+        Item made = result.getItem();
+        // a cut of food (beef, a rice panicle), not of a wild plant's bush back into its crop
+        boolean culinaryInput = slots.getFirst().stream().anyMatch(i -> isFood(i) || i.builtInRegistryHolder().is(FoodTags.CULINARY));
+        boolean rawCut = cut.isPresent() && culinaryInput && made.builtInRegistryHolder().is(FoodTags.RAW_INGREDIENTS)
+                && BuiltInRegistries.ITEM.getKey(made).getNamespace().equals(holder.id().identifier().getNamespace());
+        (rawCut ? rawCuts : byOutput).computeIfAbsent(made, k -> new ArrayList<>()).add(step);
     }
 
     private static ItemStack result(Recipe<?> recipe, ContextMap context) {
