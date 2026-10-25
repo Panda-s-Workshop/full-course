@@ -45,6 +45,9 @@ class ConfigTest {
         // score 0 is raw food: a Simple threshold of 0 would make rotten flesh a meal
         var zero = new FullCourseConfig.Snapshot(false, 8, 80, 2, 5, false, 1.0, new int[] {0, 3, 5, 8, 12});
         assertArrayEquals(Tier.DEFAULT_THRESHOLDS, FullCourseConfig.Snapshot.of(zero).tierThresholds());
+        // two equal thresholds leave a tier no food can reach
+        var equal = new FullCourseConfig.Snapshot(false, 8, 80, 2, 5, false, 1.0, new int[] {1, 3, 3, 8, 12});
+        assertArrayEquals(Tier.DEFAULT_THRESHOLDS, FullCourseConfig.Snapshot.of(equal).tierThresholds());
     }
 
     @Test

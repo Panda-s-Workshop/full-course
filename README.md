@@ -64,7 +64,7 @@ neither Recovery nor food. Healing potions, golden apples and other effects stil
 | `maxMealSlots` | `5` | The most meal slots a player can have (1–16). The Tasting Journal opens three past the starting slots; `/fullcourse unlock` can go up to this. |
 | `keepMealsOnDeath` | `false` | Keep held meals through death. |
 | `durationMultiplier` | `1.0` | Multiplies every meal's duration (0.05–20). |
-| `tierThresholds` | `1,3,5,8,12` | Lowest recipe-chain score of tiers 1 to 5: exactly five, ascending, 1–999. Anything else falls back to the defaults. |
+| `tierThresholds` | `1,3,5,8,12` | Lowest recipe-chain score of tiers 1 to 5: exactly five, each higher than the last, 1–999. Anything else falls back to the defaults. |
 | `slotMilestones` | `8,15,20` | Different dishes to taste for meal slot 3 (two stars or more), 4 and 5 (three stars or more; slot 5 also needs a feast). Exactly three, each 1–9999, and slot 5's not below slot 4's; anything else falls back to the defaults. Raise them in a pack with many food mods. |
 
 Each player also has three display settings of their own, which the server never sees: `config/fullcourse-client.toml`

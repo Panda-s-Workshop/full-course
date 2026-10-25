@@ -168,16 +168,19 @@ public final class FullCourseConfig {
         return source.durationMultiplier();
     }
 
-    /** Thresholds, ascending; the defaults if the configured list is malformed. */
+    /** Thresholds, strictly ascending; the defaults if the configured list is malformed. */
     public static int[] tierThresholds() {
         return validThresholds(source.tierThresholds());
     }
 
-    /** {@code t} when it holds five ascending scores from 0 to 999, otherwise the defaults. */
+    /**
+     * {@code t} when it holds five strictly ascending scores from 1 to 999, otherwise the defaults: two equal thresholds
+     * would leave the tier between them with no foods.
+     */
     public static int[] validThresholds(int[] t) {
         if (t == null || t.length != 5 || t[0] < 1 || t[4] > 999) return Tier.DEFAULT_THRESHOLDS.clone();
         for (int i = 1; i < t.length; i++) {
-            if (t[i] < t[i - 1]) return Tier.DEFAULT_THRESHOLDS.clone();
+            if (t[i] <= t[i - 1]) return Tier.DEFAULT_THRESHOLDS.clone();
         }
         return t.clone();
     }

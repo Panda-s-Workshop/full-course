@@ -19,7 +19,7 @@ public final class PropertiesConfig implements FullCourseConfig.Source {
              maxMealSlots: the most meal slots a player can have (1-16); the journal opens three past the starting slots
              keepMealsOnDeath: keep held meals through death (true/false)
              durationMultiplier: multiplies every meal's duration (0.05-20)
-             tierThresholds: lowest recipe-chain score of tiers 1 to 5, exactly five, ascending, comma-separated
+             tierThresholds: lowest recipe-chain score of tiers 1 to 5, exactly five, each higher than the last, comma-separated
              slotMilestones: different dishes to taste for meal slot 3 (two stars or more), 4 and 5 (three stars or more; 5 also a feast), comma-separated""";
 
     private final boolean keepVanillaHunger;
