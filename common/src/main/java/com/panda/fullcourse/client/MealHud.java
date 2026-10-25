@@ -32,6 +32,8 @@ public final class MealHud {
     public static final Identifier LAYER = FullCourse.id("meals");
     /** Height a row takes, including the gap above it, for the loaders' row stacking. */
     public static final int HEIGHT = 20;
+    /** The held-food marker's height above the top row ({@link #marker}): what stacks above keeps clear of it. */
+    public static final int MARKER_ROOM = 4;
     /** Frames per row: a sixth would reach over the hearts. */
     static final int PER_ROW = 5;
     /** The top of the frames as last drawn (for checks). */

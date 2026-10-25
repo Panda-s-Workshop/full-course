@@ -67,10 +67,11 @@ public final class FullCourseClient {
         modBus.addListener((EntityRenderersEvent.RegisterRenderers e) ->
                 e.registerBlockEntityRenderer(ModBlockEntities.CUTTING_BOARD.get(), CuttingBoardRenderer::new));
         modBus.addListener((RegisterColorHandlersEvent.BlockTintSources e) -> e.register(List.of(new PotSoupTint()), ModBlocks.COOKING_POT.get()));
-        // the meal row sits where the food bar was, above the mount's hearts when riding; it stacks the rows above it
+        // the meal row sits where the food bar was, above the mount's hearts when riding; it stacks the rows above it,
+        // with room for the held-food marker so the held item's name and the action bar clear it
         modBus.addListener((RegisterGuiLayersEvent e) -> e.registerAbove(VanillaGuiLayers.VEHICLE_HEALTH, MealHud.LAYER, (g, delta) -> {
             Hud hud = Minecraft.getInstance().gui.hud;
-            if (MealHud.extract(g, g.guiHeight() - hud.rightHeight + 9)) hud.rightHeight += MealHud.lift();
+            if (MealHud.extract(g, g.guiHeight() - hud.rightHeight + 9)) hud.rightHeight += MealHud.lift() + MealHud.MARKER_ROOM;
         }));
         NeoForge.EVENT_BUS.addListener((RenderGuiLayerEvent.Pre e) -> {
             if (e.getName().equals(VanillaGuiLayers.FOOD_LEVEL) && MealHud.active()) e.setCanceled(true);
