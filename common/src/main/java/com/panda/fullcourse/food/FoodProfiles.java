@@ -50,6 +50,9 @@ public final class FoodProfiles {
      * a serving or slice of: a feast served from its block, a pie cut into slices).
      */
     public static final String OVERRIDES = "fullcourse/food_profiles";
+    /** The keys an override file may have. */
+    private static final List<String> OVERRIDE_KEYS = List.of("tier", "families", "remedy", "serving_of");
+    private static List<String> overrideWarnings = List.of();
     /** The crock counts double: patience is effort. */
     private static final Map<String, Integer> STATION_WEIGHTS = Map.of("fullcourse:fermenting", 2);
 
@@ -397,17 +400,37 @@ public final class FoodProfiles {
         return id == null ? "unknown" : id.toString();
     }
 
+    /** What the last rating's override files got wrong, one line each, as logged: for pack makers' checks. */
+    public static List<String> overrideWarnings() {
+        return overrideWarnings;
+    }
+
+    private static void warn(String message) {
+        overrideWarnings.add(message);
+        FullCourse.LOGGER.warn("Full Course: {}", message);
+    }
+
     private static Map<Item, ProfileOverride> overrides(MinecraftServer mcServer) {
         Map<Item, ProfileOverride> out = new HashMap<>();
+        overrideWarnings = new ArrayList<>();
+        Set<String> namespaces = new HashSet<>();
+        for (Identifier id : BuiltInRegistries.ITEM.keySet()) namespaces.add(id.getNamespace());
         for (Map.Entry<Identifier, Resource> e : mcServer.getResourceManager()
                 .listResources(OVERRIDES, id -> id.getPath().endsWith(".json")).entrySet()) {
             Identifier file = e.getKey();
             String path = file.getPath().substring(OVERRIDES.length() + 1, file.getPath().length() - ".json".length());
             Identifier itemId = Identifier.fromNamespaceAndPath(file.getNamespace(), path);
             Optional<Holder.Reference<Item>> item = BuiltInRegistries.ITEM.get(itemId);
-            if (item.isEmpty()) continue; // an override for a mod that isn't installed
+            if (item.isEmpty()) {
+                // quiet for a mod that isn't installed; a typo where the mod is
+                if (namespaces.contains(file.getNamespace())) warn("food profile override " + file + " names no item " + itemId);
+                continue;
+            }
             try (Reader reader = e.getValue().openAsReader()) {
                 JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
+                for (String key : json.keySet()) {
+                    if (!OVERRIDE_KEYS.contains(key)) warn("food profile override " + file + " has an unknown key \"" + key + "\" (it reads " + OVERRIDE_KEYS + ")");
+                }
                 Optional<Integer> tier = json.has("tier") ? Optional.of(Math.clamp(json.get("tier").getAsInt(), 0, 5)) : Optional.empty();
                 Optional<Boolean> remedy = json.has("remedy") ? Optional.of(json.get("remedy").getAsBoolean()) : Optional.empty();
                 Optional<List<Family>> families = Optional.empty();
@@ -416,15 +439,19 @@ public final class FoodProfiles {
                     for (JsonElement el : json.getAsJsonArray("families")) {
                         Optional<Family> family = Family.byKey(el.getAsString());
                         if (family.isPresent()) list.add(family.get());
-                        else FullCourse.LOGGER.warn("Full Course: food profile override {} names no family \"{}\"", file, el.getAsString());
+                        else warn("food profile override " + file + " names no family \"" + el.getAsString() + "\"");
                     }
                     // an empty list leaves the families to the recipes, as leaving the key out does
                     if (!list.isEmpty()) families = Optional.of(List.copyOf(list));
                 }
                 Optional<Item> servingOf = json.has("serving_of")
                         ? BuiltInRegistries.ITEM.get(Identifier.parse(json.get("serving_of").getAsString())).map(Holder::value) : Optional.empty();
+                if (json.has("serving_of") && servingOf.isEmpty()) {
+                    warn("food profile override " + file + " is a serving of " + json.get("serving_of").getAsString() + ", which is no item");
+                }
                 out.put(item.get().value(), new ProfileOverride(tier, families, remedy, servingOf));
             } catch (Exception ex) {
+                overrideWarnings.add("food profile override " + file + " couldn't be read: " + ex.getMessage());
                 FullCourse.LOGGER.warn("Full Course: couldn't read food profile override {}", file, ex);
             }
         }

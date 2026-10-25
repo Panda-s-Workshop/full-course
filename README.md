@@ -116,6 +116,9 @@ puts a replaced file back to the scored values.
 - `remedy`: true for foods like the golden apple, which keep their own effects and heal but give no meal.
 - `serving_of`: the dish this is a serving or slice of (a feast block, a pie); it rates exactly as that dish.
 
+A key not in this list, a file whose path names no item of an installed mod, and a `serving_of` that names no item are
+logged as warnings at each `/reload`; a file for a mod that isn't installed is skipped quietly.
+
 Full Course's own dishes are rated by files at these paths too (`data/fullcourse/fullcourse/food_profiles/<dish>.json`,
 and cake's in `data/minecraft/`), which set their families and leave the tier to the recipes. A pack file at one of
 those paths replaces the whole file: a file with only `tier` leaves the dish's families to its recipes, so copy the
