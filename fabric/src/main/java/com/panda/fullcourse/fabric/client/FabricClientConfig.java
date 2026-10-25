@@ -1,6 +1,7 @@
 package com.panda.fullcourse.fabric.client;
 
 import com.panda.fullcourse.FullCourse;
+import com.panda.fullcourse.PropertiesConfig;
 import com.panda.fullcourse.client.ClientOptions;
 import java.io.IOException;
 import java.io.Reader;
@@ -20,6 +21,12 @@ final class FabricClientConfig {
         if (Files.exists(file)) {
             try (Reader in = Files.newBufferedReader(file)) {
                 p.load(in);
+                // keys a newer version added go at the end, with their defaults, so the file lists every setting
+                String missing = PropertiesConfig.missingLines(p, ClientOptions.defaults(), ClientOptions.HEADER);
+                if (!missing.isEmpty()) {
+                    Files.writeString(file, System.lineSeparator() + missing, java.nio.file.StandardOpenOption.APPEND);
+                    p.load(new java.io.StringReader(missing));
+                }
             } catch (IOException e) {
                 FullCourse.LOGGER.warn("Couldn't read {}, using the defaults", file, e);
             }

@@ -45,6 +45,21 @@ public final class PropertiesConfig implements FullCourseConfig.Source {
         slotMilestones = FullCourseConfig.validMilestones(numbers(p, "slotMilestones"));
     }
 
+    /**
+     * The lines to add to a file written by an older version: each key of {@code defaults} it lacks, with the line
+     * {@code header} has for that key as its comment; "" when nothing is missing. Appended, the user's own lines stay.
+     */
+    public static String missingLines(Properties loaded, Properties defaults, String header) {
+        StringBuilder out = new StringBuilder();
+        for (String key : new java.util.TreeSet<>(defaults.stringPropertyNames())) {
+            if (loaded.containsKey(key)) continue;
+            header.lines().map(String::strip).filter(l -> l.startsWith(key + ":")).findFirst()
+                    .ifPresent(l -> out.append("# ").append(l).append(System.lineSeparator()));
+            out.append(key).append('=').append(defaults.getProperty(key)).append(System.lineSeparator());
+        }
+        return out.toString();
+    }
+
     /** The defaults, as a new file holds them. */
     public static Properties defaults() {
         FullCourseConfig.Source d = FullCourseConfig.DEFAULTS;

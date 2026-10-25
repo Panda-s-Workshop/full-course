@@ -85,4 +85,18 @@ class ConfigTest {
         p.setProperty("tierThresholds", "1,3,x,8,12");
         assertArrayEquals(Tier.DEFAULT_THRESHOLDS, new PropertiesConfig(p).tierThresholds());
     }
+
+    @Test
+    void anOlderFileGainsTheKeysItLacks() throws java.io.IOException {
+        Properties old = new Properties();
+        old.setProperty("keepVanillaHunger", "true");
+        String missing = PropertiesConfig.missingLines(old, PropertiesConfig.defaults(), PropertiesConfig.HEADER);
+        assertFalse(missing.contains("keepVanillaHunger"), "a key the file has stays as the user wrote it");
+        assertTrue(missing.contains("# slotMilestones: different dishes to taste"), "each added key brings its comment: " + missing);
+        Properties added = new Properties();
+        added.load(new java.io.StringReader(missing));
+        assertEquals("8,15,20", added.getProperty("slotMilestones"));
+        assertEquals(PropertiesConfig.defaults().size() - 1, added.size());
+        assertEquals("", PropertiesConfig.missingLines(PropertiesConfig.defaults(), PropertiesConfig.defaults(), PropertiesConfig.HEADER));
+    }
 }

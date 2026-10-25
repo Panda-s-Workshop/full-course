@@ -24,6 +24,12 @@ final class FabricConfig {
         if (Files.exists(file)) {
             try (Reader in = Files.newBufferedReader(file)) {
                 p.load(in);
+                // keys a newer version added go at the end, with their defaults, so the file lists every setting
+                String missing = PropertiesConfig.missingLines(p, PropertiesConfig.defaults(), PropertiesConfig.HEADER);
+                if (!missing.isEmpty()) {
+                    Files.writeString(file, System.lineSeparator() + missing, java.nio.file.StandardOpenOption.APPEND);
+                    p.load(new java.io.StringReader(missing));
+                }
             } catch (IOException e) {
                 FullCourse.LOGGER.warn("Couldn't read {}, using the defaults", file, e);
             }
