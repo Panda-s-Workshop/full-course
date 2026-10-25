@@ -47,7 +47,7 @@ public final class MealHud {
     }
 
     /** Rows of frames for the server's most slots. */
-    static int rows() {
+    public static int rows() {
         return (FullCourseConfig.maxMealSlots() + PER_ROW - 1) / PER_ROW;
     }
     static final int FRAME = 18;
