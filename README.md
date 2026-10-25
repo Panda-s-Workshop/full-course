@@ -111,7 +111,8 @@ puts a replaced file back to the scored values.
 | `groups/<family>` | The ingredients that give each benefit family to foods rated from their recipes. Full Course's own dishes, Grilled Fillet, Flatbread and cake have their families set in their food profiles, so these tags don't change them. |
 | `journal_foods` | The "any simple dish" the Tasting Journal's recipe takes. |
 
-**Block tags:** `fullcourse:heat_sources` heat a Cooking Pot set on top. A block with a `lit` or `burning` state heats
+**Block tags:** `fullcourse:heat_sources` heat a Cooking Pot set on top; it holds vanilla's `#minecraft:campfires` and
+`#minecraft:fire`, so other mods' campfires count. A block with a `lit` or `burning` state heats
 only while that state is on; any other block in the tag always heats. `fullcourse:heat_conductors` (a hopper, so a pot
 can be emptied from below) pass heat up from a source under them.
 
