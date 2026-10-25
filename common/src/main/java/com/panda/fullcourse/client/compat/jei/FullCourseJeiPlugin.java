@@ -94,6 +94,8 @@ public final class FullCourseJeiPlugin implements IModPlugin {
             registration.addIngredientInfo(feast, Component.translatable("jei.fullcourse.info.feast"));
         }
         registration.addIngredientInfo(ModItems.item("tasting_journal"), Component.translatable("jei.fullcourse.info.tasting_journal"));
+        registration.addIngredientInfo(ModItems.item("onion"), Component.translatable("jei.fullcourse.info.onion"));
+        registration.addIngredientInfo(ModItems.item("ember_pepper"), Component.translatable("jei.fullcourse.info.ember_pepper"));
     }
 
     @Override

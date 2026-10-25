@@ -3,10 +3,14 @@ package com.panda.fullcourse.kitchen;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.panda.fullcourse.registry.ModItems;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -19,7 +23,11 @@ import net.minecraft.world.item.Item;
  * Onion, Baked Potato, Broth, in a Bowl". Read from the mod's item table, so it shows the mod's own recipes; a data pack that changes them is better read in a recipe viewer.
  */
 public final class RecipeHints {
+    /** At most this many "where it comes from" lines under a recipe. */
+    private static final int MAX_SOURCES = 4;
     private static Map<Item, List<Component>> hints;
+    /** Each item's first recipe's ingredients, as item ids and tags. */
+    private static final Map<Item, List<String>> firstRecipe = new HashMap<>();
 
     private RecipeHints() {}
 
@@ -27,6 +35,48 @@ public final class RecipeHints {
     public static List<Component> lines(Item item) {
         if (hints == null) hints = load();
         return hints.getOrDefault(item, List.of());
+    }
+
+    /**
+     * Where the ingredients made first come from, so a dish can be traced to raw ingredients without a recipe viewer:
+     * "Pastry — Crafting: any dough, Butter", then Pastry's own Butter and Dough. Breadth first, each once, at most
+     * {@link #MAX_SOURCES} lines. A tag counts as the mod's own item in it (any dough: Dough).
+     */
+    public static List<Component> sources(Item item) {
+        if (hints == null) hints = load();
+        List<Component> out = new ArrayList<>();
+        Set<Item> seen = new LinkedHashSet<>(List.of(item));
+        Deque<Item> queue = new ArrayDeque<>(made(item));
+        while (!queue.isEmpty() && out.size() < MAX_SOURCES) {
+            Item next = queue.poll();
+            if (!seen.add(next)) continue;
+            List<Component> recipe = lines(next);
+            if (recipe.isEmpty()) continue;
+            out.add(Component.translatable("hint.fullcourse.from", Component.translatable(next.getDescriptionId()), recipe.getFirst())
+                    .withStyle(ChatFormatting.DARK_GRAY));
+            queue.addAll(made(next));
+        }
+        return out;
+    }
+
+    /** The mod's items among {@code item}'s first recipe's ingredients, tags resolved to the mod's own item in them. */
+    private static List<Item> made(Item item) {
+        List<Item> out = new ArrayList<>();
+        for (String id : firstRecipe.getOrDefault(item, List.of())) {
+            if (id.startsWith("#")) {
+                var tag = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, Identifier.parse(id.substring(1)));
+                for (var holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) {
+                    if (holder.value() != item && hints.containsKey(holder.value())) {
+                        out.add(holder.value());
+                        break;
+                    }
+                }
+            } else {
+                Item ingredient = BuiltInRegistries.ITEM.getValue(Identifier.parse(id));
+                if (hints.containsKey(ingredient)) out.add(ingredient);
+            }
+        }
+        return out;
     }
 
     private static Map<Item, List<Component>> load() {
@@ -47,7 +97,13 @@ public final class RecipeHints {
                 lines.add(Component.translatable("hint.fullcourse.made", Component.translatable("station.fullcourse." + made.get("station").getAsString()), from)
                         .withStyle(ChatFormatting.DARK_AQUA));
             }
-            out.put(ModItems.item(e.get("id").getAsString()), List.copyOf(lines));
+            Item item = ModItems.item(e.get("id").getAsString());
+            out.put(item, List.copyOf(lines));
+            List<String> first = new ArrayList<>();
+            for (JsonElement i : e.getAsJsonArray("made").get(0).getAsJsonObject().getAsJsonArray("from")) {
+                if (i.isJsonPrimitive()) first.add(i.getAsString());
+            }
+            firstRecipe.put(item, List.copyOf(first));
         }
         return out;
     }

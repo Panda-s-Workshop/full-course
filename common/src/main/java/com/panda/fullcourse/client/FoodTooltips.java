@@ -42,6 +42,7 @@ public final class FoodTooltips {
         Profile p = FoodProfiles.client(stack.getItem());
         boolean food = FoodProfiles.isFood(stack.getItem()) || p != Profile.NONE;
         List<Component> made = new ArrayList<>(RecipeHints.lines(stack.getItem()));
+        made.addAll(RecipeHints.sources(stack.getItem()));
         Identifier id = BuiltInRegistries.ITEM.getKey(stack.getItem());
         if (id.getNamespace().equals(FullCourse.MODID)) {
             String key = "tooltip.fullcourse." + id.getPath();
