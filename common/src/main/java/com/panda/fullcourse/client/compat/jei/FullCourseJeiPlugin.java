@@ -4,6 +4,7 @@ import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.client.BrickOvenScreen;
 import com.panda.fullcourse.client.CookingPotScreen;
 import com.panda.fullcourse.client.HeatText;
+import com.panda.fullcourse.client.JournalScreen;
 import com.panda.fullcourse.client.KitchenRecipes;
 import com.panda.fullcourse.client.MealList;
 import com.panda.fullcourse.kitchen.BakingRecipe;
@@ -17,11 +18,15 @@ import com.panda.fullcourse.registry.ModRecipes;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.gui.builder.IClickableIngredientFactory;
 import mezz.jei.api.gui.handlers.IGuiClickableArea;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
+import mezz.jei.api.gui.handlers.IGuiProperties;
+import mezz.jei.api.gui.handlers.IScreenHandler;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusFactory;
 import mezz.jei.api.recipe.types.IRecipeHolderType;
@@ -29,18 +34,21 @@ import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.runtime.IClickableIngredient;
 import mezz.jei.api.runtime.IRecipesGui;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
 /**
  * The kitchen in JEI: a page per station (Cutting Board, Cooking Pot, Brick Oven, Fermenting Crock) with its recipes,
  * the stations and knives as the blocks that make them, information pages for the stations, knives, feasts and the
- * journal, and the pot's and oven's arrows open their pages (the pot's
+ * journal, the journal's tiles for JEI's recipe and use keys, and the pot's and oven's arrows open their pages (the pot's
  * tooltip keeps the arrow's preview). JEI keeps its panels out of the meal list beside the inventory. JEI finds
  * this through its annotation on NeoForge and the {@code jei_mod_plugin} entrypoint on Fabric; nothing loads it
  * without JEI.
@@ -132,5 +140,26 @@ public final class FullCourseJeiPlugin implements IModPlugin {
             }
         });
         registration.addRecipeClickArea(BrickOvenScreen.class, BrickOvenScreen.ARROW_X, BrickOvenScreen.ARROW_Y, 24, 16, BAKING.get());
+        // the journal's tiles are dishes to JEI, so its keys for recipes, uses and bookmarks work over them
+        registration.addGuiScreenHandler(JournalScreen.class, new IScreenHandler<JournalScreen>() {
+            @Override
+            public IGuiProperties apply(JournalScreen screen) {
+                return new IGuiProperties() {
+                    @Override public Class<? extends Screen> screenClass() { return JournalScreen.class; }
+                    @Override public int guiLeft() { return screen.left(); }
+                    @Override public int guiTop() { return screen.top(); }
+                    @Override public int guiXSize() { return JournalScreen.W; }
+                    @Override public int guiYSize() { return JournalScreen.H; }
+                    @Override public int screenWidth() { return screen.width; }
+                    @Override public int screenHeight() { return screen.height; }
+                };
+            }
+
+            @Override
+            public Optional<? extends IClickableIngredient<?>> getClickableIngredientUnderMouse(IClickableIngredientFactory factory, JournalScreen screen,
+                                                                                               double mouseX, double mouseY) {
+                return screen.tileAt(mouseX, mouseY).flatMap(tile -> factory.createBuilder(new ItemStack(tile.item())).buildWithArea(tile.x(), tile.y(), 16, 16));
+            }
+        });
     }
 }

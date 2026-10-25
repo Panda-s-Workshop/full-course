@@ -7,10 +7,13 @@ import com.panda.fullcourse.food.FoodText;
 import com.panda.fullcourse.food.Tasting;
 import com.panda.fullcourse.logic.Meals;
 import com.panda.fullcourse.logic.Milestones;
+import com.panda.fullcourse.logic.Recovery;
 import com.panda.fullcourse.logic.Tier;
 import com.panda.fullcourse.platform.Services;
+import com.panda.fullcourse.registry.ModAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -22,6 +25,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -59,6 +63,8 @@ public final class MealList {
         int free = Math.max(0, state.slots() - meals.size());
         Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()), state.bonusSlots());
         boolean more = next != Milestones.Next.NONE && state.slots() < FullCourseConfig.maxMealSlots();
+        Component recovery = recoveryLine(player);
+        List<FormattedCharSequence> recoveryLines = recovery == null ? List.of() : font.split(recovery, w - 2 * PAD);
 
         int tx = PAD + 20, room = w - tx - PAD;
         List<List<FormattedCharSequence>> lines = new ArrayList<>();
@@ -68,7 +74,8 @@ public final class MealList {
             lines.add(wrapped);
             rows += Math.max(ROW, 12 + 10 * wrapped.size());
         }
-        int h = PAD + 12 + (meals.isEmpty() ? ROW : rows) + (free > 0 && !meals.isEmpty() ? 11 : 0) + (more ? 22 : 0) + PAD - 2;
+        int h = PAD + 12 + (meals.isEmpty() ? ROW : rows) + (free > 0 && !meals.isEmpty() ? 11 : 0) + (recoveryLines.isEmpty() ? 0 : 10 * recoveryLines.size() + 1) + (more ? 22 : 0)
+                + PAD - 2;
         int x = screen.leftPos - GAP - w, y = Math.max(GAP, Math.min(screen.topPos, screen.height - GAP - h));
         shown = new Rect2i(x, y, w, h);
         g.fill(x, y, x + w, y + h, BG);
@@ -98,6 +105,11 @@ public final class MealList {
             g.text(font, Component.translatable(free == 1 ? "gui.fullcourse.meals.free_one" : "gui.fullcourse.meals.free", free), x + PAD, cy, DIM, false);
             cy += 11;
         }
+        for (FormattedCharSequence line : recoveryLines) {
+            g.text(font, line, x + PAD, cy, DIM, false);
+            cy += 10;
+        }
+        if (!recoveryLines.isEmpty()) cy += 1;
         if (more) {
             Tier counted = Tier.ofStars(next.stars());
             Component line = Component.translatable(next.needsFeast() ? "gui.fullcourse.meals.next_feast" : "gui.fullcourse.meals.next",
@@ -111,6 +123,20 @@ public final class MealList {
     }
 
     /** "19:59 · III · Brawn, Vigor, Mending": time left, then the level, which applies to every family the meal gives. */
+    /**
+     * "Recovery: 1 ♥ every 2.0 s" when {@code fullcourse:recovery_rate} (Mending, another mod, a command) moves Recovery
+     * off its default pace, "Recovery: off" at 0; null at the default pace, or while vanilla hunger is kept.
+     */
+    public static Component recoveryLine(LocalPlayer player) {
+        if (FullCourseConfig.keepVanillaHunger()) return null;
+        AttributeInstance attribute = player.getAttribute(ModAttributes.RECOVERY_RATE.holder());
+        double rate = attribute == null ? 1 : attribute.getValue();
+        if (Math.abs(rate - 1) < 1e-6) return null;
+        int interval = Recovery.interval(FullCourseConfig.recoveryIntervalTicks(), rate);
+        if (interval <= 0) return Component.translatable("gui.fullcourse.meals.recovery_off");
+        return Component.translatable("gui.fullcourse.meals.recovery", String.format(Locale.ROOT, "%.1f", interval / 20.0));
+    }
+
     private static String benefits(Meals.Meal<Identifier> meal, long now) {
         String names = meal.families().stream().map(f -> Component.translatable("family.fullcourse." + f.key()).getString())
                 .collect(Collectors.joining(", "));

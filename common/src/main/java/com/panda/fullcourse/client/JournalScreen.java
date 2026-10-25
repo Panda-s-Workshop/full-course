@@ -12,11 +12,14 @@ import com.panda.fullcourse.platform.Services;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -31,8 +34,9 @@ import net.minecraft.world.item.ItemStack;
  * The Tasting Journal's screen: every dish the server rates (the mod's, vanilla's, and other mods' of two stars or
  * more, plus anything already tasted), by tier, in a grid; tasted dishes in colour inside a frame of their tier's
  * colour, the rest faded, with a pip on those whose tasting would move the next slot along. Hovering a dish shows its
- * tooltip (tier, benefits, and with Shift the recipe chain). The next meal slot's milestone and a bar sit at the top.
- * Reads only the synced food state: nothing is sent.
+ * tooltip (tier, benefits, and with Shift the recipe chain). The next meal slot's milestone and a bar sit at the top, and
+ * a search box beside the title narrows the grid by name or, with "@", by mod. Reads only the synced food state: nothing
+ * is sent.
  */
 public class JournalScreen extends Screen {
     private static final Identifier TEXTURE = FullCourse.id("textures/gui/journal.png");
@@ -41,9 +45,12 @@ public class JournalScreen extends Screen {
     /** The layout drawn into textures/gui/journal.png: panel, bar, grid and scrollbar track. */
     public static final int W = 212, H = 194, GRID_X = 8, GRID_Y = 46, COLS = 10, ROWS = 7, BAR_X = 8, BAR_Y = 30, BAR_W = 196,
             BAR_H = 4, SCROLL_X = 195, SCROLL_Y = 46, SCROLL_H = ROWS * 18 - 2;
-    private static final int LABEL = 0xFF404040, FADE = 0xB08B8B8B, WELL = 0xFF3C3C3C, PIP_EDGE = 0xFF202020;
+    private static final int LABEL = 0xFF404040, FADE = 0xB08B8B8B, WELL = 0xFF3C3C3C, PIP_EDGE = 0xFF202020, SEARCH_W = 92;
 
+    /** Every dish the journal lists, and those the search lets through (what the grid shows). */
+    private final List<Item> all = new ArrayList<>();
     private final List<Item> dishes = new ArrayList<>();
+    private EditBox search;
     /** A fixed list to show instead of the server's dishes (for checks: a pack with more dishes than one page). */
     private final List<Item> fixed;
     private int left, top, scroll;
@@ -66,9 +73,58 @@ public class JournalScreen extends Screen {
     protected void init() {
         left = (width - W) / 2;
         top = (height - H) / 2;
+        all.clear();
+        all.addAll(fixed != null ? fixed : dishes(state().tasted()));
+        String query = search == null ? "" : search.getValue();
+        search = new EditBox(font, left + W - 8 - SEARCH_W, top + 4, SEARCH_W, 12, Component.translatable("gui.fullcourse.journal.search"));
+        search.setHint(Component.translatable("gui.fullcourse.journal.search_hint").withStyle(ChatFormatting.DARK_GRAY));
+        search.setValue(query);
+        search.setResponder(text -> filter());
+        addRenderableWidget(search);
+        filter();
+    }
+
+    /** The grid shows the dishes whose name holds the search, or with "@", those of a mod whose id or name starts so. */
+    private void filter() {
+        String query = search.getValue().trim().toLowerCase(Locale.ROOT);
         dishes.clear();
-        dishes.addAll(fixed != null ? fixed : dishes(state().tasted()));
+        for (Item item : all) if (matches(item, query)) dishes.add(item);
         scroll = Mth.clamp(scroll, 0, maxScroll());
+    }
+
+    static boolean matches(Item item, String query) {
+        if (query.isEmpty()) return true;
+        if (query.startsWith("@")) {
+            String mod = query.substring(1);
+            String ns = BuiltInRegistries.ITEM.getKey(item).getNamespace();
+            return ns.startsWith(mod) || Services.PLATFORM.modName(ns).toLowerCase(Locale.ROOT).startsWith(mod);
+        }
+        return item.getName(new ItemStack(item)).getString().toLowerCase(Locale.ROOT).contains(query);
+    }
+
+    /** Sets the search, as typing it would (for checks). */
+    public void search(String text) {
+        search.setValue(text);
+    }
+
+    /** A grid tile on screen: its dish and the top-left of its 16×16 icon. */
+    public record Tile(Item item, int x, int y) {}
+
+    /** The tile under the mouse, if any (recipe viewers use it to show a dish's recipes and uses). */
+    public Optional<Tile> tileAt(double mouseX, double mouseY) {
+        for (int i = scroll * COLS; i < dishes.size() && i < (scroll + ROWS) * COLS; i++) {
+            int x = left + GRID_X + (i % COLS) * 18, y = top + GRID_Y + (i / COLS - scroll) * 18;
+            if (mouseX >= x - 1 && mouseX < x + 17 && mouseY >= y - 1 && mouseY < y + 17) return Optional.of(new Tile(dishes.get(i), x, y));
+        }
+        return Optional.empty();
+    }
+
+    public int left() {
+        return left;
+    }
+
+    public int top() {
+        return top;
     }
 
     private FoodState state() {

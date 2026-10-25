@@ -9,12 +9,15 @@ final class NeoForgeClientConfig implements ClientOptions.Source {
 
     private static final ModConfigSpec.IntValue MEAL_ROW_OFFSET = B
             .comment("GUI pixels to lift the meal row by, to make room for another mod's HUD row.")
+            .translation("fullcourse.configuration.mealRowOffset")
             .defineInRange("mealRowOffset", ClientOptions.DEFAULTS.mealRowOffset(), 0, ClientOptions.MAX_OFFSET);
     private static final ModConfigSpec.BooleanValue SHOW_RECOVERY_PARTICLES = B
             .comment("Show a heart each time Recovery heals you.")
+            .translation("fullcourse.configuration.showRecoveryParticles")
             .define("showRecoveryParticles", ClientOptions.DEFAULTS.showRecoveryParticles());
     private static final ModConfigSpec.BooleanValue SHOW_TIER_PIPS = B
             .comment("A dot in the tier's colour on the icon of every food that gives a meal.")
+            .translation("fullcourse.configuration.showTierPips")
             .define("showTierPips", ClientOptions.DEFAULTS.showTierPips());
 
     static final ModConfigSpec SPEC = B.build();

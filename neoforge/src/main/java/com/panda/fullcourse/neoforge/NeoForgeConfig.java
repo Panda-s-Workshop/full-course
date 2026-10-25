@@ -11,27 +11,35 @@ public final class NeoForgeConfig implements FullCourseConfig.Source {
 
     private static final ModConfigSpec.BooleanValue KEEP_VANILLA_HUNGER = B
             .comment("Keep vanilla hunger and regeneration; Full Course only adds meal benefits.")
+            .translation("fullcourse.configuration.keepVanillaHunger")
             .define("keepVanillaHunger", D.keepVanillaHunger());
     private static final ModConfigSpec.IntValue RECOVERY_DELAY = B
             .comment("Seconds without taking damage before Recovery starts healing.")
+            .translation("fullcourse.configuration.recoveryDelaySeconds")
             .defineInRange("recoveryDelaySeconds", D.recoveryDelaySeconds(), 0, 600);
     private static final ModConfigSpec.IntValue RECOVERY_INTERVAL = B
             .comment("Ticks between Recovery heals of 1 HP, before Mending.")
+            .translation("fullcourse.configuration.recoveryIntervalTicks")
             .defineInRange("recoveryIntervalTicks", D.recoveryIntervalTicks(), 1, 12000);
     private static final ModConfigSpec.IntValue STARTING_SLOTS = B
             .comment("Meal slots a new player has.")
+            .translation("fullcourse.configuration.startingMealSlots")
             .defineInRange("startingMealSlots", D.startingMealSlots(), 1, 16);
     private static final ModConfigSpec.IntValue MAX_SLOTS = B
             .comment("The most meal slots the Tasting Journal can unlock.")
+            .translation("fullcourse.configuration.maxMealSlots")
             .defineInRange("maxMealSlots", D.maxMealSlots(), 1, 16);
     private static final ModConfigSpec.BooleanValue KEEP_MEALS = B
             .comment("Keep held meals through death.")
+            .translation("fullcourse.configuration.keepMealsOnDeath")
             .define("keepMealsOnDeath", D.keepMealsOnDeath());
     private static final ModConfigSpec.DoubleValue DURATION = B
             .comment("Multiplies every meal's duration.")
+            .translation("fullcourse.configuration.durationMultiplier")
             .defineInRange("durationMultiplier", D.durationMultiplier(), 0.05, 20.0);
     private static final ModConfigSpec.ConfigValue<List<? extends Integer>> THRESHOLDS = B
             .comment("Lowest recipe-chain score of tiers 1 to 5 (Simple, Prepared, Hearty, Gourmet, Feast): exactly five, ascending.")
+            .translation("fullcourse.configuration.tierThresholds")
             .defineList(List.of("tierThresholds"), () -> List.of(1, 3, 5, 8, 12), () -> 1, o -> o instanceof Integer i && i >= 0 && i < 1000,
                     ModConfigSpec.Range.of(5, 5));
 

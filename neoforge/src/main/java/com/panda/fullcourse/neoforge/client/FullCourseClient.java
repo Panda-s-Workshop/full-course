@@ -40,6 +40,8 @@ import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -51,6 +53,8 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 public final class FullCourseClient {
     public FullCourseClient(IEventBus modBus, ModContainer container) {
         container.registerConfig(ModConfig.Type.CLIENT, NeoForgeClientConfig.SPEC);
+        // the mod list's Config button: NeoForge's own screen for the client and server settings
+        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         ClientOptions.use(new NeoForgeClientConfig());
         modBus.addListener((RegisterClientPayloadHandlersEvent e) -> {
             e.register(ProfilesPayload.TYPE, (payload, context) -> ClientSync.received(payload));
