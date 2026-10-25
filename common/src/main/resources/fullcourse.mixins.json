@@ -2,8 +2,9 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.panda.fullcourse.mixin",
+  "plugin": "com.panda.fullcourse.mixin.FullCourseMixinPlugin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": ["CakeBlockMixin", "FarmersDelightPieMixin", "FoodDataMixin", "FoodPropertiesMixin", "LivingEntityMixin", "PlayerMixin", "ServerPlayerMixin"],
+  "mixins": ["CakeBlockMixin", "FoodDataMixin", "FoodPropertiesMixin", "LivingEntityMixin", "PlayerMixin", "ServerPlayerMixin"],
   "client": ["client.GuiGraphicsExtractorMixin", "client.InventoryScreenMixin"],
   "injectors": { "defaultRequire": 1 }
 }
