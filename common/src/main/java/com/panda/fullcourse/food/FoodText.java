@@ -44,7 +44,7 @@ public final class FoodText {
         if (tasted) stars.append(Component.literal(" ✔ ").append(Component.translatable("tooltip.fullcourse.tasted")).withStyle(ChatFormatting.GREEN));
         out.add(stars);
         if (!p.givesMeal()) {
-            out.add(Component.translatable("tooltip.fullcourse.raw").withStyle(ChatFormatting.GRAY));
+            out.add(Component.translatable(p.ingredient() ? "tooltip.fullcourse.raw" : "tooltip.fullcourse.raw_only").withStyle(ChatFormatting.GRAY));
             if (nutrition > 0) out.add(heal(nutrition).withStyle(ChatFormatting.GRAY));
         } else {
             for (Family family : p.families()) {

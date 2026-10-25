@@ -15,9 +15,10 @@ import net.minecraft.network.codec.StreamCodec;
  * @param steps the depth of its cheapest recipe chain
  * @param stations the distinct stations in that chain (the score counts the crock twice; this counts it once)
  * @param ingredients the distinct raw ingredients that chain starts from
+ * @param ingredient some recipe makes it into another food: a raw food's tooltip says so only then
  */
-public record Profile(Tier tier, int score, int steps, int stations, int ingredients, List<Family> families, boolean remedy) {
-    public static final Profile NONE = new Profile(Tier.RAW, 0, 0, 0, 0, List.of(), false);
+public record Profile(Tier tier, int score, int steps, int stations, int ingredients, List<Family> families, boolean remedy, boolean ingredient) {
+    public static final Profile NONE = new Profile(Tier.RAW, 0, 0, 0, 0, List.of(), false, false);
 
     public static final StreamCodec<ByteBuf, Profile> STREAM_CODEC = new StreamCodec<>() {
         @Override
@@ -34,7 +35,8 @@ public record Profile(Tier tier, int score, int steps, int stations, int ingredi
                 if (!families.contains(f)) families.add(f);
             }
             boolean remedy = ByteBufCodecs.BOOL.decode(buf);
-            return new Profile(tier, score, steps, stations, ingredients, families, remedy);
+            boolean ingredient = ByteBufCodecs.BOOL.decode(buf);
+            return new Profile(tier, score, steps, stations, ingredients, families, remedy, ingredient);
         }
 
         @Override
@@ -47,6 +49,7 @@ public record Profile(Tier tier, int score, int steps, int stations, int ingredi
             ByteBufCodecs.VAR_INT.encode(buf, p.families().size());
             for (Family f : p.families()) ByteBufCodecs.VAR_INT.encode(buf, f.ordinal());
             ByteBufCodecs.BOOL.encode(buf, p.remedy());
+            ByteBufCodecs.BOOL.encode(buf, p.ingredient());
         }
     };
 

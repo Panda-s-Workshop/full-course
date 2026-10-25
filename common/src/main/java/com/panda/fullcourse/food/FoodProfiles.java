@@ -170,6 +170,14 @@ public final class FoodProfiles {
             List<TierScorer.Recipe<Item>> kept = recipes.stream().filter(r -> !onlyServingsOf(r, dish, overrides)).toList();
             return kept.isEmpty() ? null : kept;
         })));
+        // everything some food recipe takes: a raw food that is one of them can still become a meal
+        Set<Item> usedIn = new HashSet<>();
+        for (List<TierScorer.Recipe<Item>> recipes : byOutput.values()) {
+            for (TierScorer.Recipe<Item> r : recipes) r.ingredients().forEach(usedIn::addAll);
+        }
+        for (List<TierScorer.Recipe<Item>> recipes : rawCuts.values()) {
+            for (TierScorer.Recipe<Item> r : recipes) r.ingredients().forEach(usedIn::addAll);
+        }
         TierScorer<Item> scorer = new TierScorer<>(new TierScorer.Graph<>() {
             @Override
             public List<TierScorer.Recipe<Item>> recipesFor(Item item) {
@@ -240,7 +248,8 @@ public final class FoodProfiles {
                     families = List.copyOf(withMending);
                 }
             }
-            out.put(item, new Profile(tier, score.score(), score.depth(), score.stations().size(), score.leaves().size(), families, remedy));
+            out.put(item, new Profile(tier, score.score(), score.depth(), score.stations().size(), score.leaves().size(), families, remedy,
+                    usedIn.contains(item)));
         }
         return Collections.unmodifiableMap(out);
     }

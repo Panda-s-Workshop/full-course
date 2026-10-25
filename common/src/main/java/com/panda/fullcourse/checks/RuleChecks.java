@@ -681,6 +681,8 @@ public final class RuleChecks {
         check(tide.equals("Tide IV: +4 respiration, 60% less water drag"), "Tide's drag as a percentage: %s", tide);
         List<String> raw = text(c, Items.BEEF, false, false);
         check(raw.get(1).contains("Made into a dish, it gives a meal") && raw.get(2).equals("Heals 1.5 ❤ over 3 s"), "raw lines %s", raw);
+        List<String> flesh = text(c, Items.ROTTEN_FLESH, false, false);
+        check(flesh.get(1).equals("Heals only, no meal"), "no recipe takes rotten flesh, so no dish is promised: %s", flesh);
         List<String> remedy = text(c, Items.GOLDEN_APPLE, false, false);
         check(remedy.size() == 2 && remedy.get(0).startsWith("Remedy") && remedy.get(1).equals("Heals 2 ❤ over 4 s"),
                 "a remedy shows its line and its heal, no stars: %s", remedy);

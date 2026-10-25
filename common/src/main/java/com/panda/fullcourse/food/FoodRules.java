@@ -97,7 +97,8 @@ public final class FoodRules {
         } else if (!FullCourseConfig.keepVanillaHunger()) {
             // with no food bar to watch, say why nothing filled a slot
             Component name = dish.getName(new ItemStack(dish));
-            player.sendSystemMessage(Component.translatable(profile.remedy() ? "message.fullcourse.no_meal.remedy" : "message.fullcourse.no_meal.raw", name)
+            String why = profile.remedy() ? "remedy" : profile.ingredient() ? "raw" : "raw_only";
+            player.sendSystemMessage(Component.translatable("message.fullcourse.no_meal." + why, name)
                     .withStyle(ChatFormatting.GRAY), true);
         }
         set(player, before, s);
