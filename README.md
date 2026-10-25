@@ -119,8 +119,9 @@ puts a replaced file back to the scored values.
 Full Course's own dishes are rated by files at these paths too (`data/fullcourse/fullcourse/food_profiles/<dish>.json`,
 and cake's in `data/minecraft/`), which set their families and leave the tier to the recipes. A pack file at one of
 those paths replaces the whole file: a file with only `tier` leaves the dish's families to its recipes, so copy the
-families to keep them. A food in `fullcourse:soups` gets Mending only when its families come from its recipes;
-families set in a file are used as written.
+families to keep them. A food in `fullcourse:soups` gets Mending only when its families come from its recipes,
+and a food whose ingredients fall in fewer groups than its tier gives is made up with Mending. Families set in a file
+are used as written, up to the tier's count.
 
 **What the scorer can't see.** Fluids a machine pours in (Create's filling, for instance) aren't ingredients; only
 items are. Another mod's tool that a crafting recipe uses and gives back (a rolling pin, a knife) counts as an
