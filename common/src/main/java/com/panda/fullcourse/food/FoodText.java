@@ -28,11 +28,18 @@ public final class FoodText {
      * @param tasted    the player has eaten this dish before
      */
     public static List<Component> lines(Profile p, int nutrition, boolean shift, boolean tasted) {
+        return lines(p, nutrition, shift, tasted, FullCourseConfig.regenerates());
+    }
+
+    /**
+     * {@link #lines(Profile, int, boolean, boolean)} for a world whose {@code naturalHealthRegeneration} is
+     * {@code regenerates}: the server's own for a command, the synced one in a tooltip.
+     */
+    public static List<Component> lines(Profile p, int nutrition, boolean shift, boolean tasted, boolean regenerates) {
         List<Component> out = new ArrayList<>();
         // with vanilla hunger food fills the bar instead of healing over time, and Recovery (Mending's work) is off
         boolean hunger = FullCourseConfig.keepVanillaHunger();
         // with naturalHealthRegeneration off food heals nothing and Recovery doesn't run, as vanilla's food doesn't heal
-        boolean regenerates = FullCourseConfig.regenerates();
         if (hunger || !regenerates) nutrition = 0;
         if (p.remedy()) { // no tier, so no stars
             out.add(Component.translatable("tooltip.fullcourse.remedy").withStyle(ChatFormatting.LIGHT_PURPLE));
@@ -46,7 +53,8 @@ public final class FoodText {
         if (tasted) stars.append(Component.literal(" ✔ ").append(Component.translatable("tooltip.fullcourse.tasted")).withStyle(ChatFormatting.GREEN));
         out.add(stars);
         if (!p.givesMeal()) {
-            out.add(Component.translatable(p.ingredient() ? "tooltip.fullcourse.raw" : "tooltip.fullcourse.raw_only").withStyle(ChatFormatting.GRAY));
+            String raw = p.ingredient() ? "tooltip.fullcourse.raw" : "tooltip.fullcourse.raw_only";
+            out.add(Component.translatable(raw + (regenerates ? "" : ".no_heal")).withStyle(ChatFormatting.GRAY));
             if (nutrition > 0) out.add(heal(nutrition).withStyle(ChatFormatting.GRAY));
         } else {
             for (Family family : p.families()) {
@@ -171,7 +179,9 @@ public final class FoodText {
         if (tier >= thresholds.length || tier >= Tier.FEAST.ordinal()) {
             return Component.translatable("tooltip.fullcourse.score_top", sum(p), name, lowest);
         }
-        return Component.translatable("tooltip.fullcourse.score", sum(p), name, lowest, thresholds[tier] - 1);
+        int highest = thresholds[tier] - 1;
+        if (highest <= lowest) return Component.translatable("tooltip.fullcourse.score_one", sum(p), name, lowest);
+        return Component.translatable("tooltip.fullcourse.score", sum(p), name, lowest, highest);
     }
 
     /** "30", "2.5": one decimal at most, none for a whole number (rounded first: 0.1 × 3 × 100 is 30.000000000000004). */

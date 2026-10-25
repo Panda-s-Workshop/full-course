@@ -36,6 +36,8 @@ public final class RecipeHints {
     private static final Map<Item, List<String>> firstRecipe = new HashMap<>();
     /** Each item's ingredients over all its recipes, as item ids and tags, alternatives included. */
     private static final Map<Item, Set<String>> takes = new LinkedHashMap<>();
+    /** {@link #usedIn} per item: a tooltip asks every frame. */
+    private static final Map<Item, Optional<Component>> uses = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
      * Marks a name a wrapped line keeps whole (the client's tooltip wrap reads it): an insertion, which only chat uses,
@@ -89,6 +91,15 @@ public final class RecipeHints {
      * mod's recipes that take it by id or by a tag it's in. Empty for an item no recipe takes.
      */
     public static Optional<Component> usedIn(Item item) {
+        return uses.computeIfAbsent(item, RecipeHints::findUses).map(Component::copy);
+    }
+
+    /** Forgets {@link #usedIn}'s answers: the tags they read may have changed (a join, a reload). */
+    public static void forgetUses() {
+        uses.clear();
+    }
+
+    private static Optional<Component> findUses(Item item) {
         hints();
         List<Item> users = new ArrayList<>();
         for (var e : takes.entrySet()) {

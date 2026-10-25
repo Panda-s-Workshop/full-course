@@ -85,7 +85,8 @@ public final class FullCourseCommand {
         }
         var food = stack.get(DataComponents.FOOD);
         source.sendSuccess(() -> stack.getHoverName().copy().withStyle(ChatFormatting.BOLD), false);
-        for (Component line : FoodText.lines(p, food == null ? 0 : food.nutrition(), true, false)) source.sendSuccess(() -> line, false);
+        boolean regenerates = source.getLevel().getGameRules().get(net.minecraft.world.level.gamerules.GameRules.NATURAL_HEALTH_REGENERATION);
+        for (Component line : FoodText.lines(p, food == null ? 0 : food.nutrition(), true, false, regenerates)) source.sendSuccess(() -> line, false);
         return Math.max(1, p.tier().stars());
     }
 

@@ -231,13 +231,16 @@ public final class FoodProfiles {
             List<TierScorer.Recipe<Item>> kept = recipes.stream().filter(r -> !onlyServingsOf(r, dish, servings)).toList();
             return kept.isEmpty() ? null : kept;
         }));
-        // everything some food recipe takes: a raw food that is one of them can still become a meal
+        // everything some food recipe takes: a raw food that is one of them can still become a meal (a spider eye, which
+        // only the fermented spider eye takes, can't)
         Set<Item> usedIn = new HashSet<>();
-        for (List<TierScorer.Recipe<Item>> recipes : byOutput.values()) {
-            for (TierScorer.Recipe<Item> r : recipes) r.ingredients().forEach(usedIn::addAll);
-        }
-        for (List<TierScorer.Recipe<Item>> recipes : rawCuts.values()) {
-            for (TierScorer.Recipe<Item> r : recipes) r.ingredients().forEach(usedIn::addAll);
+        for (Map<Item, List<TierScorer.Recipe<Item>>> recipes : List.of(byOutput, rawCuts)) {
+            recipes.forEach((made, list) -> {
+                if (isFood(made) || made.builtInRegistryHolder().is(FoodTags.CULINARY) || made.builtInRegistryHolder().is(FoodTags.PLACED_MEALS)
+                        || servedFrom.contains(made)) {
+                    for (TierScorer.Recipe<Item> r : list) r.ingredients().forEach(usedIn::addAll);
+                }
+            });
         }
         TierScorer<Item> scorer = new TierScorer<>(new TierScorer.Graph<>() {
             @Override

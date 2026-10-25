@@ -86,12 +86,14 @@ public final class FoodTooltips {
             boolean eaten = FoodProfiles.eatenAsIs(stack.getItem());
             if (eaten && p.givesMeal() && mc.player != null && mc.player.hasEffect(net.minecraft.world.effect.MobEffects.HUNGER)) {
                 lines.add(Math.min(2, lines.size()), Component.translatable("tooltip.fullcourse.queasy").withStyle(ChatFormatting.GREEN));
+                foodEnd++;
             }
             // under the stars: an untasted dish that would move the next meal slot along, as the journal marks it
             if (eaten && !tasted && mc.player != null
                     && JournalScreen.countsToward(JournalScreen.nextSlot(Services.PLATFORM.foodState(mc.player)), FoodProfiles.clientTastedAs(stack.getItem()))) {
                 lines.add(Math.min(2, lines.size()), Component.translatable("gui.fullcourse.journal.counts",
                         Services.PLATFORM.foodState(mc.player).slots() + 1).withStyle(ChatFormatting.GRAY));
+                foodEnd++;
             }
         } else if (!made.isEmpty() && !shift) {
             lines.add(1, Component.translatable("tooltip.fullcourse.shift_recipe").withStyle(ChatFormatting.GRAY));

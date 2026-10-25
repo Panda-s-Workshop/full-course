@@ -41,6 +41,7 @@ public final class ClientSync {
 
     public static void received(ProfilesPayload payload) {
         payload.apply();
+        com.panda.fullcourse.kitchen.RecipeHints.forgetUses();
         if (!hinted) hintIn = HINT_DELAY;
     }
 

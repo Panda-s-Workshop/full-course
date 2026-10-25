@@ -118,7 +118,7 @@ public final class MealList {
             cy += rowH;
         }
         if (hidden > 0) {
-            g.text(font, Component.translatable("gui.fullcourse.meals.more", hidden), x + PAD, cy, DIM, false);
+            g.text(font, Component.translatable(hidden == 1 ? "gui.fullcourse.meals.more.one" : "gui.fullcourse.meals.more", hidden), x + PAD, cy, DIM, false);
             cy += 11;
         }
         if (free > 0 && !meals.isEmpty()) {
