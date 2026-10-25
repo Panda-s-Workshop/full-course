@@ -175,7 +175,7 @@ public final class FullCourseConfig {
 
     /** {@code t} when it holds five ascending scores from 0 to 999, otherwise the defaults. */
     public static int[] validThresholds(int[] t) {
-        if (t == null || t.length != 5 || t[0] < 0 || t[4] > 999) return Tier.DEFAULT_THRESHOLDS.clone();
+        if (t == null || t.length != 5 || t[0] < 1 || t[4] > 999) return Tier.DEFAULT_THRESHOLDS.clone();
         for (int i = 1; i < t.length; i++) {
             if (t[i] < t[i - 1]) return Tier.DEFAULT_THRESHOLDS.clone();
         }

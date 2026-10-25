@@ -48,7 +48,7 @@ public final class NeoForgeConfig implements FullCourseConfig.Source {
             .comment("Lowest recipe-chain score of tiers 1 to 5 (Simple, Prepared, Hearty, Gourmet, Feast): exactly five, ascending.")
             .translation("fullcourse.configuration.tierThresholds")
             .worldRestart()
-            .defineList(List.of("tierThresholds"), () -> List.of(1, 3, 5, 8, 12), () -> 1, o -> o instanceof Integer i && i >= 0 && i < 1000,
+            .defineList(List.of("tierThresholds"), () -> List.of(1, 3, 5, 8, 12), () -> 1, o -> o instanceof Integer i && i >= 1 && i < 1000,
                     ModConfigSpec.Range.of(5, 5));
     private static final ModConfigSpec.ConfigValue<List<? extends Integer>> MILESTONES = B
             .comment("Different dishes to taste for meal slot 3 (two stars or more), 4 and 5 (three stars or more; 5 also a feast): exactly three.")

@@ -42,6 +42,9 @@ class ConfigTest {
         assertArrayEquals(Tier.DEFAULT_THRESHOLDS, FullCourseConfig.Snapshot.of(six).tierThresholds());
         var falling = new FullCourseConfig.Snapshot(false, 8, 80, 2, 5, false, 1.0, new int[] {5, 4, 3, 2, 1});
         assertArrayEquals(Tier.DEFAULT_THRESHOLDS, roundTrip(FullCourseConfig.Snapshot.of(falling)).tierThresholds());
+        // score 0 is raw food: a Simple threshold of 0 would make rotten flesh a meal
+        var zero = new FullCourseConfig.Snapshot(false, 8, 80, 2, 5, false, 1.0, new int[] {0, 3, 5, 8, 12});
+        assertArrayEquals(Tier.DEFAULT_THRESHOLDS, FullCourseConfig.Snapshot.of(zero).tierThresholds());
     }
 
     @Test
