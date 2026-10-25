@@ -23,7 +23,8 @@ ingredients), the stronger and longer its benefits. Every food from every mod ge
 - **Meals.** Food heals over time, and a cooked dish also fills a meal slot in the row where the food bar was. Its
   benefits (more hearts, damage, armor, speed, mining speed and more) last while its ring runs down. You start with
   two slots; a new dish over a full row replaces the meal with the least time left among those no better than it.
-  Over a row of better meals, a cheaper food only heals.
+  Over a row of better meals, a cheaper food only heals. A meal's time counts in game time, so on a server it runs on
+  while you're logged out.
 - **Stars.** A food's tier, one to five stars on its tooltip, comes from the work in its recipe chain: steps,
   stations and ingredients. More stars give more benefits, higher levels and longer meals. Hold Shift on a food to
   see its chain.
