@@ -1,0 +1,24 @@
+{
+  "meal.start": {
+    "subtitle": "subtitles.fullcourse.meal.start",
+    "sounds": [
+      {
+        "name": "minecraft:block.note_block.chime",
+        "type": "event",
+        "volume": 0.6,
+        "pitch": 1.5
+      }
+    ]
+  },
+  "meal.end": {
+    "subtitle": "subtitles.fullcourse.meal.end",
+    "sounds": [
+      {
+        "name": "minecraft:block.note_block.chime",
+        "type": "event",
+        "volume": 0.5,
+        "pitch": 0.75
+      }
+    ]
+  }
+}

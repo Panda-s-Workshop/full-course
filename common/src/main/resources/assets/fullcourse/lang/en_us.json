@@ -200,6 +200,8 @@
   "station.fullcourse.fire": "Furnace, smoker or campfire",
   "station.fullcourse.oven": "Brick Oven",
   "station.fullcourse.pot": "Cooking Pot",
+  "subtitles.fullcourse.meal.end": "Meal runs out",
+  "subtitles.fullcourse.meal.start": "Meal begins",
   "tag.item.fullcourse.containers": "Containers",
   "tag.item.fullcourse.culinary": "Culinary",
   "tag.item.fullcourse.groups.brawn": "Brawn Ingredients",

@@ -5,15 +5,20 @@ import com.panda.fullcourse.logic.Meals;
 import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.logic.Recovery;
 import com.panda.fullcourse.platform.Services;
+import com.panda.fullcourse.platform.registry.DeferredHolder;
 import com.panda.fullcourse.registry.ModAttributes;
+import com.panda.fullcourse.registry.ModSounds;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -25,7 +30,7 @@ import net.minecraft.world.level.gamerules.GameRules;
 
 /**
  * The server's food rules: what eating does, what each tick does and what death
- * does. Loaders call {@link #tick} after every player tick and {@link #onDeath} when a player dies; eating comes from
+ * does. Starting a meal and a meal running out each play a cue to that player. Loaders call {@link #tick} after every player tick and {@link #onDeath} when a player dies; eating comes from
  * common mixins on {@code FoodProperties.onConsume} and the cake block.
  */
 public final class FoodRules {
@@ -79,6 +84,7 @@ public final class FoodRules {
                 s = unlockSlots(player, s.withTasted(id));
                 s = s.withMeals(s.meals().eat(meal, s.slots()));
                 player.sendSystemMessage(FoodText.mealMessage(name, profile), true);
+                cue(player, ModSounds.MEAL_START);
                 FoodAdvancements.onMeal(player, profile.tier(), s.tasted());
             }
         }
@@ -112,6 +118,7 @@ public final class FoodRules {
         restoreHealth(player);
         FoodState before = state(player);
         FoodState s = before.withMeals(before.meals().expire(now));
+        if (s.meals().active().size() < before.meals().active().size()) cue(player, ModSounds.MEAL_END);
         if (now % SLOT_CHECK_TICKS == 0) s = unlockSlots(player, s);
         if (!FullCourseConfig.keepVanillaHunger()) {
             if (now % Recovery.NOURISH_TICKS == 0 && s.nourish() > 0) {
@@ -126,6 +133,12 @@ public final class FoodRules {
         }
         set(player, before, s);
         if (now % 20 == 0 || s.meals() != before.meals()) Benefits.apply(player, s.meals().strongest());
+    }
+
+    /** Plays a meal cue to {@code player} alone: their meals are their own news, not the room's. */
+    private static void cue(ServerPlayer player, DeferredHolder<SoundEvent, SoundEvent> sound) {
+        player.connection.send(new ClientboundSoundPacket(sound.holder(), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(),
+                1F, 1F, player.getRandom().nextLong()));
     }
 
     /** {@code fullcourse:recovery_rate}, which Mending raises; the default pace if something removed the attribute. */

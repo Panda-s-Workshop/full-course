@@ -9,6 +9,7 @@ import com.panda.fullcourse.registry.ModBlocks;
 import com.panda.fullcourse.registry.ModItems;
 import com.panda.fullcourse.registry.ModMenus;
 import com.panda.fullcourse.registry.ModRecipes;
+import com.panda.fullcourse.registry.ModSounds;
 import com.panda.fullcourse.registry.ModTabs;
 import java.util.List;
 import net.minecraft.resources.Identifier;
@@ -21,7 +22,7 @@ public final class FullCourse {
 
     /** The classes whose static DeferredRegisters hold the mod's content. */
     private static final List<Class<?>> CONTENT = List.of(ModAttributes.class, ModBlocks.class, ModBlockEntities.class, ModItems.class,
-            ModMenus.class, ModRecipes.class, ModTabs.class);
+            ModMenus.class, ModRecipes.class, ModSounds.class, ModTabs.class);
 
     private FullCourse() {}
 
