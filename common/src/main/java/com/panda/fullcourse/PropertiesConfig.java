@@ -34,15 +34,15 @@ public final class PropertiesConfig implements FullCourseConfig.Source {
 
     public PropertiesConfig(Properties p) {
         FullCourseConfig.Source d = FullCourseConfig.DEFAULTS;
-        keepVanillaHunger = bool(p.getProperty("keepVanillaHunger"), d.keepVanillaHunger());
-        recoveryDelaySeconds = clamp(p.getProperty("recoveryDelaySeconds"), d.recoveryDelaySeconds(), 0, 600);
-        recoveryIntervalTicks = clamp(p.getProperty("recoveryIntervalTicks"), d.recoveryIntervalTicks(), 0, 12000);
-        startingMealSlots = clamp(p.getProperty("startingMealSlots"), d.startingMealSlots(), 1, 16);
-        maxMealSlots = clamp(p.getProperty("maxMealSlots"), d.maxMealSlots(), 1, 16);
-        keepMealsOnDeath = bool(p.getProperty("keepMealsOnDeath"), d.keepMealsOnDeath());
-        durationMultiplier = clamp(p.getProperty("durationMultiplier"), d.durationMultiplier());
-        tierThresholds = FullCourseConfig.validThresholds(thresholds(p.getProperty("tierThresholds")));
-        slotMilestones = FullCourseConfig.validMilestones(thresholds(p.getProperty("slotMilestones")));
+        keepVanillaHunger = bool(p, "keepVanillaHunger", d.keepVanillaHunger());
+        recoveryDelaySeconds = clamp(p, "recoveryDelaySeconds", d.recoveryDelaySeconds(), 0, 600);
+        recoveryIntervalTicks = clamp(p, "recoveryIntervalTicks", d.recoveryIntervalTicks(), 0, 12000);
+        startingMealSlots = clamp(p, "startingMealSlots", d.startingMealSlots(), 1, 16);
+        maxMealSlots = clamp(p, "maxMealSlots", d.maxMealSlots(), 1, 16);
+        keepMealsOnDeath = bool(p, "keepMealsOnDeath", d.keepMealsOnDeath());
+        durationMultiplier = clamp(p, "durationMultiplier", d.durationMultiplier());
+        tierThresholds = FullCourseConfig.validThresholds(numbers(p, "tierThresholds"));
+        slotMilestones = FullCourseConfig.validMilestones(numbers(p, "slotMilestones"));
     }
 
     /** The defaults, as a new file holds them. */
@@ -61,39 +61,52 @@ public final class PropertiesConfig implements FullCourseConfig.Source {
         return p;
     }
 
-    private static boolean bool(String value, boolean fallback) {
+    private static boolean bool(Properties p, String key, boolean fallback) {
+        String value = p.getProperty(key);
         if (value == null) return fallback;
         String v = value.trim();
         if (v.equalsIgnoreCase("true")) return true;
         if (v.equalsIgnoreCase("false")) return false;
+        FullCourseConfig.warnOnce(key, "\"" + value + "\"", String.valueOf(fallback));
         return fallback;
     }
 
-    private static int clamp(String value, int fallback, int min, int max) {
+    private static int clamp(Properties p, String key, int fallback, int min, int max) {
+        String value = p.getProperty(key);
         if (value == null) return fallback;
         try {
-            return Math.clamp(Integer.parseInt(value.trim()), min, max);
+            int v = Integer.parseInt(value.trim());
+            int clamped = Math.clamp(v, min, max);
+            if (clamped != v) FullCourseConfig.warnOnce(key, value.trim(), clamped + " (" + min + " to " + max + ")");
+            return clamped;
         } catch (NumberFormatException e) {
+            FullCourseConfig.warnOnce(key, "\"" + value + "\"", String.valueOf(fallback));
             return fallback;
         }
     }
 
-    private static double clamp(String value, double fallback) {
+    private static double clamp(Properties p, String key, double fallback) {
+        String value = p.getProperty(key);
         if (value == null) return fallback;
         try {
             double v = Double.parseDouble(value.trim());
-            return Double.isFinite(v) ? Math.clamp(v, 0.05, 20.0) : fallback;
+            double clamped = Double.isFinite(v) ? Math.clamp(v, 0.05, 20.0) : fallback;
+            if (clamped != v) FullCourseConfig.warnOnce(key, value.trim(), clamped + " (0.05 to 20)");
+            return clamped;
         } catch (NumberFormatException e) {
+            FullCourseConfig.warnOnce(key, "\"" + value + "\"", String.valueOf(fallback));
             return fallback;
         }
     }
 
-    private static int[] thresholds(String value) {
+    /** A comma-separated list of whole numbers; null when the key is missing, empty when it isn't a list of numbers. */
+    private static int[] numbers(Properties p, String key) {
+        String value = p.getProperty(key);
         if (value == null) return null;
         try {
             return Arrays.stream(value.split(",")).mapToInt(s -> Integer.parseInt(s.trim())).toArray();
         } catch (NumberFormatException e) {
-            return null;
+            return new int[0];
         }
     }
 

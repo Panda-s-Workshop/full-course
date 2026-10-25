@@ -49,7 +49,8 @@ slots always match the server.
 - NeoForge: `config/fullcourse-synced.toml`, created with the defaults and a comment for each key on first start.
 - Fabric: `config/fullcourse.properties`, created the same way. It is read once at startup.
 
-Restart the server (or the game, in single player) after editing either file. NeoForge's in-game config screen marks
+Restart the server (or the game, in single player) after editing either file. A value that can't be used is replaced by
+the nearest allowed one or the default, and the log names the key. NeoForge's in-game config screen marks
 these keys the same way: they take effect on the next world load.
 
 The `natural_health_regeneration` gamerule works as in vanilla: turned off (as UHC packs do), nothing heals on its own,

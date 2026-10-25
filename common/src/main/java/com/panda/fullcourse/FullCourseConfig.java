@@ -3,6 +3,9 @@ package com.panda.fullcourse;
 import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.logic.Tier;
 import io.netty.buffer.ByteBuf;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.network.codec.StreamCodec;
 
 /** The mod's settings. Each loader keeps them in its own config system and plugs it in with {@link #use}. */
@@ -178,11 +181,11 @@ public final class FullCourseConfig {
      * would leave the tier between them with no foods.
      */
     public static int[] validThresholds(int[] t) {
-        if (t == null || t.length != 5 || t[0] < 1 || t[4] > 999) return Tier.DEFAULT_THRESHOLDS.clone();
-        for (int i = 1; i < t.length; i++) {
-            if (t[i] <= t[i - 1]) return Tier.DEFAULT_THRESHOLDS.clone();
-        }
-        return t.clone();
+        boolean valid = t != null && t.length == 5 && t[0] >= 1 && t[4] <= 999;
+        for (int i = 1; valid && i < t.length; i++) valid = t[i] > t[i - 1];
+        if (valid) return t.clone();
+        if (t != null) warnOnce("tierThresholds", Arrays.toString(t), Arrays.toString(Tier.DEFAULT_THRESHOLDS));
+        return Tier.DEFAULT_THRESHOLDS.clone();
     }
 
     /** Dish counts for the third, fourth and fifth meal slots; the defaults if the configured list is malformed. */
@@ -193,8 +196,18 @@ public final class FullCourseConfig {
     /** {@code m} when it holds three counts from 1 to 9999, the fifth's not below the fourth's, otherwise the defaults. */
     public static int[] validMilestones(int[] m) {
         if (m == null || m.length != 3 || m[0] < 1 || m[1] < 1 || m[2] < m[1] || m[2] > 9999 || m[0] > 9999) {
+            if (m != null) warnOnce("slotMilestones", Arrays.toString(m), Arrays.toString(Milestones.DEFAULT_TARGETS));
             return Milestones.DEFAULT_TARGETS.clone();
         }
         return m.clone();
+    }
+
+    private static final Set<String> WARNED = ConcurrentHashMap.newKeySet();
+
+    /** Logs once per key and value that a configured value wasn't usable and what is used instead. */
+    public static void warnOnce(String key, String value, String using) {
+        if (WARNED.add(key + "=" + value)) {
+            FullCourse.LOGGER.warn("Full Course: config key {} has {}, which isn't valid; using {}", key, value, using);
+        }
     }
 }
