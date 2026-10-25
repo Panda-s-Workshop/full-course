@@ -86,6 +86,8 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
     }
 
     private static final int STARS_W = 50;
+    /** The oven's and crock's width: five stars centred under the output slot at x 79 end inside it. */
+    private static final int WIDE = 112;
     /** A widget tooltip's width, in lines no wider than this. */
     private static final int TOOLTIP_WIDTH = 160;
 
@@ -148,7 +150,7 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
     /** Oven: up to four ingredients baked with fuel. */
     static final class Baking extends KitchenCategory<BakingRecipe> {
         Baking(IRecipeHolderType<BakingRecipe> type, ItemLike block, IGuiHelper gui) {
-            super(type, "oven", block, gui, 100, 42);
+            super(type, "oven", block, gui, WIDE, 42);
         }
 
         @Override
@@ -169,7 +171,7 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
     /** Crock: up to four ingredients sealed for a while. */
     static final class Fermenting extends KitchenCategory<FermentingRecipe> {
         Fermenting(IRecipeHolderType<FermentingRecipe> type, ItemLike block, IGuiHelper gui) {
-            super(type, "crock", block, gui, 100, 42);
+            super(type, "crock", block, gui, WIDE, 42);
         }
 
         @Override
