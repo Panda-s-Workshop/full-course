@@ -56,7 +56,7 @@ public final class RecipeHints {
             Component from = recipe.isEmpty() ? (wild(next) ? Component.translatable(useKey(next)) : null) : recipe.getFirst();
             if (from == null) continue;
             out.add(Component.translatable("hint.fullcourse.from", Component.translatable(next.getDescriptionId()), from)
-                    .withStyle(ChatFormatting.DARK_GRAY));
+                    .withStyle(ChatFormatting.GRAY));
             queue.addAll(made(next));
         }
         return out;
