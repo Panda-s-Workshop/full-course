@@ -87,6 +87,11 @@ public final class FoodRules {
                 cue(player, ModSounds.MEAL_START);
                 FoodAdvancements.onMeal(player, profile.tier(), s.tasted());
             }
+        } else if (!FullCourseConfig.keepVanillaHunger()) {
+            // with no food bar to watch, say why nothing filled a slot
+            Component name = dish.getName(new ItemStack(dish));
+            player.sendSystemMessage(Component.translatable(profile.remedy() ? "message.fullcourse.no_meal.remedy" : "message.fullcourse.no_meal.raw", name)
+                    .withStyle(ChatFormatting.GRAY), true);
         }
         set(player, before, s);
         Benefits.apply(player, s.meals().strongest());
@@ -122,6 +127,10 @@ public final class FoodRules {
         restoreHealth(player);
         FoodState before = state(player);
         FoodState s = before.withMeals(before.meals().expire(now));
+        // a meal of a food whose mod was removed ends: nothing can show it
+        if (s.meals().active().stream().anyMatch(m -> !BuiltInRegistries.ITEM.containsKey(m.dish()))) {
+            s = s.withMeals(new Meals<>(s.meals().active().stream().filter(m -> BuiltInRegistries.ITEM.containsKey(m.dish())).toList()));
+        }
         if (s.meals().active().size() < before.meals().active().size()) cue(player, ModSounds.MEAL_END);
         if (now % SLOT_CHECK_TICKS == 0) s = unlockSlots(player, s);
         if (!FullCourseConfig.keepVanillaHunger()) {
