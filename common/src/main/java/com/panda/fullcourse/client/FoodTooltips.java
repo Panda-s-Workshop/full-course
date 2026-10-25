@@ -79,6 +79,10 @@ public final class FoodTooltips {
             lines.addAll(1, foodLines);
             // above FoodText's "Shift: recipe chain" line, the last when Shift is up
             foodEnd = 1 + foodLines.size() - (!shift && p.steps() > 0 ? 1 : 0);
+            // under the stars: while Queasy, a meal food eaten now is spent on its heal alone
+            if (p.givesMeal() && mc.player != null && mc.player.hasEffect(net.minecraft.world.effect.MobEffects.HUNGER)) {
+                lines.add(Math.min(2, lines.size()), Component.translatable("tooltip.fullcourse.queasy").withStyle(ChatFormatting.GREEN));
+            }
             // under the stars: an untasted dish that would move the next meal slot along, as the journal marks it
             if (!tasted && mc.player != null
                     && JournalScreen.countsToward(JournalScreen.nextSlot(Services.PLATFORM.foodState(mc.player)), FoodProfiles.clientTastedAs(stack.getItem()))) {

@@ -331,6 +331,7 @@
   "tooltip.fullcourse.needs_hunger": " · does nothing without hunger",
   "tooltip.fullcourse.no_recovery": " · does nothing with vanilla hunger",
   "tooltip.fullcourse.onion.use": "Grows wild in plains, meadows, forests, taiga and savannas · plant on farmland",
+  "tooltip.fullcourse.queasy": "Queasy: eaten now, it heals but gives no meal",
   "tooltip.fullcourse.raw": "Heals only. Made into a dish, it gives a meal",
   "tooltip.fullcourse.raw_only": "Heals only, no meal",
   "tooltip.fullcourse.recovery_off": " · Recovery is off here",
