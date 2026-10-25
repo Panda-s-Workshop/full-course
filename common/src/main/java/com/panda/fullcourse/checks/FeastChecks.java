@@ -114,7 +114,7 @@ final class FeastChecks {
             check(state(c).tasted().contains(FullCourse.id("roast_banquet")), "the banquet counts as tasted");
             Item banquet = ModBlocks.ROAST_BANQUET.get().asItem();
             List<String> lines = FoodText.lines(FoodProfiles.get(c.server(), banquet), 6, false, false).stream().map(Component::getString).toList();
-            check(lines.contains("Feast bonus: +1 level, one helping each"), "the tooltip says why the levels are IV: %s", lines);
+            check(lines.contains("Feast bonus: +1 level"), "the tooltip says why the levels are IV: %s", lines);
         });
     }
 

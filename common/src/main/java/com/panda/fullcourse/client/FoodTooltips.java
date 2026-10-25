@@ -3,6 +3,7 @@ package com.panda.fullcourse.client;
 import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.FoodProfiles;
+import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.food.FoodTags;
 import com.panda.fullcourse.food.FoodText;
 import com.panda.fullcourse.food.Profile;
@@ -70,9 +71,10 @@ public final class FoodTooltips {
             boolean tasted = mc.player != null
                     && Services.PLATFORM.foodState(mc.player).tasted().contains(BuiltInRegistries.ITEM.getKey(FoodProfiles.clientTastedAs(stack.getItem())));
             var component = stack.get(DataComponents.FOOD);
-            // a feast heals per serving, not as an item
+            // a feast or cake heals per serving or slice, not as an item
             int nutrition = component != null ? component.nutrition()
-                    : stack.getItem() instanceof BlockItem b && b.getBlock() instanceof FeastBlock feast ? feast.serving() : 0;
+                    : stack.getItem() instanceof BlockItem b && b.getBlock() instanceof FeastBlock feast ? feast.serving()
+                    : stack.is(net.minecraft.world.item.Items.CAKE) ? FoodRules.CAKE_SLICE_NUTRITION : 0;
             List<Component> foodLines = wrap(FoodText.lines(p, nutrition, shift, tasted));
             lines.addAll(1, foodLines);
             // above FoodText's "Shift: recipe chain" line, the last when Shift is up
