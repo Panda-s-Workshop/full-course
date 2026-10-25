@@ -40,7 +40,7 @@ public class CookingPotBlock extends Block implements EntityBlock {
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty COOKING = BooleanProperty.create("cooking");
     /** The pot 12 x 9 x 12 px, its handles out to the sides along the facing's axis. */
-    /** Bubbles bursting on the soup, in the soup texture's light orange (vanilla's bubble pop is water-blue). */
+    /** Bubbles bursting on a soup with no colour of its own: the soup texture's light orange. */
     private static final DustParticleOptions SIMMER = new DustParticleOptions(0xE8A253, 0.6F);
     private static final Map<Direction, VoxelShape> SHAPES = Shapes.rotateHorizontal(
             Shapes.or(Block.box(2, 0, 2, 14, 9, 14), Block.box(0, 6, 6, 16, 8, 10)));
@@ -103,13 +103,21 @@ public class CookingPotBlock extends Block implements EntityBlock {
         return AbstractContainerMenu.getRedstoneSignalFromBlockEntity(level.getBlockEntity(pos));
     }
 
+    /** Bubbles in the soup's own colour, a third of the way to white so they show on it. */
+    private static DustParticleOptions simmer(Level level, BlockPos pos) {
+        if (!(level.getBlockEntity(pos) instanceof CookingPotBlockEntity pot)) return SIMMER;
+        int c = pot.soupColor();
+        int r = (c >> 16) & 0xFF, g = (c >> 8) & 0xFF, b = c & 0xFF;
+        return new DustParticleOptions((r + (255 - r) / 3) << 16 | (g + (255 - g) / 3) << 8 | (b + (255 - b) / 3), 0.6F);
+    }
+
     /** Steam over a heated pot; bubbles and a simmer while it cooks. */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         double x = pos.getX() + 0.5, y = pos.getY() + 0.6, z = pos.getZ() + 0.5;
         if (state.getValue(COOKING)) {
             if (random.nextInt(3) == 0) {
-                level.addParticle(SIMMER, x + (random.nextDouble() - 0.5) * 0.5, y - 0.02, z + (random.nextDouble() - 0.5) * 0.5, 0, 0, 0);
+                level.addParticle(simmer(level, pos), x + (random.nextDouble() - 0.5) * 0.5, y - 0.02, z + (random.nextDouble() - 0.5) * 0.5, 0, 0, 0);
             }
             if (random.nextInt(2) == 0) {
                 level.addParticle(ParticleTypes.WHITE_SMOKE, x + (random.nextDouble() - 0.5) * 0.4, y + 0.1, z + (random.nextDouble() - 0.5) * 0.4, 0, 0.02, 0);
