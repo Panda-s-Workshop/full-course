@@ -175,6 +175,20 @@ final class ConfigChecks {
         } finally {
             FoodProfiles.reset();
         }
+        // a dish whose families a file sets gives no more of them than its tier allows: the banquet at one star gives one
+        var low = new FullCourseConfig.Snapshot(false, D.recoveryDelaySeconds(), D.recoveryIntervalTicks(), D.startingMealSlots(),
+                D.maxMealSlots(), D.keepMealsOnDeath(), D.durationMultiplier(), new int[] {1, 100, 101, 102, 103});
+        try {
+            FullCourseConfig.with(low, () -> {
+                FoodProfiles.reset();
+                var banquet = profile(c, com.panda.fullcourse.registry.ModItems.item("roast_banquet"));
+                check(banquet.tier() == Tier.SIMPLE, "the banquet is %s with thresholds 1, 100.., expected Simple", banquet.tier());
+                check(banquet.families().equals(List.of(com.panda.fullcourse.logic.Family.BRAWN)), "a one-star banquet gives %s, expected its file's first family",
+                        banquet.families());
+            });
+        } finally {
+            FoodProfiles.reset();
+        }
         Tier tier = profile(c, Items.COOKED_BEEF).tier();
         check(tier == Tier.SIMPLE, "cooked beef is %s again with the default thresholds, expected Simple", tier);
         check(FoodProfiles.anyFeast(c.server()), "the feasts rate Feast with the default thresholds");

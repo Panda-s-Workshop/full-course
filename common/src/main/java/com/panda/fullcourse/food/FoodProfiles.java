@@ -255,7 +255,8 @@ public final class FoodProfiles {
             if (remedy) {
                 families = List.of();
             } else if (setFamilies.isPresent()) {
-                families = setFamilies.get();
+                // as written, up to the tier's count: a file written for a Gourmet dish still fits when thresholds make it Hearty
+                families = setFamilies.get().subList(0, Math.min(setFamilies.get().size(), tier.benefits()));
             } else {
                 families = TierScorer.benefits(dish, score.leaves(), FoodProfiles::groupsOf, dish.builtInRegistryHolder().is(FoodTags.SOUPS),
                         tier.benefits());
