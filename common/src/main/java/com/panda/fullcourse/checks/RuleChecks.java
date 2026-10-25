@@ -40,6 +40,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -106,6 +107,7 @@ public final class RuleChecks {
         CHECKS.put("end_exit_keeps_vigor_hearts", RuleChecks::endExitKeepsVigorHearts);
         CHECKS.put("vanilla_tiers", RuleChecks::vanillaTiers);
         CHECKS.put("benefit_attribute_applied", RuleChecks::benefitApplied);
+        CHECKS.put("family_numbers_at_four", RuleChecks::familyNumbersAtFour);
         CHECKS.put("benefit_removed_on_expiry", RuleChecks::benefitRemovedOnExpiry);
         CHECKS.put("balance_caps", RuleChecks::balanceCaps);
         CHECKS.put("saturation_heals", RuleChecks::saturationHeals);
@@ -553,6 +555,41 @@ public final class RuleChecks {
         eat(c, Items.PUMPKIN_PIE, c.t()); // Prepared: Vigor I, Fortune I
         modifier(c, Attributes.MAX_HEALTH, Family.VIGOR, 2.0);
         modifier(c, Attributes.LUCK, Family.FORTUNE, 1.0);
+    }
+
+    /**
+     * Each family at level IV, read back from the player's attributes as the design's table gives it: added amounts
+     * as the value over the base, multiplied ones as the value's share of the base.
+     */
+    private static void familyNumbersAtFour(Ctx c) {
+        Player p = c.player();
+        record Expect(Family family, Holder<Attribute> attribute, double value, boolean share) {}
+        List<Expect> table = List.of(
+                new Expect(Family.BRAWN, Attributes.ATTACK_DAMAGE, 4, false),
+                new Expect(Family.TIDE, Attributes.OXYGEN_BONUS, 4, false),
+                new Expect(Family.TIDE, Attributes.WATER_MOVEMENT_EFFICIENCY, 0.60, false),
+                new Expect(Family.VIGOR, Attributes.MAX_HEALTH, 8, false),
+                new Expect(Family.SWIFT, Attributes.MOVEMENT_SPEED, 1.20, true),
+                new Expect(Family.DILIGENCE, Attributes.BLOCK_BREAK_SPEED, 1.40, true),
+                new Expect(Family.FORTUNE, Attributes.LUCK, 4, false),
+                new Expect(Family.FORTITUDE, Attributes.ARMOR, 4, false),
+                new Expect(Family.EMBER, Attributes.BURNING_TIME, 0.20, true),
+                new Expect(Family.LIGHTFOOT, Attributes.SAFE_FALL_DISTANCE, 8, false),
+                new Expect(Family.LIGHTFOOT, Attributes.JUMP_STRENGTH, 1.20, true),
+                new Expect(Family.MENDING, ModAttributes.RECOVERY_RATE.holder(), 2.0, false));
+        for (Family f : Family.values()) {
+            if (f == Family.NIGHT_EYE) continue; // night vision, no attribute: night_eye_gives_night_vision
+            check(table.stream().anyMatch(e -> e.family() == f), "%s has no expected numbers", f);
+        }
+        for (Expect e : table) {
+            AttributeInstance instance = p.getAttribute(e.attribute());
+            Benefits.apply(p, Map.of(e.family(), 4));
+            double base = instance.getBaseValue();
+            double got = e.share() ? instance.getValue() / base : instance.getValue() - base;
+            Benefits.apply(p, Map.of());
+            check(Math.abs(got - e.value()) < 1e-6, "%s IV on %s: %s, expected %s", e.family(), e.attribute().getRegisteredName(), got, e.value());
+            check(instance.getValue() == base, "%s removed leaves %s at %s, not its base %s", e.family(), e.attribute().getRegisteredName(), instance.getValue(), base);
+        }
     }
 
     private static void modifier(Ctx c, Holder<Attribute> attribute, Family family, double amount) {
