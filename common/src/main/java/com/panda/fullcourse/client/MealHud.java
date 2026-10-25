@@ -32,8 +32,11 @@ public final class MealHud {
     public static final Identifier LAYER = FullCourse.id("meals");
     /** Height a row takes, including the gap above it, for the loaders' row stacking. */
     public static final int HEIGHT = 20;
+    static final int FRAME = 18;
     /** The held-food marker's height above the top row ({@link #marker}): what stacks above keeps clear of it. */
     public static final int MARKER_ROOM = 4;
+    /** From one row's top to the next row's: a frame and room for the marker over the lower row's slots. */
+    public static final int ROW_STEP = FRAME + MARKER_ROOM;
     /** Frames per row: a sixth would reach over the hearts. */
     static final int PER_ROW = 5;
     /** The top of the frames as last drawn (for checks). */
@@ -45,14 +48,13 @@ public final class MealHud {
 
     /** What the rows add above the food row's place: their height plus the player's {@code mealRowOffset}. */
     public static int lift() {
-        return HEIGHT * rows() + ClientOptions.mealRowOffset();
+        return HEIGHT + ROW_STEP * (rows() - 1) + ClientOptions.mealRowOffset();
     }
 
     /** Rows of frames for the server's most slots. */
     public static int rows() {
         return (FullCourseConfig.maxMealSlots() + PER_ROW - 1) / PER_ROW;
     }
-    static final int FRAME = 18;
     /** A meal's ring blinks for its last tenth, but never less than this many ticks. */
     static final int ENDING_TICKS = 200;
     /** The marker over a meal the held food would replace. */
@@ -85,7 +87,7 @@ public final class MealHud {
     public static boolean extract(GuiGraphicsExtractor g, int bottom) {
         if (!active()) return false;
         bottom -= ClientOptions.mealRowOffset();
-        lastTop = bottom - FRAME - (rows() - 1) * HEIGHT;
+        lastTop = bottom - FRAME - (rows() - 1) * ROW_STEP;
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         FoodState state = Services.PLATFORM.foodState(player);
@@ -98,7 +100,7 @@ public final class MealHud {
         Meals.Target target = preview(player, state);
         for (int i = 0; i < max; i++) {
             int col = i % PER_ROW;
-            int x = right - (col + 1) * FRAME - col, top = firstTop - (i / PER_ROW) * HEIGHT;
+            int x = right - (col + 1) * FRAME - col, top = firstTop - (i / PER_ROW) * ROW_STEP;
             if (i >= slots) {
                 lockedFrame(g, x, top);
                 continue;
