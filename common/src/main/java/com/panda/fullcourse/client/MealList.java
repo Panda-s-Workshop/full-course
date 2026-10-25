@@ -128,6 +128,12 @@ public final class MealList {
             float done = Math.min(next.needsFeast() ? 0.95F : 1F, next.have() / (float) next.need());
             g.fill(x + PAD, cy + 13, x + w - PAD, cy + 16, 0xFF3A3A3A);
             g.fill(x + PAD, cy + 13, x + PAD + Math.round((w - 2 * PAD) * done), cy + 16, counted.color());
+            // the rule behind the numbers, as the journal says it
+            if (mouseX >= x && mouseX < x + w && mouseY >= cy && mouseY < cy + 18) {
+                Component rule = Component.translatable(next.needsFeast() ? "gui.fullcourse.journal.rule_feast" : "gui.fullcourse.journal.rule",
+                        state.slots() + 1, next.need(), "★".repeat(counted.stars()));
+                g.setTooltipForNextFrame(font, font.split(rule, 200), mouseX, mouseY);
+            }
         }
         if (hovered != null) g.setTooltipForNextFrame(font, hovered, mouseX, mouseY);
     }
