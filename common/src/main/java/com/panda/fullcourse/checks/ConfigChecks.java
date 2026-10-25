@@ -66,6 +66,19 @@ final class ConfigChecks {
             c.player().setHealth(10F);
             eat(c, Items.BREAD, t + 400);
             check(dishes(c).equals(List.of(id(Items.BREAD))), "meals still come with vanilla hunger: %s", dishes(c));
+            // the bar decides when cake is eaten, as in vanilla: no helping rule, two slices in a row for a hungry player
+            var pos = c.spot();
+            var before = c.level().getBlockState(pos);
+            c.level().setBlock(pos, net.minecraft.world.level.block.Blocks.CAKE.defaultBlockState(), 3);
+            try {
+                food.setFoodLevel(10);
+                var hit = new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos), net.minecraft.core.Direction.UP, pos, false);
+                for (int i = 0; i < 2; i++) c.level().getBlockState(pos).useWithoutItem(c.level(), c.player(), hit);
+                int bites = c.level().getBlockState(pos).getValue(net.minecraft.world.level.block.CakeBlock.BITES);
+                check(bites == 2, "a hungry player with vanilla hunger eats two slices in a row, bites %s", bites);
+            } finally {
+                c.level().setBlock(pos, before, 3);
+            }
         });
     }
 
