@@ -220,6 +220,11 @@ final class KitchenChecks {
         check(missing.isEmpty(), "no recipe makes %s", missing);
         check(made.contains(ModItems.CUTTING_BOARD.get()) && made.contains(ModItems.COOKING_POT.get()) && made.contains(ModItems.BRICK_OVEN.get())
                 && made.contains(ModItems.FERMENTING_CROCK.get()), "the kitchen blocks are craftable");
+        // our soups and pies are in the shared tags other mods' recipes take
+        var soup = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "foods/soup"));
+        var pie = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "foods/pie"));
+        check(item("fish_chowder").builtInRegistryHolder().is(soup) && item("apple_pie").builtInRegistryHolder().is(pie),
+                "fish chowder is a c:foods/soup and apple pie a c:foods/pie");
     }
 
     /** Every dish's tier, scored on the real recipes, is its designed tier; its families are the design's. */
