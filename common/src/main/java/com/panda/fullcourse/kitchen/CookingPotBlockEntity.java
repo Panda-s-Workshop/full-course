@@ -1,6 +1,7 @@
 package com.panda.fullcourse.kitchen;
 
 import com.panda.fullcourse.food.FoodTags;
+import com.panda.fullcourse.logic.ShortHalves;
 import com.panda.fullcourse.registry.ModBlockEntities;
 import com.panda.fullcourse.registry.ModRecipes;
 import com.panda.fullcourse.registry.ModSounds;
@@ -54,8 +55,11 @@ public class CookingPotBlockEntity extends BaseContainerBlockEntity implements W
     private static final int[] TOP = {0, 1, 2, 3, 4, 5};
     private static final int[] SIDE = {CONTAINER};
     private static final int[] BOTTOM = {OUTPUT, 0, 1, 2, 3, 4, 5};
-    /** Data slots for the menu: progress, the recipe's time, heated (0/1), {@link Status}, the container a dish needs. */
-    public static final int DATA_PROGRESS = 0, DATA_TIME = 1, DATA_HEATED = 2, DATA_STATUS = 3, DATA_NEEDS = 4, DATA_COUNT = 5;
+    /**
+     * Data slots for the menu: progress, the recipe's time, heated (0/1), {@link Status}, and the container a dish needs
+     * as its raw item id in two halves: a data slot travels as a short, and a big pack has more items than one holds.
+     */
+    public static final int DATA_PROGRESS = 0, DATA_TIME = 1, DATA_HEATED = 2, DATA_STATUS = 3, DATA_NEEDS = 4, DATA_NEEDS_HIGH = 5, DATA_COUNT = 6;
 
     /** What the pot is doing, for its screen: the reason it isn't cooking, if it isn't. */
     public enum Status { EMPTY, COOKING, NO_HEAT, NEEDS_CONTAINER, OUTPUT_FULL, NO_RECIPE }
@@ -81,7 +85,8 @@ public class CookingPotBlockEntity extends BaseContainerBlockEntity implements W
                 case DATA_TIME -> time;
                 case DATA_HEATED -> heated ? 1 : 0;
                 case DATA_STATUS -> status.ordinal();
-                case DATA_NEEDS -> needs;
+                case DATA_NEEDS -> ShortHalves.low(needs);
+                case DATA_NEEDS_HIGH -> ShortHalves.high(needs);
                 default -> 0;
             };
         }
@@ -93,7 +98,8 @@ public class CookingPotBlockEntity extends BaseContainerBlockEntity implements W
                 case DATA_TIME -> time = value;
                 case DATA_HEATED -> heated = value != 0;
                 case DATA_STATUS -> status = Status.values()[Math.floorMod(value, Status.values().length)];
-                case DATA_NEEDS -> needs = value;
+                case DATA_NEEDS -> needs = ShortHalves.join(value, ShortHalves.high(needs));
+                case DATA_NEEDS_HIGH -> needs = ShortHalves.join(ShortHalves.low(needs), value);
                 default -> { }
             }
         }

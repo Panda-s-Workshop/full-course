@@ -70,7 +70,7 @@ public class CookingPotMenu extends AbstractContainerMenu {
 
     /** The container the found recipe is waiting for, or empty. */
     public ItemStack needs() {
-        int id = data.get(CookingPotBlockEntity.DATA_NEEDS);
+        int id = com.panda.fullcourse.logic.ShortHalves.join(data.get(CookingPotBlockEntity.DATA_NEEDS), data.get(CookingPotBlockEntity.DATA_NEEDS_HIGH));
         return id < 0 ? ItemStack.EMPTY : new ItemStack(BuiltInRegistries.ITEM.byId(id));
     }
 
