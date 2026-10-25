@@ -262,7 +262,7 @@ public final class FoodProfiles {
                         tier.benefits());
             }
             out.put(item, new Profile(tier, score.score(), score.depth(), score.stations().size(), score.leaves().size(), families, remedy,
-                    usedIn.contains(item)));
+                    usedIn.contains(dish)));
         }
         return Collections.unmodifiableMap(out);
     }
