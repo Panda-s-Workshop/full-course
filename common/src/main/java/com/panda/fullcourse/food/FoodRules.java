@@ -100,7 +100,8 @@ public final class FoodRules {
      * that rates dishes higher catches up.
      */
     private static FoodState unlockSlots(ServerPlayer player, FoodState s) {
-        int reached = Milestones.reached(Tasting.count(s.tasted(), item -> FoodProfiles.get(player.level().getServer(), item)));
+        int reached = Milestones.reached(Tasting.count(s.tasted(), item -> FoodProfiles.get(player.level().getServer(), item)),
+                FullCourseConfig.slotMilestones());
         if (reached <= s.bonusSlots()) return s;
         for (int k = s.bonusSlots(); k < reached; k++) {
             if (FullCourseConfig.startingMealSlots() + k + 1 <= FullCourseConfig.maxMealSlots()) FoodAdvancements.award(player, "slot_" + (k + 3));

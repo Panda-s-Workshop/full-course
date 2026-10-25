@@ -1,5 +1,6 @@
 package com.panda.fullcourse;
 
+import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.logic.Tier;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -31,6 +32,11 @@ public final class FullCourseConfig {
 
         /** Lowest scores of tiers 1..5. */
         int[] tierThresholds();
+
+        /** Dishes to taste for the third, fourth and fifth meal slots. */
+        default int[] slotMilestones() {
+            return Milestones.DEFAULT_TARGETS.clone();
+        }
     }
 
     public static final Source DEFAULTS = new Source() {
@@ -46,7 +52,15 @@ public final class FullCourseConfig {
 
     /** The values a server sends its clients, so HUD, slots and tooltips match the server's. */
     public record Snapshot(boolean keepVanillaHunger, int recoveryDelaySeconds, int recoveryIntervalTicks, int startingMealSlots,
-                           int maxMealSlots, boolean keepMealsOnDeath, double durationMultiplier, int[] tierThresholds) implements Source {
+                           int maxMealSlots, boolean keepMealsOnDeath, double durationMultiplier, int[] tierThresholds,
+                           int[] slotMilestones) implements Source {
+        /** With the default milestones. */
+        public Snapshot(boolean keepVanillaHunger, int recoveryDelaySeconds, int recoveryIntervalTicks, int startingMealSlots,
+                        int maxMealSlots, boolean keepMealsOnDeath, double durationMultiplier, int[] tierThresholds) {
+            this(keepVanillaHunger, recoveryDelaySeconds, recoveryIntervalTicks, startingMealSlots, maxMealSlots, keepMealsOnDeath,
+                    durationMultiplier, tierThresholds, Milestones.DEFAULT_TARGETS.clone());
+        }
+
         public static final StreamCodec<ByteBuf, Snapshot> STREAM_CODEC = new StreamCodec<>() {
             @Override
             public Snapshot decode(ByteBuf buf) {
@@ -56,7 +70,9 @@ public final class FullCourseConfig {
                 double multiplier = buf.readDouble();
                 int[] thresholds = new int[buf.readUnsignedByte()];
                 for (int i = 0; i < thresholds.length; i++) thresholds[i] = buf.readInt();
-                return new Snapshot(keep, delay, interval, start, max, keepMeals, multiplier, thresholds);
+                int[] milestones = new int[buf.readUnsignedByte()];
+                for (int i = 0; i < milestones.length; i++) milestones[i] = buf.readInt();
+                return new Snapshot(keep, delay, interval, start, max, keepMeals, multiplier, thresholds, milestones);
             }
 
             @Override
@@ -67,13 +83,17 @@ public final class FullCourseConfig {
                 int[] t = s.tierThresholds();
                 buf.writeByte(t.length);
                 for (int value : t) buf.writeInt(value);
+                int[] m = s.slotMilestones();
+                buf.writeByte(m.length);
+                for (int value : m) buf.writeInt(value);
             }
         };
 
-        /** The values {@code s} plays by, thresholds already checked, so a client never reads a list the server rejected. */
+        /** The values {@code s} plays by, lists already checked, so a client never reads a list the server rejected. */
         public static Snapshot of(Source s) {
             return new Snapshot(s.keepVanillaHunger(), s.recoveryDelaySeconds(), s.recoveryIntervalTicks(), s.startingMealSlots(),
-                    s.maxMealSlots(), s.keepMealsOnDeath(), s.durationMultiplier(), validThresholds(s.tierThresholds()));
+                    s.maxMealSlots(), s.keepMealsOnDeath(), s.durationMultiplier(), validThresholds(s.tierThresholds()),
+                    validMilestones(s.slotMilestones()));
         }
     }
 
@@ -153,12 +173,25 @@ public final class FullCourseConfig {
         return validThresholds(source.tierThresholds());
     }
 
-    /** {@code t} when it holds five ascending scores, otherwise the defaults. */
+    /** {@code t} when it holds five ascending scores from 0 to 999, otherwise the defaults. */
     public static int[] validThresholds(int[] t) {
-        if (t == null || t.length != 5) return Tier.DEFAULT_THRESHOLDS.clone();
+        if (t == null || t.length != 5 || t[0] < 0 || t[4] > 999) return Tier.DEFAULT_THRESHOLDS.clone();
         for (int i = 1; i < t.length; i++) {
             if (t[i] < t[i - 1]) return Tier.DEFAULT_THRESHOLDS.clone();
         }
         return t.clone();
+    }
+
+    /** Dish counts for the third, fourth and fifth meal slots; the defaults if the configured list is malformed. */
+    public static int[] slotMilestones() {
+        return validMilestones(source.slotMilestones());
+    }
+
+    /** {@code m} when it holds three counts from 1 to 9999, the fifth's not below the fourth's, otherwise the defaults. */
+    public static int[] validMilestones(int[] m) {
+        if (m == null || m.length != 3 || m[0] < 1 || m[1] < 1 || m[2] < m[1] || m[2] > 9999 || m[0] > 9999) {
+            return Milestones.DEFAULT_TARGETS.clone();
+        }
+        return m.clone();
     }
 }

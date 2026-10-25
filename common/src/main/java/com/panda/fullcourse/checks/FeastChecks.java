@@ -3,6 +3,7 @@ package com.panda.fullcourse.checks;
 import static com.panda.fullcourse.checks.RuleChecks.check;
 
 import com.panda.fullcourse.FullCourse;
+import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.food.FoodState;
@@ -50,6 +51,7 @@ final class FeastChecks {
         checks.put("feast_one_helping", FeastChecks::feastOneHelping);
         checks.put("feast_refuses_queasy", FeastChecks::feastRefusesQueasy);
         checks.put("slot_unlocks_at_milestone", FeastChecks::slotUnlocksAtMilestone);
+        checks.put("config_slot_milestones", FeastChecks::configSlotMilestones);
         checks.put("journal_recipe", FeastChecks::journalRecipe);
         checks.put("tasting_advancements", FeastChecks::tastingAdvancements);
     }
@@ -205,6 +207,21 @@ final class FeastChecks {
 
     private static void taste(RuleChecks.Ctx c, Item item) {
         FoodRules.onEatDish(c.player(), item, 1, c.t());
+    }
+
+    /** {@code slotMilestones} 2,3,4: the second two-star dish already opens the third slot. */
+    private static void configSlotMilestones(RuleChecks.Ctx c) {
+        var d = FullCourseConfig.DEFAULTS;
+        var quick = new FullCourseConfig.Snapshot(false, d.recoveryDelaySeconds(), d.recoveryIntervalTicks(), d.startingMealSlots(),
+                d.maxMealSlots(), d.keepMealsOnDeath(), d.durationMultiplier(), d.tierThresholds(), new int[] {2, 3, 4});
+        FullCourseConfig.with(quick, () -> {
+            List<Item> prepared = foods(c, 2);
+            taste(c, prepared.get(0));
+            check(state(c).slots() == 2, "one two-star dish at a count of 2: still 2 slots, %s", state(c).slots());
+            taste(c, prepared.get(1));
+            check(state(c).slots() == 3, "the second two-star dish opens the third slot at a count of 2: %s", state(c).slots());
+        });
+        Services.PLATFORM.setFoodState(c.player(), FoodState.EMPTY);
     }
 
     /**

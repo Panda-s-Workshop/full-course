@@ -229,7 +229,7 @@ public class JournalScreen extends Screen {
 
     /** The next slot to earn, or {@code NONE} once there is none left (all earned, or the config's maximum reached). */
     public static Milestones.Next nextSlot(FoodState state) {
-        Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()), state.bonusSlots());
+        Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()), state.bonusSlots(), FullCourseConfig.slotMilestones());
         return state.slots() >= FullCourseConfig.maxMealSlots() ? Milestones.Next.NONE : next;
     }
 
@@ -247,7 +247,7 @@ public class JournalScreen extends Screen {
     /** "Meal slot 4" and "9 / 15 ★★★", a bar in the counted tier's colour, and the whole rule on hover. */
     private void milestone(GuiGraphicsExtractor g, FoodState state, int mouseX, int mouseY) {
         Milestones.Count count = Tasting.clientCount(state.tasted());
-        Milestones.Next next = Milestones.next(count, state.bonusSlots());
+        Milestones.Next next = Milestones.next(count, state.bonusSlots(), FullCourseConfig.slotMilestones());
         int y = top + 18;
         if (next == Milestones.Next.NONE || state.slots() >= FullCourseConfig.maxMealSlots()) {
             Component all = Component.translatable("gui.fullcourse.journal.all");

@@ -4,10 +4,11 @@ package com.panda.fullcourse.logic;
  * Meal slots earned by tasting: the third at 8 different dishes of two stars or more, the fourth at 15 of three stars
  * or more, the fifth at 20 of three stars or more plus a serving from a feast. Each milestone needs the one before.
  * A base install has 23 dishes of three stars or more (21 of the mod's and vanilla's rabbit stew and cake), so the
- * fifth slot asks for nearly all of them.
+ * fifth slot asks for nearly all of them. Packs with more dishes move the three counts (config {@code slotMilestones}).
  */
 public final class Milestones {
     public static final int THIRD = 8, FOURTH = 15, FIFTH = 20;
+    public static final int[] DEFAULT_TARGETS = {THIRD, FOURTH, FIFTH};
 
     private Milestones() {}
 
@@ -33,16 +34,25 @@ public final class Milestones {
         public static final Next NONE = new Next(0, 0, 0, 0, false);
     }
 
-    /** How many of the three milestones are reached (0..3), in order. */
+    /** How many of the three milestones are reached (0..3), in order, at the default counts. */
     public static int reached(Count c) {
-        if (c.prepared() < THIRD) return 0;
-        if (c.hearty() < FOURTH) return 1;
-        if (c.hearty() < FIFTH || !c.feast()) return 2;
+        return reached(c, DEFAULT_TARGETS);
+    }
+
+    /** How many of the three milestones are reached (0..3), in order, at {@code targets} (third, fourth, fifth). */
+    public static int reached(Count c, int[] targets) {
+        if (c.prepared() < targets[0]) return 0;
+        if (c.hearty() < targets[1]) return 1;
+        if (c.hearty() < targets[2] || !c.feast()) return 2;
         return 3;
     }
 
     public static Next next(Count c) {
         return next(c, 0);
+    }
+
+    public static Next next(Count c, int earned) {
+        return next(c, earned, DEFAULT_TARGETS);
     }
 
     /**
@@ -58,11 +68,11 @@ public final class Milestones {
      * The next milestone past those reached and those already {@code earned} (slots given by a command, or earned before
      * a datapack rated dishes lower): the one whose slot the player doesn't have yet.
      */
-    public static Next next(Count c, int earned) {
-        return switch (Math.max(reached(c), earned)) {
-            case 0 -> new Next(3, 2, c.prepared(), THIRD, false);
-            case 1 -> new Next(4, 3, c.hearty(), FOURTH, false);
-            case 2 -> new Next(5, 3, c.hearty(), FIFTH, !c.feast());
+    public static Next next(Count c, int earned, int[] targets) {
+        return switch (Math.max(reached(c, targets), earned)) {
+            case 0 -> new Next(3, 2, c.prepared(), targets[0], false);
+            case 1 -> new Next(4, 3, c.hearty(), targets[1], false);
+            case 2 -> new Next(5, 3, c.hearty(), targets[2], !c.feast());
             default -> Next.NONE;
         };
     }

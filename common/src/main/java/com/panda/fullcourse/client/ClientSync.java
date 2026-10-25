@@ -68,7 +68,7 @@ public final class ClientSync {
         Component title = Language.getInstance().has(ordinal)
                 ? Component.translatable("toast.fullcourse.slot.title", Component.translatable(ordinal))
                 : Component.translatable("toast.fullcourse.slot.title_n", slots);
-        Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()), state.bonusSlots());
+        Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()), state.bonusSlots(), FullCourseConfig.slotMilestones());
         Component body = next == Milestones.Next.NONE || slots >= FullCourseConfig.maxMealSlots()
                 ? Component.translatable("toast.fullcourse.slot.last")
                 : Component.translatable(next.needsFeast() ? "toast.fullcourse.slot.next_feast" : "toast.fullcourse.slot.next",

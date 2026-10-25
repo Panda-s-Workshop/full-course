@@ -87,7 +87,8 @@ public final class FullCourseCommand {
                 state.tasted().size()).withStyle(ChatFormatting.BOLD), false);
         if (meals.isEmpty()) source.sendSuccess(() -> Component.translatable("command.fullcourse.meals.none").withStyle(ChatFormatting.GRAY), false);
         for (Meals.Meal<Identifier> meal : meals) source.sendSuccess(() -> mealLine(meal, now), false);
-        Milestones.Next next = Milestones.next(Tasting.count(state.tasted(), item -> FoodProfiles.get(source.getServer(), item)), state.bonusSlots());
+        Milestones.Next next = Milestones.next(Tasting.count(state.tasted(), item -> FoodProfiles.get(source.getServer(), item)), state.bonusSlots(),
+                FullCourseConfig.slotMilestones());
         if (next != Milestones.Next.NONE && state.slots() < FullCourseConfig.maxMealSlots()) {
             Component line = Component.translatable(next.needsFeast() ? "gui.fullcourse.meals.next_feast" : "gui.fullcourse.meals.next",
                     state.slots() + 1, Math.min(next.have(), next.need()), next.need(), "★".repeat(Tier.ofStars(next.stars()).stars()));

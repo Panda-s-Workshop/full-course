@@ -19,7 +19,8 @@ public final class PropertiesConfig implements FullCourseConfig.Source {
              maxMealSlots: the most meal slots the Tasting Journal can unlock (1-16)
              keepMealsOnDeath: keep held meals through death (true/false)
              durationMultiplier: multiplies every meal's duration (0.05-20)
-             tierThresholds: lowest recipe-chain score of tiers 1 to 5, exactly five, ascending, comma-separated""";
+             tierThresholds: lowest recipe-chain score of tiers 1 to 5, exactly five, ascending, comma-separated
+             slotMilestones: different dishes to taste for meal slot 3 (two stars or more), 4 and 5 (three stars or more; 5 also a feast), comma-separated""";
 
     private final boolean keepVanillaHunger;
     private final int recoveryDelaySeconds;
@@ -29,6 +30,7 @@ public final class PropertiesConfig implements FullCourseConfig.Source {
     private final boolean keepMealsOnDeath;
     private final double durationMultiplier;
     private final int[] tierThresholds;
+    private final int[] slotMilestones;
 
     public PropertiesConfig(Properties p) {
         FullCourseConfig.Source d = FullCourseConfig.DEFAULTS;
@@ -40,6 +42,7 @@ public final class PropertiesConfig implements FullCourseConfig.Source {
         keepMealsOnDeath = bool(p.getProperty("keepMealsOnDeath"), d.keepMealsOnDeath());
         durationMultiplier = clamp(p.getProperty("durationMultiplier"), d.durationMultiplier());
         tierThresholds = FullCourseConfig.validThresholds(thresholds(p.getProperty("tierThresholds")));
+        slotMilestones = FullCourseConfig.validMilestones(thresholds(p.getProperty("slotMilestones")));
     }
 
     /** The defaults, as a new file holds them. */
@@ -54,6 +57,7 @@ public final class PropertiesConfig implements FullCourseConfig.Source {
         p.setProperty("keepMealsOnDeath", String.valueOf(d.keepMealsOnDeath()));
         p.setProperty("durationMultiplier", String.valueOf(d.durationMultiplier()));
         p.setProperty("tierThresholds", Arrays.stream(d.tierThresholds()).mapToObj(String::valueOf).collect(Collectors.joining(",")));
+        p.setProperty("slotMilestones", Arrays.stream(d.slotMilestones()).mapToObj(String::valueOf).collect(Collectors.joining(",")));
         return p;
     }
 
@@ -101,4 +105,5 @@ public final class PropertiesConfig implements FullCourseConfig.Source {
     @Override public boolean keepMealsOnDeath() { return keepMealsOnDeath; }
     @Override public double durationMultiplier() { return durationMultiplier; }
     @Override public int[] tierThresholds() { return tierThresholds.clone(); }
+    @Override public int[] slotMilestones() { return slotMilestones.clone(); }
 }

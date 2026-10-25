@@ -61,7 +61,7 @@ public final class MealList {
         long now = player.level().getGameTime();
         List<Meals.Meal<Identifier>> meals = state.meals().active();
         int free = Math.max(0, state.slots() - meals.size());
-        Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()), state.bonusSlots());
+        Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()), state.bonusSlots(), FullCourseConfig.slotMilestones());
         boolean more = next != Milestones.Next.NONE && state.slots() < FullCourseConfig.maxMealSlots();
         Component recovery = recoveryLine(player);
         List<FormattedCharSequence> recoveryLines = recovery == null ? List.of() : font.split(recovery, w - 2 * PAD);
@@ -124,8 +124,9 @@ public final class MealList {
 
     /** "19:59 · III · Brawn, Vigor, Mending": time left, then the level, which applies to every family the meal gives. */
     /**
-     * "Recovery: 1 ♥ every 2.0 s" when {@code fullcourse:recovery_rate} (Mending, another mod, a command) moves Recovery
-     * off its default pace, "Recovery: off" at 0; null at the default pace, or while vanilla hunger is kept.
+     * "Recovery: ½ ❤ every 2.0 s" (each Recovery heal is 1 HP) when {@code fullcourse:recovery_rate} (Mending, another
+     * mod, a command) moves Recovery off its default pace, "Recovery: off" at 0; null at the default pace, or while
+     * vanilla hunger is kept.
      */
     public static Component recoveryLine(LocalPlayer player) {
         if (FullCourseConfig.keepVanillaHunger()) return null;
