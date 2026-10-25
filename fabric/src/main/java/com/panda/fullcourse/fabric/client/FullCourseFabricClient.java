@@ -83,13 +83,11 @@ public final class FullCourseFabricClient implements ClientModInitializer {
             vanilla.extractRenderState(g, delta);
             g.pose().popMatrix();
         });
-        // vanilla's action-bar message (bottom 63 above the screen's bottom) would cover the row once two or more rows of
-        // mount hearts, a second row of slots, or a large mealRowOffset, lift it (row top 48 + 10 per heart row above the
-        // bottom); NeoForge already stacks it above the HUD
+        // vanilla's action-bar message sits just above the held item's name: lifted as far as the name is, so the two
+        // keep vanilla's spacing and the message clears the row too; NeoForge already stacks it above the HUD
         HudElementRegistry.replaceElement(VanillaHudElements.OVERLAY_MESSAGE, vanilla -> (g, delta) -> {
             var player = Minecraft.getInstance().player;
-            int lift = player == null || !MealHud.active() ? 0
-                    : Math.max(0, 10 * MealHud.vehicleHeartRows(player) + MealHud.HEIGHT * (MealHud.rows() - 1) + ClientOptions.mealRowOffset() - 14);
+            int lift = player == null || !MealHud.active() ? 0 : Math.max(0, MealHud.lift() - 10 + 10 * MealHud.vehicleHeartRows(player));
             if (lift == 0) {
                 vanilla.extractRenderState(g, delta);
                 return;
