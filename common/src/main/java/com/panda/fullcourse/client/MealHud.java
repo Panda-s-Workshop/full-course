@@ -5,6 +5,7 @@ import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodState;
 import com.panda.fullcourse.logic.Meals;
+import com.panda.fullcourse.logic.Tier;
 import com.panda.fullcourse.platform.Services;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -19,8 +20,8 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * The meal row where the food bar was: one 18×18 frame per slot, right-aligned to the hotbar's right edge,
- * the dish inside, its frame a ring in the tier's colour that drains clockwise from the top as the time runs out (the
- * icon itself stays clear); a lighter frame with a plate for free slots and dim padlocks for slots the journal hasn't
+ * the dish inside, its frame a ring in the tier's colour that drains clockwise from the top as the time runs out, over
+ * a dim track of the same colour so a meal about to end still shows its tier (the icon itself stays clear); a lighter frame with a plate for free slots and dim padlocks for slots the journal hasn't
  * unlocked yet. Holding a food that gives a meal marks the slot it would take with a small arrow above it: white over
  * the free slot it fills (shown there, dimmed) or its own slot to refresh, red over the meal it would replace (dimmed).
  * Loaders place it and hide the food bar.
@@ -92,10 +93,12 @@ public final class MealHud {
             long left = meal.remaining(now);
             long ending = Math.max(ENDING_TICKS, (meal.end() - meal.start()) / 10);
             boolean blinkOff = left < ending && (now / 5) % 2 == 0;
-            frame(g, x, top, 0xFF262626, 0x88000000);
+            frame(g, x, top, Tier.FRAME_GREY, 0x88000000);
             int lit = Math.round(RING.length * meal.fraction(now));
-            int color = blinkOff ? 0xFFFFFFFF : meal.tier().color();
-            for (int p = RING.length - lit; p < RING.length; p++) g.fill(x + RING[p][0], top + RING[p][1], x + RING[p][0] + 1, top + RING[p][1] + 1, color);
+            int color = blinkOff ? 0xFFFFFFFF : meal.tier().color(), track = meal.tier().trackColor();
+            for (int p = 0; p < RING.length; p++) {
+                g.fill(x + RING[p][0], top + RING[p][1], x + RING[p][0] + 1, top + RING[p][1] + 1, p < RING.length - lit ? track : color);
+            }
             BuiltInRegistries.ITEM.get(meal.dish()).ifPresent(item -> g.item(new ItemStack(item.value()), x + 1, top + 1));
             if (targeted && target.fill() == Meals.Fill.REPLACE) {
                 g.fill(x + 1, top + 1, x + FRAME - 1, top + FRAME - 1, 0x77000000);   // the meal that would go, dimmed

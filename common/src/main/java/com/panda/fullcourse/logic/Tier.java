@@ -74,6 +74,22 @@ public enum Tier {
         };
     }
 
+    /** The dark grey of a meal frame's border, which {@link #trackColor} dims toward. */
+    public static final int FRAME_GREY = 0xFF262626;
+
+    /**
+     * The tier's colour dimmed 60% of the way toward {@link #FRAME_GREY}: the track under a meal's draining ring, so the
+     * part of the time already gone still shows the tier.
+     */
+    public int trackColor() {
+        int c = color(), out = 0xFF000000;
+        for (int shift = 0; shift <= 16; shift += 8) {
+            int ch = (c >> shift) & 0xFF, grey = (FRAME_GREY >> shift) & 0xFF;
+            out |= (grey + Math.round((ch - grey) * 0.4F)) << shift;
+        }
+        return out;
+    }
+
     /** Benefit-minutes: families × level × minutes, the measure the balance curve is pinned on. */
     public int benefitMinutes() {
         return benefits * level * minutes;
