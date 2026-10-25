@@ -1,8 +1,8 @@
 {
   "type": "fullcourse:fermenting",
   "ingredients": [
-    "minecraft:milk_bucket",
-    "minecraft:brown_mushroom"
+    "#c:drinks/milk",
+    "#c:mushrooms"
   ],
   "result": {
     "id": "fullcourse:cheese",

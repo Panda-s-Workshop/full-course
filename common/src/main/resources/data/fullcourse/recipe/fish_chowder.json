@@ -3,7 +3,7 @@
   "ingredients": [
     "fullcourse:fish_fillet",
     "minecraft:baked_potato",
-    "minecraft:milk_bucket",
+    "#c:drinks/milk",
     "fullcourse:broth"
   ],
   "container": "minecraft:bowl",

@@ -76,7 +76,7 @@
         "from": [
           "fullcourse:flour",
           "#c:eggs",
-          "minecraft:milk_bucket",
+          "#c:drinks/milk",
           "minecraft:bowl"
         ]
       }
@@ -206,7 +206,7 @@
       {
         "station": "crock",
         "from": [
-          "minecraft:milk_bucket"
+          "#c:drinks/milk"
         ]
       }
     ]
@@ -218,8 +218,8 @@
       {
         "station": "crock",
         "from": [
-          "minecraft:milk_bucket",
-          "minecraft:brown_mushroom"
+          "#c:drinks/milk",
+          "#c:mushrooms"
         ]
       }
     ]
@@ -245,7 +245,7 @@
       {
         "station": "crock",
         "from": [
-          "minecraft:milk_bucket",
+          "#c:drinks/milk",
           "minecraft:sugar",
           "minecraft:glass_bottle",
           "minecraft:glass_bottle"
@@ -395,7 +395,7 @@
         "station": "pot",
         "from": [
           "minecraft:cocoa_beans",
-          "minecraft:milk_bucket"
+          "#c:drinks/milk"
         ],
         "container": "minecraft:glass_bottle"
       }
@@ -614,7 +614,7 @@
         "from": [
           "fullcourse:fish_fillet",
           "minecraft:baked_potato",
-          "minecraft:milk_bucket",
+          "#c:drinks/milk",
           "fullcourse:broth"
         ],
         "container": "minecraft:bowl"
@@ -877,7 +877,7 @@
         "station": "oven",
         "from": [
           "fullcourse:minced_meat",
-          "minecraft:brown_mushroom",
+          "#c:mushrooms",
           "fullcourse:pastry"
         ]
       }

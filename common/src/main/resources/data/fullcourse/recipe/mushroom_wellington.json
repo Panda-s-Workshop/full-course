@@ -2,7 +2,7 @@
   "type": "fullcourse:baking",
   "ingredients": [
     "fullcourse:minced_meat",
-    "minecraft:brown_mushroom",
+    "#c:mushrooms",
     "fullcourse:pastry"
   ],
   "result": {

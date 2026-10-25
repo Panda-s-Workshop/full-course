@@ -12,7 +12,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#c:eggs"
+            "items": "#c:drinks/milk"
           }
         ]
       }
@@ -22,7 +22,7 @@
       "conditions": {
         "items": [
           {
-            "items": "fullcourse:flour"
+            "items": "#c:eggs"
           }
         ]
       }
@@ -32,7 +32,7 @@
       "conditions": {
         "items": [
           {
-            "items": "minecraft:bowl"
+            "items": "fullcourse:flour"
           }
         ]
       }
@@ -42,7 +42,7 @@
       "conditions": {
         "items": [
           {
-            "items": "minecraft:milk_bucket"
+            "items": "minecraft:bowl"
           }
         ]
       }

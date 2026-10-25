@@ -159,7 +159,7 @@ in it: here it is Queasy, which stops new meals from starting and pauses Recover
 **Biome tags:** `fullcourse:has_wild_onions` and `fullcourse:has_wild_ember_peppers` choose where the wild crops grow.
 
 **Shared tags.** Recipes take `#c:eggs`, `#c:foods/dough`, `#c:foods/cooked_egg`, `#c:foods/raw_meat`,
-`#c:foods/raw_fish` and `#c:crops/onion`, so other mods' items work in them. The mod puts its onion, ember pepper,
+`#c:foods/raw_fish`, `#c:crops/onion`, `#c:drinks/milk` and `#c:mushrooms`, so other mods' items work in them. The mod puts its onion, ember pepper,
 dough, fried egg, grilled fillet and flatbread in the matching `c:` tags, its soups and stews in `c:foods/soup` and its
 pies and tart in `c:foods/pie`.
 

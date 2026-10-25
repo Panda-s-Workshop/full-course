@@ -1,7 +1,7 @@
 {
   "type": "fullcourse:fermenting",
   "ingredients": [
-    "minecraft:milk_bucket"
+    "#c:drinks/milk"
   ],
   "result": {
     "id": "fullcourse:butter",

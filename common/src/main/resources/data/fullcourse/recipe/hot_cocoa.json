@@ -2,7 +2,7 @@
   "type": "fullcourse:cooking",
   "ingredients": [
     "minecraft:cocoa_beans",
-    "minecraft:milk_bucket"
+    "#c:drinks/milk"
   ],
   "container": "minecraft:glass_bottle",
   "result": {

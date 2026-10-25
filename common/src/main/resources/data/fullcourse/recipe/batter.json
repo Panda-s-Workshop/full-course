@@ -4,7 +4,7 @@
   "ingredients": [
     "fullcourse:flour",
     "#c:eggs",
-    "minecraft:milk_bucket",
+    "#c:drinks/milk",
     "minecraft:bowl"
   ],
   "result": {

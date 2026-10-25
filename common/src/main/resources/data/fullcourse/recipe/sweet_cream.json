@@ -1,7 +1,7 @@
 {
   "type": "fullcourse:fermenting",
   "ingredients": [
-    "minecraft:milk_bucket",
+    "#c:drinks/milk",
     "minecraft:sugar",
     "minecraft:glass_bottle",
     "minecraft:glass_bottle"
