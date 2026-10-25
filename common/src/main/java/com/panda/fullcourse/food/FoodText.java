@@ -138,7 +138,7 @@ public final class FoodText {
     }
 
     /** "30", "2.5": one decimal at most, none for a whole number (rounded first: 0.1 × 3 × 100 is 30.000000000000004). */
-    static String number(double v) {
+    public static String number(double v) {
         double r = Math.round(v * 10) / 10.0;
         return r == Math.rint(r) ? Long.toString(Math.round(r)) : String.format(java.util.Locale.ROOT, "%.1f", r);
     }

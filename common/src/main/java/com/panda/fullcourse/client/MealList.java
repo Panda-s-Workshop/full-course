@@ -13,7 +13,6 @@ import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.registry.ModAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -64,8 +63,18 @@ public final class MealList {
         int free = Math.max(0, state.slots() - meals.size());
         Milestones.Next next = Milestones.next(Tasting.clientCount(state.tasted()), state.bonusSlots(), FullCourseConfig.slotMilestones());
         boolean more = next != Milestones.Next.NONE && state.slots() < FullCourseConfig.maxMealSlots();
+        List<FormattedCharSequence> recoveryLines = new ArrayList<>();
         Component recovery = recoveryLine(player);
-        List<FormattedCharSequence> recoveryLines = recovery == null ? List.of() : font.split(recovery, w - 2 * PAD);
+        if (recovery != null && font.width(recovery) > w - 2 * PAD && recoveryInterval(player) > 0) {
+            // split where it reads, not before the unit
+            recoveryLines.addAll(font.split(Component.translatable("gui.fullcourse.meals.recovery_heal"), w - 2 * PAD));
+            recoveryLines.addAll(font.split(Component.translatable("gui.fullcourse.meals.recovery_every",
+                    FoodText.number(recoveryInterval(player) / 20.0)), w - 2 * PAD));
+        } else if (recovery != null) {
+            recoveryLines.addAll(font.split(recovery, w - 2 * PAD));
+        }
+        Component delay = recovery == null ? null : recoveryDelayLine(player);
+        if (delay != null) recoveryLines.addAll(font.split(delay, w - 2 * PAD));
 
         int tx = PAD + 20, room = w - tx - PAD;
         List<List<FormattedCharSequence>> lines = new ArrayList<>();
@@ -124,18 +133,26 @@ public final class MealList {
     }
 
     /**
-     * "Recovery: ½ ❤ every 2.0 s" (each Recovery heal is 1 HP) when {@code fullcourse:recovery_rate} (Mending, another
-     * mod, a command) moves Recovery off its default pace, "Recovery: off" at 0; null at the default pace, or while
-     * vanilla hunger is kept.
+     * "Recovery: ½ ❤ every 4 s" (each Recovery heal is 1 HP) at the pace {@code fullcourse:recovery_rate} (Mending,
+     * another mod, a command) sets, "Recovery: off" when it heals nothing; null while vanilla hunger is kept.
      */
     public static Component recoveryLine(LocalPlayer player) {
         if (FullCourseConfig.keepVanillaHunger()) return null;
-        AttributeInstance attribute = player.getAttribute(ModAttributes.RECOVERY_RATE.holder());
-        double rate = attribute == null ? 1 : attribute.getValue();
-        if (Math.abs(rate - 1) < 1e-6) return null;
-        int interval = Recovery.interval(FullCourseConfig.recoveryIntervalTicks(), rate);
+        int interval = recoveryInterval(player);
         if (interval <= 0) return Component.translatable("gui.fullcourse.meals.recovery_off");
-        return Component.translatable("gui.fullcourse.meals.recovery", String.format(Locale.ROOT, "%.1f", interval / 20.0));
+        return Component.translatable("gui.fullcourse.meals.recovery", FoodText.number(interval / 20.0));
+    }
+
+    /** "Starts 8 s after a hit", under {@link #recoveryLine} while Recovery heals and waits for a delay; else null. */
+    public static Component recoveryDelayLine(LocalPlayer player) {
+        int delay = FullCourseConfig.recoveryDelayTicks();
+        if (FullCourseConfig.keepVanillaHunger() || delay <= 0 || recoveryInterval(player) <= 0) return null;
+        return Component.translatable("gui.fullcourse.meals.recovery_delay", FoodText.number(delay / 20.0));
+    }
+
+    private static int recoveryInterval(LocalPlayer player) {
+        AttributeInstance attribute = player.getAttribute(ModAttributes.RECOVERY_RATE.holder());
+        return Recovery.interval(FullCourseConfig.recoveryIntervalTicks(), attribute == null ? 1 : attribute.getValue());
     }
 
     /** "19:59 · Brawn III, Vigor III, Mending III": time left, then each family at its level, as the action bar says it. */
