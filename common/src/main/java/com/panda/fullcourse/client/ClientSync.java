@@ -72,7 +72,7 @@ public final class ClientSync {
         Component body = next == Milestones.Next.NONE || slots >= FullCourseConfig.maxMealSlots()
                 ? Component.translatable("toast.fullcourse.slot.last")
                 : Component.translatable(next.needsFeast() ? "toast.fullcourse.slot.next_feast" : "toast.fullcourse.slot.next",
-                        next.need(), "★".repeat(next.stars()));
+                        Math.min(next.have(), next.need()), next.need(), "★".repeat(next.stars()));
         mc.gui.toastManager().addToast(new SlotToast(title, body));
         mc.getSoundManager().play(SimpleSoundInstance.forUI(ModSounds.SLOT_UNLOCK.get(), 1F, 1F));
         mc.getSoundManager().play(SimpleSoundInstance.forUI(ModSounds.SLOT_UNLOCK_FANFARE.get(), 1F, 1F));
