@@ -1,6 +1,7 @@
 package com.panda.fullcourse.food;
 
 import com.panda.fullcourse.FullCourseConfig;
+import com.panda.fullcourse.kitchen.FeastBlock;
 import com.panda.fullcourse.logic.Meals;
 import com.panda.fullcourse.logic.Milestones;
 import com.panda.fullcourse.logic.Recovery;
@@ -82,7 +83,7 @@ public final class FoodRules {
                 Identifier id = BuiltInRegistries.ITEM.getKey(FoodProfiles.tastedAs(player.level().getServer(), dish));
                 int duration = profile.tier().durationTicks(FullCourseConfig.durationMultiplier());
                 Meals.Meal<Identifier> meal = new Meals.Meal<>(id, profile.tier(), profile.families(), profile.tier().level(), now, now + duration);
-                s = unlockSlots(player, s.withTasted(id));
+                s = unlockSlots(player, s.withTasted(id).withHelping(id, now, FeastBlock.HELPING_TICKS));
                 s = s.withMeals(s.meals().eat(meal, s.slots()));
                 player.sendSystemMessage(FoodText.mealMessage(name, profile), true);
                 cue(player, ModSounds.MEAL_START);

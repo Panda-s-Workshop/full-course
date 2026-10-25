@@ -4,8 +4,8 @@ import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodRules;
 import com.panda.fullcourse.food.FoodText;
-import com.panda.fullcourse.logic.Meals;
 import com.panda.fullcourse.registry.ModSounds;
+import java.util.Map;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -151,9 +151,9 @@ public class FeastBlock extends Block {
         }
         Identifier id = BuiltInRegistries.ITEM.getKey(dish);
         long now = player.level().getGameTime();
-        for (Meals.Meal<Identifier> meal : FoodRules.state(player).meals().active()) {
-            long since = now - meal.start();
-            boolean same = meal.dish().equals(id) || BuiltInRegistries.ITEM.get(meal.dish())
+        for (Map.Entry<Identifier, Long> helping : FoodRules.state(player).helpings().entrySet()) {
+            long since = now - helping.getValue();
+            boolean same = helping.getKey().equals(id) || BuiltInRegistries.ITEM.get(helping.getKey())
                     .map(h -> FoodProfiles.dishOf(player.level().getServer(), h.value()) == dish).orElse(false);
             if (same && since >= 0 && since < HELPING_TICKS) {
                 return Component.translatable("message.fullcourse.feast.had_share", name, FoodText.duration((int) (HELPING_TICKS - since)));

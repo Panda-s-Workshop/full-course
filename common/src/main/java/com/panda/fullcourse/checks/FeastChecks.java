@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -172,10 +173,13 @@ final class FeastChecks {
             nextGuest(c);
             serve(c);
             check(servings(c) == 6, "the next guest takes theirs, %s left", servings(c));
-            var meals = state(c).meals().active();
-            var later = new Meals.Meal<>(meals.getFirst().dish(), meals.getFirst().tier(), meals.getFirst().families(), meals.getFirst().level(),
-                    meals.getFirst().start() - FeastBlock.HELPING_TICKS, meals.getFirst().end() - FeastBlock.HELPING_TICKS);
-            Services.PLATFORM.setFoodState(c.player(), state(c).withMeals(new Meals<>(List.of(later))));
+            // the helping is remembered apart from the meal: a meal replaced, lost on death or cut short frees nothing
+            Services.PLATFORM.setFoodState(c.player(), state(c).withMeals(Meals.empty()));
+            serve(c);
+            check(servings(c) == 6, "with the meal gone, still one helping in five minutes, %s left", servings(c));
+            Identifier banquet = BuiltInRegistries.ITEM.getKey(ModBlocks.ROAST_BANQUET.get().asItem());
+            long now = c.level().getGameTime();
+            Services.PLATFORM.setFoodState(c.player(), state(c).withHelping(banquet, now - FeastBlock.HELPING_TICKS, FeastBlock.HELPING_TICKS));
             serve(c);
             check(servings(c) == 5, "five minutes on, another helping, %s left", servings(c));
         });
