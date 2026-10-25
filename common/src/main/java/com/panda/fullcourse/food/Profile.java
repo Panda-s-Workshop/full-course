@@ -27,9 +27,12 @@ public record Profile(Tier tier, int score, int steps, int stations, int ingredi
             int steps = ByteBufCodecs.VAR_INT.decode(buf);
             int stations = ByteBufCodecs.VAR_INT.decode(buf);
             int ingredients = ByteBufCodecs.VAR_INT.decode(buf);
-            int n = Math.min(ByteBufCodecs.VAR_INT.decode(buf), Family.values().length);
-            List<Family> families = new ArrayList<>(n);
-            for (int i = 0; i < n; i++) families.add(Family.values()[Math.clamp(ByteBufCodecs.VAR_INT.decode(buf), 0, Family.values().length - 1)]);
+            int n = ByteBufCodecs.VAR_INT.decode(buf);
+            List<Family> families = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                Family f = Family.values()[Math.clamp(ByteBufCodecs.VAR_INT.decode(buf), 0, Family.values().length - 1)];
+                if (!families.contains(f)) families.add(f);
+            }
             boolean remedy = ByteBufCodecs.BOOL.decode(buf);
             return new Profile(tier, score, steps, stations, ingredients, families, remedy);
         }
@@ -48,7 +51,7 @@ public record Profile(Tier tier, int score, int steps, int stations, int ingredi
     };
 
     public Profile {
-        families = List.copyOf(families);
+        families = families.stream().distinct().toList();
     }
 
     /** Whether eating it fills a meal slot: tier 1 or more, and not a remedy. */

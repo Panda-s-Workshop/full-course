@@ -31,8 +31,11 @@ public final class Recovery {
         return since >= 0 && since % interval == 0;
     }
 
+    /** The most heal-over-time a player can have waiting, in HP (a modded food can name any nutrition). */
+    public static final int MAX_NOURISH = 1000;
+
     /** The heal-over-time left after eating food with {@code nutrition}: a new heal replaces a smaller one. */
     public static int nourish(int remaining, int nutrition) {
-        return Math.max(remaining, Math.max(0, nutrition));
+        return Math.min(MAX_NOURISH, Math.max(remaining, Math.max(0, nutrition)));
     }
 }

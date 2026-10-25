@@ -300,6 +300,7 @@ public class CookingPotBlockEntity extends BaseContainerBlockEntity implements W
         super.saveAdditional(out);
         ContainerHelper.saveAllItems(out, items);
         out.putInt("progress", progress);
+        out.putInt("soup_color", soupColor);
     }
 
     @Override

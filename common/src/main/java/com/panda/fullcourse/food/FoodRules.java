@@ -9,9 +9,8 @@ import com.panda.fullcourse.platform.Services;
 import com.panda.fullcourse.platform.registry.DeferredHolder;
 import com.panda.fullcourse.registry.ModAttributes;
 import com.panda.fullcourse.registry.ModSounds;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.WeakHashMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -40,7 +39,9 @@ public final class FoodRules {
     /** How often a player's slots are counted again outside meals (after a login or a datapack reload). */
     private static final int SLOT_CHECK_TICKS = 100;
     /** Each player's current Saturation effect and its ticks so far: it heals on the first and then every second. */
-    private static final Map<UUID, SaturationRun> SATURATION = new HashMap<>();
+    private static final Map<ServerPlayer, SaturationRun> SATURATION = new WeakHashMap<>();
+    /** The game time each player's rules last ran at, so a frozen clock doesn't run them again every tick. */
+    private static final Map<ServerPlayer, Long> LAST_TICK = new WeakHashMap<>();
 
     private record SaturationRun(MobEffectInstance effect, int ticks) {}
 
@@ -117,6 +118,8 @@ public final class FoodRules {
     /** One tick at game time {@code now} (rule checks step through time with it). */
     public static void tick(ServerPlayer player, long now) {
         if (!player.isAlive()) return;
+        Long last = LAST_TICK.put(player, now);
+        if (last != null && last == now) return;
         restoreHealth(player);
         FoodState before = state(player);
         FoodState s = before.withMeals(before.meals().expire(now));
@@ -165,13 +168,13 @@ public final class FoodRules {
     private static void saturation(ServerPlayer player) {
         MobEffectInstance effect = player.getEffect(MobEffects.SATURATION);
         if (effect == null) {
-            SATURATION.remove(player.getUUID());
+            SATURATION.remove(player);
             return;
         }
         // a new effect instance (removed and given again, even within one tick) starts over
-        SaturationRun run = SATURATION.get(player.getUUID());
+        SaturationRun run = SATURATION.get(player);
         run = run != null && run.effect() == effect ? new SaturationRun(effect, run.ticks() + 1) : new SaturationRun(effect, 1);
-        SATURATION.put(player.getUUID(), run);
+        SATURATION.put(player, run);
         if ((run.ticks() - 1) % 20 == 0 && player.isHurt()) player.heal(effect.getAmplifier() + 1F);
     }
 
@@ -185,7 +188,7 @@ public final class FoodRules {
 
     /** A player died: meals are lost unless the config keeps them; the tasted set and unlocked slots stay. */
     public static void onDeath(ServerPlayer player) {
-        SATURATION.remove(player.getUUID());
+        SATURATION.remove(player);
         if (FullCourseConfig.keepMealsOnDeath()) return;
         FoodState before = state(player);
         set(player, before, before.withMeals(Meals.empty()).withNourish(0));

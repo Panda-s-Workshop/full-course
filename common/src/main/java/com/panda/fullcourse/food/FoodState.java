@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.panda.fullcourse.FullCourseConfig;
 import com.panda.fullcourse.logic.Family;
 import com.panda.fullcourse.logic.Meals;
+import com.panda.fullcourse.logic.Recovery;
 import com.panda.fullcourse.logic.Tier;
 import io.netty.buffer.ByteBuf;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public record FoodState(Meals<Identifier> meals, int nourish, Set<Identifier> ta
 
     public static final Codec<FoodState> CODEC = RecordCodecBuilder.create(i -> i.group(
             MEAL_CODEC.listOf().optionalFieldOf("meals", List.of()).forGetter(s -> s.meals().active()),
-            Codec.intRange(0, 1000).optionalFieldOf("nourish", 0).forGetter(FoodState::nourish),
+            Codec.intRange(0, Recovery.MAX_NOURISH).optionalFieldOf("nourish", 0).forGetter(FoodState::nourish),
             Identifier.CODEC.listOf().optionalFieldOf("tasted", List.of()).forGetter(s -> new ArrayList<>(s.tasted())),
             Codec.intRange(0, 16).optionalFieldOf("bonus_slots", 0).forGetter(FoodState::bonusSlots)
     ).apply(i, (meals, nourish, tasted, bonus) -> new FoodState(new Meals<>(meals), nourish, new LinkedHashSet<>(tasted), bonus)));
