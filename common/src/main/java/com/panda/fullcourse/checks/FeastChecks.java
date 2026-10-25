@@ -18,8 +18,11 @@ import com.panda.fullcourse.registry.ModBlocks;
 import com.panda.fullcourse.registry.ModItems;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -32,6 +35,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -44,8 +48,67 @@ import net.minecraft.world.level.block.state.BlockState;
 final class FeastChecks {
     private FeastChecks() {}
 
+    /**
+     * A feast is more work than five one-star meals: at least six things made on the way, the feast among them, through
+     * each one's fewest-step recipe, at four stations or more. Our recipes and the fire's count; vanilla's crafting
+     * (bottles, buckets) is where raw things come from.
+     */
+    private static void feastWorthIt(RuleChecks.Ctx c) {
+        var context = net.minecraft.world.item.crafting.display.SlotDisplayContext.fromLevel(c.level());
+        Map<Item, List<List<Ingredient>>> recipes = new HashMap<>();
+        for (var holder : c.server().getRecipeManager().getRecipes()) {
+            var recipe = holder.value();
+            boolean ours = holder.id().identifier().getNamespace().equals(FullCourse.MODID);
+            if (!(ours || recipe instanceof net.minecraft.world.item.crafting.AbstractCookingRecipe) || recipe.placementInfo().isImpossibleToPlace()) continue;
+            for (var display : recipe.display()) {
+                ItemStack result = display.result().resolveForFirstStack(context);
+                if (result.isEmpty()) continue;
+                recipes.computeIfAbsent(result.getItem(), k -> new ArrayList<>()).add(recipe.placementInfo().ingredients());
+                break;
+            }
+        }
+        int feasts = 0;
+        for (Item item : BuiltInRegistries.ITEM) {
+            Identifier id = BuiltInRegistries.ITEM.getKey(item);
+            Profile p = FoodProfiles.get(c.server(), item);
+            if (!id.getNamespace().equals(FullCourse.MODID) || p.tier() != Tier.FEAST) continue;
+            feasts++;
+            Set<Item> made = made(recipes, item, new HashSet<>());
+            check(made != null && made.size() >= 6, "%s makes %s on the way, fewer than six", id, made);
+            check(p.stations() >= 4, "%s takes %s stations, fewer than four", id, p.stations());
+        }
+        check(feasts >= 3, "%s feasts rated, expected the banquet, the harvest pie and the tart", feasts);
+    }
+
+    /** {@code item} and what's made on the way to it, the fewest; empty for a raw item; null when every way cycles. */
+    private static Set<Item> made(Map<Item, List<List<Ingredient>>> recipes, Item item, Set<Item> path) {
+        List<List<Ingredient>> ways = recipes.get(item);
+        if (ways == null) return Set.of();
+        if (!path.add(item)) return null;
+        Set<Item> best = null;
+        for (List<Ingredient> way : ways) {
+            Set<Item> all = new HashSet<>(Set.of(item));
+            for (Ingredient ingredient : way) {
+                Set<Item> cheapest = null;
+                for (var alt : ingredient.items().toList()) {
+                    Set<Item> s = made(recipes, alt.value(), path);
+                    if (s != null && (cheapest == null || s.size() < cheapest.size())) cheapest = s;
+                }
+                if (cheapest == null) {
+                    all = null;
+                    break;
+                }
+                all.addAll(cheapest);
+            }
+            if (all != null && (best == null || all.size() < best.size())) best = all;
+        }
+        path.remove(item);
+        return best;
+    }
+
     static void register(Map<String, Consumer<RuleChecks.Ctx>> checks) {
         checks.put("feast_serving_gives_meal", FeastChecks::feastServingGivesMeal);
+        checks.put("feast_worth_it", FeastChecks::feastWorthIt);
         checks.put("feast_last_serving", FeastChecks::feastLastServing);
         checks.put("feast_untouched_drops", FeastChecks::feastUntouchedDrops);
         checks.put("feast_needs_ground", FeastChecks::feastNeedsGround);
