@@ -3,7 +3,6 @@ package com.panda.fullcourse.client;
 import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.kitchen.CookingPotBlockEntity;
 import com.panda.fullcourse.kitchen.CookingPotMenu;
-import com.panda.fullcourse.kitchen.KitchenHeat;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.ChatFormatting;
@@ -80,10 +79,7 @@ public class CookingPotScreen extends AbstractContainerScreen<CookingPotMenu> {
     /** What the flame says: that the pot is heated, or what heats it. */
     public List<Component> flameLines() {
         if (menu.heated()) return List.of(Component.translatable("gui.fullcourse.pot.heated").withStyle(ChatFormatting.GOLD));
-        List<Component> lines = new ArrayList<>();
-        lines.add(Component.translatable("gui.fullcourse.pot.cold"));
-        lines.addAll(KitchenHeat.notes());
-        return lines;
+        return HeatText.needsHeat();
     }
 
     /** The arrow's tooltip: {@link #arrowLines()}, and with a recipe viewer, that a click shows the pot's recipes. */

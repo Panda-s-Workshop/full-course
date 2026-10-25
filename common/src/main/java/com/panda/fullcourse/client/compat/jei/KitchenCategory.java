@@ -1,6 +1,9 @@
 package com.panda.fullcourse.client.compat.jei;
 
+import com.panda.fullcourse.client.HeatText;
+import com.panda.fullcourse.food.FoodProfiles;
 import com.panda.fullcourse.food.FoodText;
+import com.panda.fullcourse.food.Profile;
 import com.panda.fullcourse.kitchen.BakingRecipe;
 import com.panda.fullcourse.kitchen.CookingRecipe;
 import com.panda.fullcourse.kitchen.CuttingRecipe;
@@ -9,23 +12,27 @@ import com.panda.fullcourse.kitchen.KitchenTags;
 import java.util.List;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.placement.HorizontalAlignment;
+import mezz.jei.api.gui.placement.VerticalAlignment;
 import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
+import mezz.jei.api.gui.widgets.ITextWidget;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.types.IRecipeHolderType;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.ItemLike;
 
 /**
  * One kitchen station's page in JEI: its name and block as the title and icon, the ingredients in a grid, an arrow,
- * the result, and what the station needs (a knife, heat below, fuel, time).
+ * the result with its stars when it gives a meal, and what the station needs (a knife, heat below, fuel, time).
  */
 abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<RecipeHolder<R>> {
     private final IRecipeHolderType<R> type;
@@ -74,8 +81,18 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
     }
 
     /** "0:10" under the arrow: how long the station takes. */
-    static void time(IRecipeExtrasBuilder extras, int ticks, int x, int y) {
-        extras.addText(Component.literal(FoodText.duration(ticks)), 30, 10).setPosition(x, y).setColor(0xFF606060);
+    static ITextWidget time(IRecipeExtrasBuilder extras, int ticks, int x, int y) {
+        return extras.addText(Component.literal(FoodText.duration(ticks)), 30, 10).setPosition(x, y).setColor(0xFF606060);
+    }
+
+    /** The result's stars in its tier's colour, centred under its slot at (x, y), if it gives a meal. */
+    static void stars(IRecipeExtrasBuilder extras, ItemStackTemplate result, int x, int y) {
+        Profile profile = FoodProfiles.client(result.create().getItem());
+        if (!profile.givesMeal()) return;
+        extras.addText(Component.literal("★".repeat(profile.tier().stars())), 30, 10)
+                .setPosition(x - 6, y, 30, 10, HorizontalAlignment.CENTER, VerticalAlignment.TOP)
+                .setTextAlignment(HorizontalAlignment.CENTER)
+                .setColor(profile.tier().color());
     }
 
     /** Board: the item and a knife, cut into the result. */
@@ -115,8 +132,9 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
         @Override
         public void createRecipeExtras(IRecipeExtrasBuilder extras, RecipeHolder<CookingRecipe> holder, IFocusGroup focuses) {
             extras.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(64, 10);
-            extras.addAnimatedRecipeFlameWidget(300).setPosition(20, 40).setTooltip(Component.translatable("gui.fullcourse.pot.cold"));
+            extras.addAnimatedRecipeFlameWidget(300).setPosition(20, 40).setTooltip(HeatText.needsHeat());
             time(extras, holder.value().time(), 84, 42);
+            stars(extras, holder.value().result(), 99, 29);
         }
     }
 
@@ -137,6 +155,7 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
             extras.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(44, 10);
             extras.addAnimatedRecipeFlameWidget(300).setPosition(48, -2).setTooltip(Component.translatable("gui.fullcourse.oven.unlit"));
             time(extras, holder.value().time(), 44, 28);
+            stars(extras, holder.value().result(), 79, 29);
         }
     }
 
@@ -155,7 +174,9 @@ abstract class KitchenCategory<R extends Recipe<?>> implements IRecipeCategory<R
         @Override
         public void createRecipeExtras(IRecipeExtrasBuilder extras, RecipeHolder<FermentingRecipe> holder, IFocusGroup focuses) {
             extras.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(44, 10);
-            time(extras, holder.value().time(), 44, 28);
+            // the crock goes by the overworld's clock too, so sleeping through the night counts toward this
+            time(extras, holder.value().time(), 44, 28).setTooltip(Component.translatable("gui.fullcourse.jei.crock_sleep"));
+            stars(extras, holder.value().result(), 79, 29);
         }
     }
 }

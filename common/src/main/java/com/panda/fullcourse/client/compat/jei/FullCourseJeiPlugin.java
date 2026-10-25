@@ -3,6 +3,7 @@ package com.panda.fullcourse.client.compat.jei;
 import com.panda.fullcourse.FullCourse;
 import com.panda.fullcourse.client.BrickOvenScreen;
 import com.panda.fullcourse.client.CookingPotScreen;
+import com.panda.fullcourse.client.HeatText;
 import com.panda.fullcourse.client.KitchenRecipes;
 import com.panda.fullcourse.client.MealList;
 import com.panda.fullcourse.kitchen.BakingRecipe;
@@ -11,7 +12,9 @@ import com.panda.fullcourse.kitchen.CuttingRecipe;
 import com.panda.fullcourse.kitchen.FermentingRecipe;
 import com.panda.fullcourse.kitchen.KitchenTags;
 import com.panda.fullcourse.registry.ModBlocks;
+import com.panda.fullcourse.registry.ModItems;
 import com.panda.fullcourse.registry.ModRecipes;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
@@ -30,11 +33,14 @@ import mezz.jei.api.runtime.IRecipesGui;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.ItemLike;
 
 /**
  * The kitchen in JEI: a page per station (Cutting Board, Cooking Pot, Brick Oven, Fermenting Crock) with its recipes,
- * the stations and knives as the blocks that make them, and the pot's and oven's arrows open their pages (the pot's
+ * the stations and knives as the blocks that make them, information pages for the stations, knives, feasts and the
+ * journal, and the pot's and oven's arrows open their pages (the pot's
  * tooltip keeps the arrow's preview). JEI keeps its panels out of the meal list beside the inventory. JEI finds
  * this through its annotation on NeoForge and the {@code jei_mod_plugin} entrypoint on Fabric; nothing loads it
  * without JEI.
@@ -67,6 +73,19 @@ public final class FullCourseJeiPlugin implements IModPlugin {
         registration.addRecipes(COOKING.get(), KitchenRecipes.of(ModRecipes.COOKING.get()));
         registration.addRecipes(BAKING.get(), KitchenRecipes.of(ModRecipes.BAKING.get()));
         registration.addRecipes(FERMENTING.get(), KitchenRecipes.of(ModRecipes.FERMENTING.get()));
+        // an information page for each thing whose use isn't a recipe
+        registration.addIngredientInfo(ModBlocks.CUTTING_BOARD.get(), Component.translatable("jei.fullcourse.info.cutting_board"));
+        BuiltInRegistries.ITEM.getTagOrEmpty(KitchenTags.KNIVES).forEach(knife ->
+                registration.addIngredientInfo(knife.value(), Component.translatable("jei.fullcourse.info.knife")));
+        List<Component> pot = new ArrayList<>(List.of(Component.translatable("jei.fullcourse.info.cooking_pot")));
+        pot.addAll(HeatText.needsHeatOnPage());
+        registration.addIngredientInfo(ModBlocks.COOKING_POT.get(), pot.toArray(Component[]::new));
+        registration.addIngredientInfo(ModBlocks.BRICK_OVEN.get(), Component.translatable("jei.fullcourse.info.brick_oven"));
+        registration.addIngredientInfo(ModBlocks.FERMENTING_CROCK.get(), Component.translatable("jei.fullcourse.info.fermenting_crock"));
+        for (ItemLike feast : List.of(ModBlocks.ROAST_BANQUET.get(), ModBlocks.HARVEST_PIE.get(), ModBlocks.GLOW_BERRY_TART.get())) {
+            registration.addIngredientInfo(feast, Component.translatable("jei.fullcourse.info.feast"));
+        }
+        registration.addIngredientInfo(ModItems.item("tasting_journal"), Component.translatable("jei.fullcourse.info.tasting_journal"));
     }
 
     @Override
