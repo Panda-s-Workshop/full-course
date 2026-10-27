@@ -37,6 +37,28 @@ class SourceHygieneTest {
         assertTrue(offenders.isEmpty(), "client classes referenced outside the client package: " + offenders);
     }
 
+    /**
+     * Listing another mod's methods or fields resolves every type in their signatures, and on a dedicated server one
+     * client-only type (a {@code PoseStack} parameter) throws {@link NoClassDefFoundError} and stops the server
+     * (1.0.0-beta.1). Look members up one at a time by name, and catch {@link LinkageError} wherever a compat reader
+     * reflects on another mod's class.
+     */
+    @Test
+    void reflectionOnOtherModsNeverListsMembersAndCatchesLinkageErrors() throws IOException {
+        List<String> listing = new ArrayList<>();
+        List<String> uncaught = new ArrayList<>();
+        Pattern lists = Pattern.compile("\\.get(Declared)?(Methods|Fields|Constructors)\\(\\)");
+        Pattern reflects = Pattern.compile("\\.get(Declared)?(Method|Field)\\(|\\.getRecordComponents\\(\\)|\\.findVirtual\\(");
+        for (Path p : javaFiles()) {
+            String norm = p.toString().replace('\\', '/');
+            String text = Files.readString(p);
+            if (lists.matcher(text).find()) listing.add(norm);
+            if (norm.contains("/compat/") && reflects.matcher(text).find() && !text.contains("LinkageError")) uncaught.add(norm);
+        }
+        assertTrue(listing.isEmpty(), "member listing (resolves every signature): " + listing);
+        assertTrue(uncaught.isEmpty(), "compat reflection without a LinkageError catch: " + uncaught);
+    }
+
     @Test
     void literalTranslationKeysExistInTheLangFile() throws IOException {
         String lang = Files.readString(LANG);

@@ -34,6 +34,9 @@ public final class FarmersDelightCuts {
             return Optional.of(new Cut(ingredient, first.create()));
         } catch (ReflectiveOperationException | RuntimeException e) {
             return Optional.empty(); // another version's shape: the cut stays a raw ingredient
+        } catch (LinkageError e) {
+            LinkageWarnings.once(recipe.getClass(), "a cutting recipe", e);
+            return Optional.empty();
         }
     }
 }

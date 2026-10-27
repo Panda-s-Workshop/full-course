@@ -19,7 +19,8 @@ import net.minecraft.world.item.crafting.Recipe;
  * {@code create()} (Create's processing outputs), preferring a component named {@code result} or {@code results} (a
  * sequenced assembly's transitional item isn't its result). A component named for fluids, or holding them, marks a
  * recipe that takes fluids (Create's chocolate bar, pressed from melted chocolate alone). Anything else about it
- * (chances, heat) is ignored. Read reflectively, so nothing here needs the other mod.
+ * (chances, heat) is ignored. Read reflectively, so nothing here needs the other mod; a class whose methods name types
+ * this side doesn't have (client-only ones on a dedicated server) is skipped with a warning.
  */
 public final class RecipeFields {
     public record Read(List<Ingredient> ingredients, ItemStack result, boolean fluids) {
@@ -70,6 +71,9 @@ public final class RecipeFields {
             }
         } catch (ReflectiveOperationException | RuntimeException e) {
             return Optional.empty(); // a record that won't be read from outside its mod
+        } catch (LinkageError e) {
+            LinkageWarnings.once(type, "a recipe's fields", e); // names a type this side doesn't have
+            return Optional.empty();
         }
         ItemStack result = named.isEmpty() ? other : named;
         return result.isEmpty() ? Optional.empty() : Optional.of(new Read(List.copyOf(ingredients), result, fluids));
@@ -97,6 +101,9 @@ public final class RecipeFields {
                 return method.invoke(value);
             } catch (ReflectiveOperationException | RuntimeException e) {
                 // not this one
+            } catch (LinkageError e) {
+                LinkageWarnings.once(value.getClass(), name + "()", e);
+                return null;
             }
         }
         return null;
